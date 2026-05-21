@@ -5,5 +5,5 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Inter Variable', 'ui-sans-serif';
+    --font-sans: 'Outfit Variable', 'ui-sans-serif';
 }

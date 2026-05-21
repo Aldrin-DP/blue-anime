@@ -1,5 +1,6 @@
 <template>
     <div>
+        <Head title="Home" />
         Home
     </div>
 </template>

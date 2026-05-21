@@ -2,8 +2,10 @@
     <div class="flex flex-col h-dvh">
         <TheHeader />
 
-        <main class="flex-1 py-5 px-20">
-            <slot></slot>
+        <main class=" bg-gradient-to-bl from-blue-950 to-teal-950 flex-1">
+            <div class="py-5 px-20">
+                <slot></slot>
+            </div>
         </main>
 
         <TheFooter />
