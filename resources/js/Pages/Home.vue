@@ -1,8 +1,16 @@
 <template>
     <div>
-        <h1 class="text-red-500 text-xl font-bold">Blue Anime</h1>
+        Home
     </div>
 </template>
 
 <script>
+
+    export default {
+        data() {
+            return {
+
+            }
+        }
+    }
 </script>
