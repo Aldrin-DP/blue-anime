@@ -1,8 +1,8 @@
 <template>
     <div class="bg-gray-950 text-gray-300 flex items-center">
-        <header class="max-w-325 w-full lg:flex lg:mx-5 xl:mx-20 lg:items-center">
+        <header class="max-w-325 w-full lg:flex lg:mx-5 xl:mx-15 lg:items-center">
             <div class="flex h-20 justify-between items-center w-full px-3 lg:w-auto lg:px-0">
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1 lg:-ml-2">
                     <Link href="/">
                         <img src="/public/images/sea.png" width="55px" alt="logo" class="hover:scale-115 transition-all duration-300">
                     </Link>

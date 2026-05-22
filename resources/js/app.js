@@ -5,6 +5,7 @@ import '@fontsource-variable/outfit/wght.css';
 import AppLayout from './Layouts/AppLayout.vue'
 
 createInertiaApp({
+    title: (title) => { return `${title} Sea Anime` },
     resolve: name => {
         const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
         let page = pages[`./Pages/${name}.vue`]
