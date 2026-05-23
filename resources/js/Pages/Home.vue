@@ -2,24 +2,24 @@
     <Head title="Home - " />
     <div>
         <section>
-            <h1 class="text-3xl font-bold text-gray-200 tracking-wider">Fresh from Deep</h1>
-            <p class="text-gray-400 text-md">Newly added episodes</p>
+            <h1 class="text-3xl font-bold text-gray-700 dark:text-gray-200 tracking-wider">Fresh from Deep</h1>
+            <p class="text-gray-600 dark:text-gray-400 text-md">Newly added episodes</p>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-5 mt-5">
                 <div
                     v-for="(episode, index) in newEpisodes" :key="index"
                     class="mb-3"
                 >
 
-                    <div class="border-2 border-gray-700 p-0.75 bg-gray-400 rounded-lg aspect-2/3 relative">
+                    <div class="border-2 border-gray-200 dark:border-gray-700 p-0.75  bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative">
                         <span class="absolute py-0.5 inline rounded-md px-2 text-xs  sm:text-sm shadow top-2 left-2 font-bold bg-blue-800 text-gray-300">
                             EP {{ episode.episode }}
                         </span>
                         <img :src="episode.media.coverImage.extraLarge" alt="" class="rounded w-full h-full object-cover object-center">
                     </div>
-                    <p class="text-gray-300 font-semibold truncate">
+                    <p class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1">
                         {{ episode.media.title.english ? episode.media.title.english : episode.media.title.romaji }}
                     </p>
-                    <p class="text-gray-400 font-semibold text-[13px]">
+                    <p class="text-gray-600 dark:text-gray-400 font-semibold text-[13px]">
                         Episode {{ episode.episode }}
                     </p>
                 </div>
