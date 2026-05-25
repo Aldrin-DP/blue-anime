@@ -54,7 +54,7 @@ export default {
     },
     methods: {
         handleLogin() {
-            this.form.post('/register', {
+            this.form.post('/login', {
                 onError: () => this.form.reset('password'),
                 onBefore: () => this.form.clearErrors(),
             });

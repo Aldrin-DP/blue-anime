@@ -1,22 +1,27 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return inertia('Home');
+Route::get('/', [HomeController::class, 'home'])->name('home');
+
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisterController::class, 'create'])->name('register');
+    Route::get('/register/success', [RegisterController::class, 'success'])->name('register.success');
+    Route::post('/register', [RegisterController::class, 'store']);
+
+    Route::get('/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/login', [LoginController::class, 'store']);
 });
 
-Route::inertia('/register', 'Auth/Register');
-Route::inertia('/login', 'Auth/Login');
-
-Route::post('/register', [AuthController::class, 'register']);
-
-Route::get('/color', function () {
-    return inertia('Colors');
+Route::middleware('auth')->group(function () {
+    Route::post('/post', [LogoutController::class, 'logout']);
 });
 
-Route::get('/register/success', function () {
-    return inertia('Auth/RegisterSuccess');
-})->name('register.success');
+
+
+

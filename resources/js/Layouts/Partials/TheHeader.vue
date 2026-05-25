@@ -48,32 +48,54 @@
                     </div>
 
                     <div class="flex flex-col items-center lg:justify-between gap-2 mt-4 lg:mt-0 pt-3 lg:pt-0 border-t border-gray-300 dark:border-gray-800 lg:flex-row lg:border-none">
-                        <button  @click="toggle" v-if="!isOpen">
-                            <div v-if="state.isDark" class="flex items-center gap-0.5 text-[15px] text-gray-700 dark:text-gray-300  font-semibold tracking-wide px-3 py-1.5 border border-transparent hover:dark:text-gray-100 hover:text-gray-800 hover:border-gray-300 hover:dark:border-gray-700 hover:rounded hover:shadow-lg hover:shadow-gray-300 hover:dark:shadow-gray-900 transition-all duration-300 cursor-pointer">
+                        <button
+                            @click="toggle"
+                            v-if="!isOpen"
+                        >
+                            <div
+                                v-if="state.isDark"
+                                class="flex items-center gap-0.5 text-[15px] text-gray-700 dark:text-gray-300  font-semibold tracking-wide px-3 py-1.5 border border-transparent hover:dark:text-gray-100 hover:text-gray-800 hover:border-gray-300 hover:dark:border-gray-700 hover:rounded hover:shadow-lg hover:shadow-gray-300 hover:dark:shadow-gray-900 transition-all duration-300 cursor-pointer"
+                            >
                                 <SunIcon class="size-3.5"/>
                                 <button class="cursor-pointer">Shallow</button>
                             </div>
-                            <div v-else class="flex items-center gap-0.5 text-[15px] text-gray-700 dark:text-gray-300  font-semibold tracking-wide px-3 py-1.5 border border-transparent hover:dark:text-gray-100 hover:text-gray-800 hover:border-gray-300 hover:dark:border-gray-700 hover:rounded hover:shadow-lg hover:shadow-gray-200 hover:dark:shadow-gray-900 transition-all duration-300 cursor-pointer">
+                            <div
+                                v-else
+                                class="flex items-center gap-0.5 text-[15px] text-gray-700 dark:text-gray-300  font-semibold tracking-wide px-3 py-1.5 border border-transparent hover:dark:text-gray-100 hover:text-gray-800 hover:border-gray-300 hover:dark:border-gray-700 hover:rounded hover:shadow-lg hover:shadow-gray-200 hover:dark:shadow-gray-900 transition-all duration-300 cursor-pointer"
+                            >
                                 <MoonIcon class="size-3.5"/>
                                 <button class="cursor-pointer">Abyss</button>
                             </div>
                         </button>
 
-                        <NavLink href="/login" class="flex items-center justify-center w-full lg:w-auto gap-1">
+                        <NavLink v-if="!$page.props.auth.user" href="/login" class="flex items-center justify-center w-full lg:w-auto gap-1">
                             <ArrowRightEndOnRectangleIcon class="size-5" />
                             Log in
                         </NavLink>
 
-                        <div class="w-full lg:w-auto">
-                            <Link href="/register">
-                                 <div v-if="isLoggedIn">
-                                    <div class="flex items-center gap-1">
-                                        <p class="py-1 px-3 bg-blue-700 rounded-full text-gray-300 font-bold text-2xl">A</p>
-                                        <h4>Aldrin</h4>
+                        <div class="w-full lg:w-auto relative ">
+                            <div v-if="$page.props.auth.user" class="lg:cursor-pointer lg:px-4 lg:py-1.5 lg:border rounded-xl lg:border-gray-200 lg:dark:border-gray-800 hover:dark:text-gray-100 hover:text-gray-800">
+                                <div @click="toggleAccountMenu" class="flex items-center gap-2 pb-3 border-b border-gray-300 dark:border-gray-700 lg:border-none lg:pb-0">
+                                    <p class=" px-2 bg-blue-700 rounded-full text-gray-300 font-bold text-lg">
+                                        {{ username.charAt(0).toUpperCase() }}
+                                    </p>
+                                    <h4>{{ username }}</h4>
+                                </div>
+                                <div {{ :class="isAccountMenuOpen ? 'block' : 'block lg:hidden'" }} class="flex flex-col mt-3 lg:px-2 lg:border lg:rounded-xl lg:bg-gray-100/90 lg:dark:bg-gray-950/80 lg:backdrop-filter-blur lg:border-gray-300 lg:dark:border-gray-800 lg:absolute lg:py-2 lg:w-50  lg:top-13 lg:right-0">
+                                    <NavLink>Account Settings</NavLink>
+                                    <NavLink>Library</NavLink>
+                                    <div class="lg:mx-2 lg:mb-1">
+                                        <BaseButton
+                                            @click=""
+                                            variant="danger"
+                                            class="mt-5 w-full lg:mt-2"> Logout </BaseButton>
                                     </div>
                                 </div>
+
+                            </div>
+                            <Link href="/register" v-else>
                                 <BaseButton
-                                    v-else
+
                                     variant="primary"
                                     class="w-full lg:w-auto"
                                 >
@@ -116,12 +138,24 @@ export default {
     data() {
         return {
             isOpen: false,
-            isLoggedIn: false
+            isLoggedIn: false,
+            isAccountMenuOpen: false
         }
     },
     methods: {
         toggleNav() {
             this.isOpen = !this.isOpen;
+        },
+        toggleAccountMenu() {
+            this.isAccountMenuOpen = !this.isAccountMenuOpen;
+        },
+        handleLogout() {
+
+        }
+    },
+    computed: {
+        username() {
+            return this.$page.props.auth.user.username;
         }
     }
 }
