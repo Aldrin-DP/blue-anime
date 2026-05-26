@@ -17,7 +17,7 @@
                         </div>
                     </button>
                     <!-- Hamburger -->
-                    <button @click="toggleNav" class="lg:hidden cursor-pointer border border-transparent  px-1 py-1 hover:border-gray-800 hover:text-gray-100 hover:shadow-lg hover:shadow-gray-900 transition-all duration-300">
+                    <button @click="toggleNav" class="lg:hidden cursor-pointer border border-transparent  px-1 py-1 hover:text-gray-700 hover:border-gray-300 hover:dark:border-gray-800 hover:dark:text-gray-100 hover:shadow-lg hover:shadow-gray-300 hover:dark:shadow-gray-900 transition-all duration-300">
                         <XMarkIcon v-if="isOpen" class="size-6.5" />
                         <Bars3Icon v-else class="size-6.5" />
                     </button>
