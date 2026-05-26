@@ -4,7 +4,7 @@
         <div class="w-full max-w-115 flex flex-col items-center">
             <h2 class="text-3xl tracking-wider font-bold text-gray-700 dark:text-gray-300">Begin Your Dive</h2>
             <p class="text-gray-600 dark:text-gray-400 mt-2">Begin your dive and explore thousands of anime.</p>
-            <form @submit.prevent="submitForm" class="my-5 w-full bg-gradient-to-tr from-gray-100 to-blue-100 dark:border dark:border-gray-700 dark:bg-gradient-to-br dark:from-blue-950 dark:to-teal-950 shadow-lg dark:shadow-lg p-5 rounded-lg">
+            <form @submit.prevent="register" class="my-5 w-full bg-gradient-to-tr from-gray-100 to-blue-100 dark:border dark:border-gray-700 dark:bg-gradient-to-br dark:from-blue-950 dark:to-teal-950 shadow-lg dark:shadow-lg p-5 rounded-lg">
                 <div class="mb-3">
                     <label class="block uppercase text-xs tracking-wide font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Username</label>
                     <input v-model="form.username" type="text" class="px-3 py-1.5 w-full rounded-lg border dark:border-none border-gray-200 dark:border-blue-800  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90" placeholder="Vegeta77" required>
@@ -20,12 +20,12 @@
                     <input
                         v-model="form.password"
                         class="px-3 py-1.5 w-full rounded-lg border dark:border-none border-gray-200 dark:border-blue-800  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90"
-                        placeholder="Agent-77" type="password" required>
+                        placeholder="********" type="password" required>
                     <small v-if="form.errors.password" class="text-red-400 tracking-wide font-medium block ml-1 mt-1"> {{ form.errors.password }} </small>
                 </div>
                 <div class="mb-3">
                     <label class="block uppercase text-xs tracking-wide font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Confirm Password</label>
-                    <input v-model="form.password_confirmation" class="px-3 py-1.5 w-full rounded-lg border dark:border-none border-gray-200 dark:border-blue-800  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90" placeholder="Agent-77" type="password" required>
+                    <input v-model="form.password_confirmation" class="px-3 py-1.5 w-full rounded-lg border dark:border-none border-gray-200 dark:border-blue-800  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90" placeholder="********" type="password" required>
                     <small v-if="form.errors.password_confirmation" class="text-red-400 tracking-wide font-medium block ml-1 mt-1">Confirm Password is required.</small>
                 </div>
                 <BaseButton
@@ -64,7 +64,7 @@ export default {
         }
     },
     methods: {
-        submitForm() {
+        register() {
             this.form.post('/register', {
                 onError: () => this.form.reset('password', 'password_confirmation'),
                 onBefore: () => this.form.clearErrors(),

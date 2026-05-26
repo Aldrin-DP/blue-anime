@@ -74,7 +74,7 @@
                         </NavLink>
 
                         <div class="w-full lg:w-auto relative ">
-                            <div v-if="$page.props.auth.user" class="lg:cursor-pointer lg:px-4 lg:py-1.5 lg:border rounded-xl lg:border-gray-200 lg:dark:border-gray-800 hover:dark:text-gray-100 hover:text-gray-800">
+                            <div v-if="$page.props.auth.user" class="lg:cursor-pointer lg:px-4 lg:py-1.5 lg:border rounded-xl lg:border-gray-300 lg:dark:border-gray-800 hover:dark:text-gray-100 hover:text-gray-800">
                                 <div @click="toggleAccountMenu" class="flex items-center gap-2 pb-3 border-b border-gray-300 dark:border-gray-700 lg:border-none lg:pb-0">
                                     <p class=" px-2 bg-blue-700 rounded-full text-gray-300 font-bold text-lg">
                                         {{ username.charAt(0).toUpperCase() }}
@@ -86,7 +86,8 @@
                                     <NavLink>Library</NavLink>
                                     <div class="lg:mx-2 lg:mb-1">
                                         <BaseButton
-                                            @click=""
+                                            @click="logout"
+                                            :isProcessing="form.processing"
                                             variant="danger"
                                             class="mt-5 w-full lg:mt-2"> Logout </BaseButton>
                                     </div>
@@ -117,6 +118,7 @@ import BaseButton from '../../Components/Base/BaseButton.vue';
 import NavLink from '../../Components/NavLink.vue';
 import { MagnifyingGlassIcon, SunIcon, MoonIcon, ArrowRightEndOnRectangleIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/24/solid';
 import { useTheme } from '../../composables/useTheme';
+import { useForm } from '@inertiajs/vue3';
 
 export default {
     name: 'ThemeToggle',
@@ -139,7 +141,8 @@ export default {
         return {
             isOpen: false,
             isLoggedIn: false,
-            isAccountMenuOpen: false
+            isAccountMenuOpen: false,
+            form: useForm()
         }
     },
     methods: {
@@ -149,8 +152,10 @@ export default {
         toggleAccountMenu() {
             this.isAccountMenuOpen = !this.isAccountMenuOpen;
         },
-        handleLogout() {
-
+        logout() {
+            this.form.post('/logout', {
+                onFinish: () => this.isAccountMenuOpen = false
+            });
         }
     },
     computed: {

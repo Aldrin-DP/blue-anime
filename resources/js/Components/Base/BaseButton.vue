@@ -54,12 +54,12 @@ export default {
     computed: {
         btnClasses() {
             return [
-                'cursor-pointer px-5 py-2 rounded-full font-bold text-gray-200 bg-gradient-to-b from-blue-700 to-blue-900 text-sm',
+                'cursor-pointer px-5 py-2 rounded-full font-bold text-gray-200 text-sm',
                 {
-                    'bg-gradient-to-b from-blue-700 to-blue-900 hover:opacity-90 transition-all duration-300': this.variant === 'primary' && !this.isProcessing,
-                    'bg-gradient-to-b from-green-700 to-green-900 hover:opacity-90 transition-all duration-300': this.variant === 'secondary' && !this.isProcessing,
-                    'bg-gradient-to-b from-red-400 to-red-600 hover:opacity-90 transition-all duration-300': this.variant === 'danger' && !this.isProcessing,
-                    'opacity-70 bg-blue-700 cursor-not-allowed': this.disabled || this.isProcessing
+                    'bg-gradient-to-b from-blue-700 to-blue-900 hover:opacity-90 transition-all duration-300': this.variant === 'primary',
+                    'bg-gradient-to-b from-green-700 to-green-900 hover:opacity-90 transition-all duration-300': this.variant === 'secondary',
+                    'bg-gradient-to-b from-red-400 to-red-600 hover:opacity-90 transition-all duration-300': this.variant === 'danger',
+                    'opacity-70 cursor-not-allowed': this.disabled || this.isProcessing
                 },
             ];
         }
