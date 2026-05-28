@@ -1,119 +1,185 @@
 <template>
     <Head title="Home - " />
-    <div>
+    <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
+        <section class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-700 dark:text-gray-200 tracking-wider">Making Waves</h1>
+            <p class="text-gray-600 dark:text-gray-400 text-md">The hottest anime everyone is diving into right now.</p>
+
+            <AnimeCard :anime="trendingAnime" />
+        </section>
+
         <section>
             <h1 class="text-3xl font-bold text-gray-700 dark:text-gray-200 tracking-wider">Fresh from Deep</h1>
             <p class="text-gray-600 dark:text-gray-400 text-md">Newly added episodes</p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-5 mt-5">
-                <div
-                    v-for="(episode, index) in newEpisodes" :key="index"
-                    class="mb-3"
-                >
 
-                    <div class="border-2 border-gray-200 dark:border-gray-700 p-0.75  bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative">
-                        <span class="absolute py-0.5 inline rounded-md px-2 text-xs  sm:text-sm shadow top-2 left-2 font-bold bg-blue-800 text-gray-300">
-                            EP {{ episode.episode }}
-                        </span>
-                        <img :src="episode.media.coverImage.extraLarge" alt="" class="rounded w-full h-full object-cover object-center">
-                    </div>
-                    <p class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1">
-                        {{ episode.media.title.english ? episode.media.title.english : episode.media.title.romaji }}
-                    </p>
-                    <p class="text-gray-600 dark:text-gray-400 font-semibold text-[13px]">
-                        Episode {{ episode.episode }}
-                    </p>
-                </div>
-            </div>
+            <AnimeCard :anime="newEpisodes" />
         </section>
     </div>
 </template>
 
 <script>
+    import { useForm } from '@inertiajs/vue3';
+    import AnimeCard from '../Components/Anime/AnimeCard.vue';
+
     export default {
+        components: {
+            AnimeCard
+        },
         data() {
             return {
+                ANILIST_API: 'https://graphql.anilist.co',
+                trendingAnime: [],
                 newEpisodes: [],
+                form: useForm(),
+                isLoading: false,
+                hasError: false
             }
         },
         methods: {
-            async fetchNewEpisodes() {
-                const trendingQuery = `
-                    query($page: Int, $perPage: Int) {
-                        Page (page: $page, perPage: $perPage) {
-                            media (
-                                type: ANIME
-                                status: RELEASING
-                                sort: TRENDING_DESC
-                            ) {
-                                id
-                                title {
-                                    romaji
-                                    english
+            async fetchTrendingAnime() {
+                this.isLoading = true;
+                this.hasError = false;
+
+                try {
+                    const query = `
+                        query Page($page: Int, $perPage: Int, $type: MediaType, $status: MediaStatus, $sort: [MediaSort]) {
+                            Page(page: $page, perPage: $perPage) {
+                                media(type: $type, status: $status, sort: $sort) {
+                                    id
+                                    title {
+                                        english
+                                        romaji
+                                    }
+                                    coverImage {
+                                        extraLarge
+                                    }
+                                    format
                                 }
                             }
                         }
-                    }
-                `
-                const trendingResponse = await fetch('https://graphql.anilist.co', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        query: trendingQuery,
-                        variables: { page: 1, perPage: 30 }
-                    })
-                });
+                    `
+                    const variables = {page: 1, perPage: 18, type: 'ANIME', status: 'RELEASING', sort: 'TRENDING_DESC' };
 
-                if (!trendingResponse.ok) {
-                    console.log('Failed fetching trending animes.');
-                    return;
+                    const response = await fetch(this.ANILIST_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: query,
+                            variables: variables
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch trending anime');
+                    }
+
+                    const data = await response.json();
+                    this.trendingAnime = data.data.Page.media;
+
+                } catch (error){
+                    this.hasError = true;
+                    console.error(error);
+                } finally {
+                    this.isLoading = false;
                 }
 
-                const trendingData = await trendingResponse.json();
-                const trendingIds = trendingData.data.Page.media.map(m => m.id);
+            },
+            async fetchNewEpisodes() {
+                this.isLoading = true;
+                this.hasError = false;
 
-                const query = `
-                    query($trendingIds: [Int], $page: Int, $perPage: Int) {
-                        Page (page: $page, perPage: $perPage) {
-                            airingSchedules (
-                                notYetAired: false
-                                mediaId_in: $trendingIds
-                                sort: TIME_DESC
-                            ) {
-                                episode
-                                airingAt
-                                media {
+                try {
+                    const trendingQuery = `
+                        query($page: Int, $perPage: Int) {
+                            Page (page: $page, perPage: $perPage) {
+                                media (
+                                    type: ANIME
+                                    status: RELEASING
+                                    sort: TRENDING_DESC
+                                ) {
                                     id
-                                    popularity
-                                    trending
                                     title {
                                         romaji
                                         english
-                                    },
-                                    coverImage {
-                                        extraLarge
-                                        large
                                     }
                                 }
                             }
                         }
-                    }`
-                const variables = { trendingIds, "page": 1, "perPage": 30 };
-                const response = await fetch('https://graphql.anilist.co', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query, variables })
-                });
+                    `
+                    const trendingResponse = await fetch(this.ANILIST_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: trendingQuery,
+                            variables: { page: 1, perPage: 18 }
+                        })
+                    });
 
-                if (!response.ok) {
-                    console.log('Failed to fetch latest episodes.');
-                    return;
+                    if (!trendingResponse.ok) {
+                        throw new Error('Failed to fetch trending episode.');
+                    }
+
+                    const trendingData = await trendingResponse.json();
+                    const trendingIds = trendingData.data.Page.media.map(m => m.id);
+
+                    const query = `
+                        query($trendingIds: [Int], $page: Int, $perPage: Int) {
+                            Page (page: $page, perPage: $perPage) {
+                                airingSchedules (
+                                    notYetAired: false
+                                    mediaId_in: $trendingIds
+                                    sort: TIME_DESC
+                                ) {
+                                    episode
+                                    airingAt
+                                    media {
+                                        id
+                                        popularity
+                                        trending
+                                        title {
+                                            romaji
+                                            english
+                                        },
+                                        coverImage {
+                                            extraLarge
+                                            large
+                                        }
+                                    }
+                                }
+                            }
+                        }`
+                    const variables = { trendingIds, "page": 1, "perPage": 18 };
+                    const response = await fetch('https://graphql.anilist.co', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query, variables })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch latest episodes.');
+                    }
+
+                    const data = await response.json();
+
+                    this.newEpisodes = data.data.Page.airingSchedules.map((item) => ({
+                        ...item.media,
+                        episode: item.episode
+                    }))
+
+                } catch (error){
+                    this.hasError = true;
+                    console.error(error);
+                } finally {
+                    this.isLoading = false;
                 }
 
-                const data = await response.json();
-                this.newEpisodes = data.data.Page.airingSchedules;
+            },
+            showAnime(animeId) {
+                this.form.get(`/anime/${animeId}`);
             }
         },
         mounted() {
+            this.fetchTrendingAnime();
             this.fetchNewEpisodes();
         }
     }

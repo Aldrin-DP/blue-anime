@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-gray-50 text-gray-800 dark:bg-gray-950 dark:text-gray-300 flex items-center sticky top-0 z-10">
-        <header class="max-w-325 w-full lg:flex lg:mx-5 xl:mx-15 lg:items-center">
+    <div class="bg-gray-50 text-gray-800 dark:bg-gray-950 dark:text-gray-300 flex items-center sticky top-0 z-10000">
+        <header class="max-w-325 w-full lg:flex lg:mx-10 xl:mx-15 lg:items-center">
             <div class="flex h-18 justify-between items-center w-full px-3 lg:w-auto lg:px-0">
 
                 <AppLogo />
@@ -22,7 +22,6 @@
                         <Bars3Icon v-else class="size-6.5" />
                     </button>
                  </div>
-
             </div>
 
             <div
@@ -44,7 +43,7 @@
                 <div class="flex flex-col flex-1 justify-between lg:flex-row lg:items-center">
                     <div class="flex flex-col items-center lg:flex-row lg:gap-2">
                         <NavLink class="w-full lg:w-auto" href="/"> Surface </NavLink>
-                        <NavLink class="w-full lg:w-auto" href="/"> Explore the Deep</NavLink>
+                        <NavLink class="w-full lg:w-auto" href="/"> Explore</NavLink>
                     </div>
 
                     <div class="flex flex-col items-center lg:justify-between gap-2 mt-4 lg:mt-0 pt-3 lg:pt-0 border-t border-gray-300 dark:border-gray-800 lg:flex-row lg:border-none">
@@ -69,7 +68,7 @@
                         </button>
 
                         <NavLink v-if="!$page.props.auth.user" href="/login" class="flex items-center justify-center w-full lg:w-auto gap-1">
-                            <ArrowRightEndOnRectangleIcon class="size-5" />
+                            <!-- <ArrowRightEndOnRectangleIcon class="size-5" /> -->
                             Log in
                         </NavLink>
 

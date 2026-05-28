@@ -3,7 +3,7 @@
         <TheHeader />
 
         <main class="bg-gradient-to-bl from-blue-50 to-teal-50 dark:bg-gradient-to-bl dark:from-blue-950 dark:to-teal-950 flex-1">
-            <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
+            <div class="">
                 <slot></slot>
             </div>
         </main>
