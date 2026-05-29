@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-gray-50 text-gray-800 dark:bg-gray-950 dark:text-gray-300 flex items-center sticky top-0 z-10000">
+    <div class="bg-red-50/80 text-gray-800 dark:bg-gray-950/80 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 flex items-center sticky backdrop-blur-md top-0 z-10000">
         <header class="max-w-325 w-full lg:flex lg:mx-10 xl:mx-15 lg:items-center">
             <div class="flex h-18 justify-between items-center w-full px-3 lg:w-auto lg:px-0">
 
@@ -26,7 +26,7 @@
 
             <div
                 :class="isOpen ? 'flex' : 'hidden'"
-                class="lg:flex flex-col justify-between absolute w-full lg:w-auto px-3 lg:px-0 py-4 lg:py-0 bg-gray-50 dark:bg-gray-950 border-t border-gray-300 dark:border-gray-800 lg:flex-1 h-auto z-20 lg:flex-row lg:relative lg:z-0 lg:border-none"
+                class="lg:flex flex-col justify-between absolute w-full lg:w-auto px-3 lg:px-0 py-4 lg:py-0  border-t border-gray-300 dark:border-gray-800 lg:flex-1 h-auto z-20 lg:flex-row lg:relative lg:z-0 lg:border-none"
             >
                 <div
                     tabindex="0"

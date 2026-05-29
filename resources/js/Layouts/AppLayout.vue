@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col h-auto">
+    <div class="flex flex-col h-auto bg-gray-50 dark:bg-gray-950">
         <TheHeader />
 
         <main class="bg-gradient-to-bl from-blue-50 to-teal-50 dark:bg-gradient-to-bl dark:from-blue-950 dark:to-teal-950 flex-1">
