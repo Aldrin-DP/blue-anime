@@ -1,4 +1,5 @@
 <template>
+    <Head :title="`${anime.title.english} -  `" />
     <div class="p-0 m-0 lg:p-10 xl:px-15 xl:py-10">
         <section class="relative h-full bg-cover bg-center lg:flex">
             <img :src="anime.coverImage.extraLarge" class="absolute inset-0 w-full h-full object-cover lg:hidden" alt="">
@@ -6,8 +7,15 @@
                 <div class="border-2 border-gray-200 dark:border-gray-700 p-0.75  bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 ">
                     <img :src="anime.coverImage.extraLarge" alt="" class="rounded w-full h-full object-cover object-center">
                 </div>
+                <div
+                    v-if="anime.nextAiringEpisode"
+                    class="flex justify-between mt-1 px-2 py-4 mx-1 text-sm text-blue-800 dark:text-blue-300 border border-blue-400 dark:border-blue-900 bg-blue-300/70 dark:bg-blue-800/70 rounded"
+                >
+                    <span class="font-semibold tracking-wider">Next episode:</span>
+                    <span class="font-bold">{{ airingAt }}</span>
+                </div>
             </div>
-            <div class="w-full lg:w-8/12 xl:w-9/12 relative z-10 p-3 bg-blue-50/80 dark:bg-gray-900/50 backdrop-filter-blur xl:bg-gradient-to-bl xl:from-blue-50 xl:to-teal-50 xl:dark:bg-gradient-to-bl xl:dark:from-blue-950 xl:dark:to-teal-950  h-full">
+            <div class="w-full lg:w-8/12 xl:w-9/12 relative z-10 p-3 bg-blue-50/80 dark:bg-gray-900/80 xl:bg-transparent xl:dark:bg-transparent  h-full">
                 <div>
                     <h2 class="font-extrabold text-xl mt-10 lg:mt-0 text-gray-900 dark:text-gray-100">
                         {{ anime.title.english ? anime.title.english : anime.title.romaji }}
@@ -24,11 +32,12 @@
 
                     <div
                         v-if="anime.nextAiringEpisode"
-                        class="flex justify-between mt-3 px-2 py-4 text-sm text-blue-800 dark:text-blue-300 border border-blue-400 dark:border-blue-900 bg-blue-300/70 dark:bg-blue-800/70 rounded"
+                        class="xl:hidden flex justify-between mt-3 px-2 py-4 text-sm text-blue-800 dark:text-blue-300 border border-blue-400 dark:border-blue-900 bg-blue-300/70 dark:bg-blue-800/70 rounded"
                     >
                         <span class="font-semibold tracking-wider">Next episode:</span>
                         <span class="font-bold">{{ airingAt }}</span>
                     </div>
+                    
                     <div class="mt-5 flex gap-1 items-center">
                         <BaseButton
                             variant="primary"
@@ -45,15 +54,15 @@
                         </BaseButton>
                     </div>
 
-                    <div class="mt-3 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/50 dark:bg-gray-900/70 rounded">
-                        <span class="tracking-wider text-xs font-semibold">SYNOPSIS</span>
-                        <div class="mt-3">
+                    <div class="mt-5 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/50 xl:dark:bg-transparent rounded">
+                        <span class="tracking-wider text-xs lg:text-base font-semibold">SYNOPSIS</span>
+                        <div class="mt-3 lg:text-[15px]">
                             {{ truncatedDescription }}
                         </div>
                         <span
                             v-if="isDescriptionOver40"
                             @click="toggleTruncatedDescription"
-                            class="cursor-pointer block font-bold mt-2"
+                            class="cursor-pointer block font-bold mt-2 lg:text-[15px]"
                         >
                             {{ isTruncated ? 'Read More' : 'See Less' }}
                         </span>
@@ -62,8 +71,7 @@
             </div>
         </section>
 
-        <section class=" backdrop-blur-md mt-3 p-3">
-
+        <section class="backdrop-blur-md mt-3 p-3">
             <h2 class="text-2xl font-extrabold tracking-wider text-gray-800 dark:text-gray-300">Episodes</h2>
             <p class="font-semibold text-gray-500">{{ episodes }} episodes available</p>
 
@@ -121,14 +129,33 @@
                     </div>
                 </div>
             </div>
+        </section>
 
-
+        <section class="backdrop-blur-md mt-3 p-3">
+            <h2 class="font-bold text-lg tracking-wide text-gray-700 dark:text-gray-400 mb-3">From the Same Depths</h2>
+            <div class="grid gap-3 lg:gap-5 grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                <div
+                    @click="showAnime(anime.mediaRecommendation.id)"
+                    v-for="anime in anime.recommendations.nodes"
+                >
+                    <div class="border-2 border-gray-200 dark:border-gray-700 p-0.75  bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative">
+                        <span class="absolute py-0.5 inline rounded-md px-2 text-xs  sm:text-sm shadow top-2 right-2 font-bold bg-blue-800 text-gray-300">
+                            {{ anime.mediaRecommendation.format }}
+                        </span>
+                        <img :src="anime.mediaRecommendation.coverImage.extraLarge" alt="" class="rounded w-full h-full object-cover object-center">
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1">
+                        {{ anime.mediaRecommendation.title.english ? anime.mediaRecommendation.title.english : anime.mediaRecommendation.title.romaji }}
+                    </p>
+                </div>
+            </div>
         </section>
     </div>
 </template>
 
 <script>
     import { StarIcon, HeartIcon, PlusIcon, ArrowsUpDownIcon, ChevronRightIcon, ChevronLeftIcon, BarsArrowUpIcon, BarsArrowDownIcon } from '@heroicons/vue/20/solid';
+    import { useForm } from '@inertiajs/vue3';
     import BaseButton from '../../Components/Base/BaseButton.vue';
     import AnimeInfo from '../../Components/Anime/AnimeInfo.vue';
 
@@ -150,6 +177,7 @@
         },
         data() {
             return {
+                form: useForm(),
                 now: Math.floor(Date.now() / 1000),
                 isTruncated: true,
                 isDescriptionOver40: true,
@@ -158,6 +186,7 @@
             }
         },
         mounted() {
+            console.log(this.data);
             setInterval(() => {
                 this.now = Math.floor(Date.now() / 1000)
             }, 1000)
@@ -271,6 +300,9 @@
                 } else if (this.sorted === 'desc') {
                     this.sorted = 'asc';
                 }
+            },
+            showAnime(animeId) {
+                this.form.get(`/anime/${animeId}`);
             }
         },
 

@@ -52,6 +52,7 @@ class AnilistService
                             nodes {
                                 mediaRecommendation {
                                     episodes
+                                    format
                                     title {
                                         english
                                         romaji

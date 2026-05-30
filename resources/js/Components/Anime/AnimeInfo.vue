@@ -41,7 +41,7 @@
             <span class="">{{ anime.duration }} mins</span>
         </div>
         <div class="hidden xl:flex items-center gap-1">
-            <span class=" uppercase text-xs text-gray-600">Type:</span>
+            <span class=" uppercase text-xs text-gray-600">Format:</span>
             <span class="">{{ anime.format }}</span>
         </div>
         <div class="hidden xl:flex items-center gap-1">
