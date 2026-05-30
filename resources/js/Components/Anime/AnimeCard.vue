@@ -1,13 +1,10 @@
 <template>
     <div>
-        <div v-if="!anime">
-            <p>Loading</p>
-        </div>
-        <div v-else>
-            <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5 mt-5">
+        <div>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5 mt-5">
                 <div
                     v-for="(anime, index) in anime" :key="anime.id"
-                    class="mb-3"
+                    class="mb-3 cursor-pointer"
                     @click="showAnime(anime.id)"
                 >
                     <div class="border-2 border-gray-200 dark:border-gray-700 p-0.75  bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative">

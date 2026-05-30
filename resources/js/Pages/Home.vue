@@ -1,29 +1,36 @@
 <template>
     <Head title="Home - " />
+
     <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
         <section class="mb-8">
             <h1 class="text-3xl font-bold text-gray-700 dark:text-gray-200 tracking-wider">Making Waves</h1>
             <p class="text-gray-600 dark:text-gray-400 text-md">The hottest anime everyone is diving into right now.</p>
 
-            <AnimeCard :anime="trendingAnime" />
+            <SkeletonCard v-if="isLoading" />
+            <AnimeCard v-else :anime="trendingAnime" />
         </section>
 
-        <section>
+        <section class="mb-2">
             <h1 class="text-3xl font-bold text-gray-700 dark:text-gray-200 tracking-wider">Fresh from Deep</h1>
             <p class="text-gray-600 dark:text-gray-400 text-md">Newly added episodes</p>
 
+            <SkeletonCard v-if="isLoading" />
             <AnimeCard :anime="newEpisodes" />
         </section>
+
+
     </div>
 </template>
 
 <script>
-    import { useForm } from '@inertiajs/vue3';
     import AnimeCard from '../Components/Anime/AnimeCard.vue';
+    import SkeletonCard from '../Components/Skeleton/SkeletonCard.vue';
+    import { useForm } from '@inertiajs/vue3';
 
     export default {
         components: {
-            AnimeCard
+            AnimeCard,
+            SkeletonCard
         },
         data() {
             return {
