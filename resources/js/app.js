@@ -3,6 +3,8 @@ import { createInertiaApp, Head, Link } from '@inertiajs/vue3'
 import '@fontsource-variable/inter'
 import '@fontsource-variable/outfit/wght.css';
 import AppLayout from './Layouts/AppLayout.vue'
+import BaseHeading from './Components/Base/BaseHeading.vue';
+import BaseText from './Components/Base/BaseText.vue';
 
 createInertiaApp({
     title: (title) => { return `${title} Sea Anime` },
@@ -17,6 +19,8 @@ createInertiaApp({
             .use(plugin)
             .component('Head', Head)
             .component('Link', Link)
+            .component('BaseHeading', BaseHeading)
+            .component('BaseText', BaseText)
             .mount(el)
     },
 })

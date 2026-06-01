@@ -17,7 +17,7 @@
             </div>
             <div class="w-full lg:w-8/12 xl:w-9/12 relative z-10 p-3 bg-blue-50/80 dark:bg-gray-900/80 xl:bg-transparent xl:dark:bg-transparent  h-full">
                 <div>
-                    <h2 class="font-extrabold text-xl mt-10 lg:mt-0 text-gray-900 dark:text-gray-100">
+                    <h2 class="font-extrabold text-xl lg:text-2xl mt-10 lg:mt-0 text-gray-900 dark:text-gray-100">
                         {{ anime.title.english ? anime.title.english : anime.title.romaji }}
                     </h2>
                     <div class="flex gap-2 mt-2">
@@ -28,7 +28,7 @@
                         </span>
                     </div>
 
-                     <AnimeInfo :data="data" />
+                    <AnimeInfo :data="data" />
 
                     <div
                         v-if="anime.nextAiringEpisode"
@@ -37,7 +37,7 @@
                         <span class="font-semibold tracking-wider">Next episode:</span>
                         <span class="font-bold">{{ airingAt }}</span>
                     </div>
-                    
+
                     <div class="mt-5 flex gap-1 items-center">
                         <BaseButton
                             variant="primary"
@@ -54,7 +54,7 @@
                         </BaseButton>
                     </div>
 
-                    <div class="mt-5 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/50 xl:dark:bg-transparent rounded">
+                    <div class="mt-5 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 xl:dark:bg-transparent rounded">
                         <span class="tracking-wider text-xs lg:text-base font-semibold">SYNOPSIS</span>
                         <div class="mt-3 lg:text-[15px]">
                             {{ truncatedDescription }}
@@ -72,8 +72,8 @@
         </section>
 
         <section class="backdrop-blur-md mt-3 p-3">
-            <h2 class="text-2xl font-extrabold tracking-wider text-gray-800 dark:text-gray-300">Episodes</h2>
-            <p class="font-semibold text-gray-500">{{ episodes }} episodes available</p>
+            <BaseHeading> Episodes </BaseHeading>
+            <BaseText> {{ episodes }} episodes available </BaseText>
 
             <div class="flex justify-between items-center my-4">
                 <div class="flex items-center gap-1">
@@ -135,6 +135,7 @@
             <h2 class="font-bold text-lg tracking-wide text-gray-700 dark:text-gray-400 mb-3">From the Same Depths</h2>
             <div class="grid gap-3 lg:gap-5 grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                 <div
+                    class="cursor-pointer"
                     @click="showAnime(anime.mediaRecommendation.id)"
                     v-for="anime in anime.recommendations.nodes"
                 >

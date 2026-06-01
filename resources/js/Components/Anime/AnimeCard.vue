@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5 mt-5">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5">
                 <div
                     v-for="(anime, index) in anime" :key="anime.id"
                     class="mb-3 cursor-pointer"

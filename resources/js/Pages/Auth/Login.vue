@@ -1,9 +1,9 @@
 <template>
     <Head title="Register - " />
     <div class="flex flex-col items-center">
-        <div class="w-full max-w-115 flex flex-col items-center">
-            <h2 class="text-3xl tracking-wider font-bold text-gray-700 dark:text-gray-300">Dive Back In</h2>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Dive back in and pick up where you left off.</p>
+        <div class="w-full max-w-115 flex flex-col my-10 items-center">
+            <BaseHeading> Dive Back In </BaseHeading>
+            <BaseText> Dive back in and pick up where you left off. </BaseText>
             <form @submit.prevent="login" class="my-5 w-full bg-gradient-to-tr from-gray-100 to-blue-100 dark:border dark:border-gray-700 dark:bg-gradient-to-br dark:from-blue-950 dark:to-teal-950 shadow-lg dark:shadow-lg p-5 rounded-lg">
                 <div class="mb-3">
                     <label class="block uppercase text-xs tracking-wide font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Email</label>

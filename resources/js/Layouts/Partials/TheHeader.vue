@@ -26,7 +26,7 @@
 
             <div
                 :class="isOpen ? 'flex' : 'hidden'"
-                class="lg:flex flex-col justify-between absolute w-full lg:w-auto px-3 lg:px-0 py-4 lg:py-0  bg-gray-50 dark:bg-gray-950 lg:bg-transparent lg:dark:bg-transparent border-t border-gray-300 dark:border-gray-800 lg:flex-1 h-auto z-20 lg:flex-row lg:relative lg:z-0 lg:border-none"
+                class="lg:flex flex-col justify-between border-b absolute w-full lg:w-auto px-3 lg:px-0 py-4 lg:py-0  bg-gray-50 dark:bg-gray-950 lg:bg-transparent lg:dark:bg-transparent border-t border-gray-300 dark:border-gray-800 lg:flex-1 h-auto z-20 lg:flex-row lg:relative lg:z-0 lg:border-none"
             >
                 <div
                     tabindex="0"
@@ -43,7 +43,7 @@
                 <div class="flex flex-col flex-1 justify-between lg:flex-row lg:items-center">
                     <div class="flex flex-col items-center lg:flex-row lg:gap-2">
                         <NavLink class="w-full lg:w-auto" href="/"> Surface </NavLink>
-                        <NavLink class="w-full lg:w-auto" href="/"> Explore</NavLink>
+                        <NavLink class="w-full lg:w-auto" href="/explore"> Explore</NavLink>
                     </div>
 
                     <div class="flex flex-col items-center lg:justify-between gap-2 mt-4 lg:mt-0 pt-3 lg:pt-0 border-t border-gray-300 dark:border-gray-800 lg:flex-row lg:border-none">

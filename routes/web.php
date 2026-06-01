@@ -4,12 +4,15 @@ use App\Http\Controllers\AnimeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 
 Route::get('/anime/{id}', [AnimeController::class, 'show'])->name('anime.show');
+
+Route::get('/explore', [ExploreController::class, 'index'])->name('explore.index');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
