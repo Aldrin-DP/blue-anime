@@ -21,7 +21,7 @@
             <div>
                 <button @click="showFilters" class="flex border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-300 font-bold tracking-wide gap-1 items-center border px-3 py-2 rounded-lg cursor-pointer">
                     <AdjustmentsHorizontalIcon class="size-6" />
-                    Filter
+                    Filters
                 </button>
             </div>
 
@@ -35,11 +35,11 @@
                         <select
                             @input="handleInput"
                             v-model="form.status" class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700">
-                            <option value="" selected>All</option>
-                            <option value="releasing">Ongoing</option>
-                            <option value="finished">Completed</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="not_yet_released">Not Yet Released</option>
+                            <option value="" selected>All Status</option>
+                            <option value="RELEASING">Ongoing</option>
+                            <option value="FINISHED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                            <option value="NOT_YET_RELEASED">Not Yet Released</option>
                         </select>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                             <ChevronDownIcon class="size-4 dark:text-gray-400" />
                         </span>
                         <select v-model="form.format" class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700">
-                            <option value="">All</option>
+                            <option value="">All Format</option>
                             <option value="TV">TV</option>
                             <option value="MOVIE">Movie</option>
                             <option value="ONA">ONA</option>
@@ -65,10 +65,10 @@
                             <ChevronDownIcon class="size-4 dark:text-gray-400" />
                         </span>
                         <select v-model="form.season" class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700">
-                            <option value="">All</option>
-                            <option value="TV">TV</option>
-                            <option value="MOVIE">Movie</option>
-                            <option value="ONA">ONA</option>
+                            <option value="">All Season</option>
+                            <option value="SUMMER">SUMMER</option>
+                            <option value="WINTER">WINTER</option>
+                            <option value="FALL">FALL</option>
                             <option value="OVA">OVA</option>
                         </select>
                     </div>
@@ -77,8 +77,16 @@
 
             <section>
                 <div class="mt-5">
-                    <p class="mb-2 text-gray-700 dark:text-gray-400">{{ filteredAnime.length }} results</p>
-                    <AnimeCard :anime="filteredAnime"/>
+                    <div v-if="form.processing">
+                        <SkeletonCard></SkeletonCard>
+                    </div>
+                    <div v-else-if="filteredAnime.length > 0">
+                        <p class="mb-2 text-gray-700 dark:text-gray-400"> Results </p>
+                        <AnimeCard :anime="filteredAnime"/>
+                    </div>
+                    <div v-else class="font-bold text-[17px] tracking-wide text-gray-700 dark:text-gray-400">
+                        We couldn't find any results for your search.
+                    </div>
                 </div>
             </section>
 
@@ -89,6 +97,7 @@
 <script>
     import { MagnifyingGlassIcon, ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/vue/24/solid';
     import AnimeCard from '../../Components/Anime/AnimeCard.vue';
+    import SkeletonCard from '../../Components/Skeleton/SkeletonCard.vue';
     import { useForm } from '@inertiajs/vue3';
 
     export default {
@@ -96,7 +105,8 @@
             MagnifyingGlassIcon,
             ChevronDownIcon,
             AdjustmentsHorizontalIcon,
-            AnimeCard
+            AnimeCard,
+            SkeletonCard
         },
         props: {
             data: Object
@@ -104,7 +114,6 @@
         data() {
             return {
                 ANILIST_API: 'https://graphql.anilist.co',
-                filteredAnime: [],
                 form: useForm({
                     search: '',
                     status: '',
@@ -120,26 +129,38 @@
             pageInfo() {
                 return this.data.data.Page.pageInfo;
             },
+            animeData() {
+                return this.data.data.Page.media;
+            },
+            filteredAnime() {
+                const filters = ['MOVIE', 'TV', 'OVA', 'ONA'];
+                return this.data.data.Page.media.filter(anime => filters.includes(anime.format));
+            }
         },
         methods: {
             searchAnime() {
-
-                console.log(this.form);
-
-
-                this.form.get('/explore');
-
+                this.form.get('/explore', {
+                    preserveState: true,
+                    preserveScroll: true
+                });
             },
             showFilters() {
                 this.isFilterOpen = !this.isFilterOpen;
-            },
-            handleInput() {
-                this.searchAnime();
             }
         },
         mounted() {
-            console.log(this.data);
-            this.filteredAnime = this.data.data.Page.media.filter( anime => ['TV', 'MOVIE', 'SPECIAL', 'OVA', 'ONA'].includes(anime.format));
+
+        },
+        watch: {
+            'form.status'(newVal, oldVal) {
+                this.searchAnime();
+            },
+            'form.format'(newVal, oldVal) {
+                this.searchAnime();
+            },
+            'form.season'(newVal, oldVal) {
+                this.searchAnime();
+            }
         }
 
     }

@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-gray-50/80 text-gray-800 dark:bg-gray-950/80 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 flex items-center sticky backdrop-blur-md top-0 z-10000">
+    <div class="bg-gray-50/90 text-gray-800 dark:bg-gray-950/80 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 flex items-center sticky backdrop-blur-md top-0 z-10000">
         <header class="max-w-325 w-full lg:flex lg:mx-10 xl:mx-15 lg:items-center">
             <div class="flex h-18 justify-between items-center w-full px-3 lg:w-auto lg:px-0">
 
@@ -73,12 +73,12 @@
                         </NavLink>
 
                         <div class="w-full lg:w-auto relative ">
-                            <div v-if="$page.props.auth.user" class="lg:cursor-pointer lg:px-4 lg:py-1.5 lg:border rounded-xl lg:border-gray-300 lg:dark:border-gray-800 hover:dark:text-gray-100 hover:text-gray-800">
-                                <div @click="toggleAccountMenu" class="flex items-center gap-2 pb-3 border-b border-gray-300 dark:border-gray-700 lg:border-none lg:pb-0">
+                            <div v-if="$page.props.auth.user" class="lg:cursor-pointer lg:border rounded-xl lg:border-gray-300 lg:dark:border-gray-800 hover:dark:text-gray-100 hover:text-gray-800">
+                                <div @click="toggleAccountMenu" class="lg:px-4 lg:py-1.5 flex items-center gap-2 pb-3 border-b border-gray-300 dark:border-gray-700 lg:border-none">
                                     <p class=" px-2 bg-blue-700 rounded-full text-gray-300 font-bold text-lg">
                                         {{ username.charAt(0).toUpperCase() }}
                                     </p>
-                                    <h4>{{ username }}</h4>
+                                    <h4 class="lg:max-w-24 truncate">{{ username }}</h4>
                                 </div>
                                 <div {{ :class="isAccountMenuOpen ? 'block' : 'block lg:hidden'" }} class="flex flex-col mt-3 lg:px-2 lg:border lg:rounded-xl lg:bg-gray-100/90 lg:dark:bg-gray-950/80 lg:backdrop-filter-blur lg:border-gray-300 lg:dark:border-gray-800 lg:absolute lg:py-2 lg:w-50  lg:top-13 lg:right-0">
                                     <NavLink>Account Settings</NavLink>
