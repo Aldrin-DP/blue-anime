@@ -18,7 +18,7 @@ Route::get('/explore', [ExploreController::class, 'index'])->name('explore.index
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
     Route::get('/register/success', [RegisterController::class, 'success'])->name('register.success');
-    Route::post('/register', [RegisterController::class, 'store']);
+    Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:2,1');
 
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);

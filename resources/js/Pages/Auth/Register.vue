@@ -29,6 +29,7 @@
                     <input v-model="form.password_confirmation" class="px-3 py-1.5 w-full rounded-lg border dark:border-none border-gray-200 dark:border-blue-800  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90" placeholder="********" type="password" required>
                     <small v-if="form.errors.password_confirmation" class="text-red-400 tracking-wide font-medium block ml-1 mt-1">Confirm Password is required.</small>
                 </div>
+                <small v-if="form.errors.throttle" class="text-red-400 tracking-wide font-medium block ml-1 mt-1"> {{ form.errors.throttle }} </small>
                 <BaseButton
                     variant="primary"
                     loadingText="Creating account..."
