@@ -77,11 +77,49 @@
 
             <section>
                 <div class="mt-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="mb-2 text-gray-700 dark:text-gray-400"> Results </p>
+                        <div class="flex items-center gap-1">
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
+                            >
+                                <ChevronLeftIcon
+                                    class="size-5 text-gray-800 dark:text-gray-300"
+                                    :class="{'text-slate-400 dark:text-slate-700': currentPage === 1 }"
+                                />
+                            </button>
+                            <div
+                                v-for="(page, index) in paginationPages"
+                                :key="index"
+                                class="flex gap-1 w-8 h-8 border rounded border-gray-300 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-300"
+                            >
+                                <button
+                                    @click="goToPage(page)"
+                                    :class="{'bg-blue-600 rounded text-gray-300': page === currentPage}"
+                                    class="w-full"
+                                >
+                                    {{page}}
+                                </button>
+                            </div>
+                            <button
+                                @click="nextPage"
+                                :disabled="(currentPage * 18) >= episodes"
+                                class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
+                            >
+                                <ChevronRightIcon
+                                    class="size-5 text-gray-800 dark:text-gray-300"
+                                    :class="{'text-slate-400': (currentPage * 18) >= episodes }"
+                                />
+                            </button>
+                        </div>
+                    </div>
                     <div v-if="form.processing">
                         <SkeletonCard></SkeletonCard>
                     </div>
                     <div v-else-if="filteredAnime.length > 0">
-                        <p class="mb-2 text-gray-700 dark:text-gray-400"> Results </p>
+
                         <AnimeCard :anime="filteredAnime"/>
                     </div>
                     <div v-else class="font-bold text-[17px] tracking-wide text-gray-700 dark:text-gray-400">
@@ -95,7 +133,7 @@
 </template>
 
 <script>
-    import { MagnifyingGlassIcon, ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/vue/24/solid';
+    import { MagnifyingGlassIcon, ChevronDownIcon, AdjustmentsHorizontalIcon, ChevronRightIcon, ChevronLeftIcon } from '@heroicons/vue/24/solid';
     import AnimeCard from '../../Components/Anime/AnimeCard.vue';
     import SkeletonCard from '../../Components/Skeleton/SkeletonCard.vue';
     import { useForm } from '@inertiajs/vue3';
@@ -106,7 +144,9 @@
             ChevronDownIcon,
             AdjustmentsHorizontalIcon,
             AnimeCard,
-            SkeletonCard
+            SkeletonCard,
+            ChevronRightIcon,
+            ChevronLeftIcon
         },
         props: {
             data: Object
@@ -119,6 +159,7 @@
                     status: '',
                     format: '',
                     season: '',
+                    page: 1
                 }),
                 isLoading: false,
                 hasError: false,
@@ -135,6 +176,27 @@
             filteredAnime() {
                 const filters = ['MOVIE', 'TV', 'OVA', 'ONA'];
                 return this.data.data.Page.media.filter(anime => filters.includes(anime.format));
+            },
+            paginationPages() {
+                const totalPages = Math.ceil(this.pageInfo.total / this.pageInfo.perPage);
+                const pagesPerGroup = 5;
+                const currentPage = this.currentPage;
+
+                const currentGroup = Math.ceil(currentPage / pagesPerGroup);
+
+                const startPage = (currentGroup-1) * pagesPerGroup + 1;
+                const endPage = Math.min(currentGroup * pagesPerGroup, totalPages);
+
+
+                const paginateNumbers = [];
+
+                for (let i = startPage; i <= endPage; i++){
+                    paginateNumbers.push(i);
+                }
+                return paginateNumbers;
+            },
+            currentPage() {
+                return this.pageInfo.currentPage;
             }
         },
         methods: {
@@ -146,19 +208,31 @@
             },
             showFilters() {
                 this.isFilterOpen = !this.isFilterOpen;
-            }
+            },
+            goToPage(page) {
+                this.form.page = page;
+                this.searchAnime();
+            },
+            prevPage() {
+                this.form.page--;
+                this.searchAnime();
+            },
+            nextPage() {
+                this.form.page++;
+                this.searchAnime();
+            },
         },
         mounted() {
 
         },
         watch: {
-            'form.status'(newVal, oldVal) {
+            'form.status'() {
                 this.searchAnime();
             },
-            'form.format'(newVal, oldVal) {
+            'form.format'() {
                 this.searchAnime();
             },
-            'form.season'(newVal, oldVal) {
+            'form.season'() {
                 this.searchAnime();
             }
         }

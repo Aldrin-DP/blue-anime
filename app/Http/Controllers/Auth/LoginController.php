@@ -3,30 +3,35 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Response;
 
 class LoginController extends Controller
 {
-    public function create() {
+    public function create(): Response
+    {
         return inertia('Auth/Login');
     }
 
-    public function store(Request $request) {
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $credentials = $request->validated();
 
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required']
-        ]);
+        $request->ensureIsNotRateLimited();
 
         if (Auth::attempt($credentials)) {
+            $request->clearRateLimit();
             $request->session()->regenerate();
 
             return redirect()->route('home');
         }
 
+        $request->recordFailedAttempt();
+
         return redirect()->route('login')->withErrors([
-            'email' => 'Email or password is incorrect.'
+            'email' => 'Email or password is incorrect.',
         ]);
     }
 }

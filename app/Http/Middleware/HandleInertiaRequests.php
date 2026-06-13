@@ -2,9 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use Dom\Attr;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -42,7 +40,7 @@ class HandleInertiaRequests extends Middleware
             //
             'auth.user' => fn () => $request->user()
                 ? $request->user()->only('id', 'username')
-                : null
+                : null,
         ];
     }
 }

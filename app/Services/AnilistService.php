@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Http;
 
 class AnilistService
 {
-    public function getAnime(int $animeId) {
+    public function getAnime(int $animeId)
+    {
 
         $response = Http::post('https://graphql.anilist.co', [
             'query' => '
@@ -69,8 +70,8 @@ class AnilistService
                 }
             ',
             'variables' => [
-                'mediaId' => $animeId
-            ]
+                'mediaId' => $animeId,
+            ],
         ]);
 
         return $response->json();

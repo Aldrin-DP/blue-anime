@@ -9,7 +9,7 @@
                 </div>
                 <div
                     v-if="anime.nextAiringEpisode"
-                    class="flex justify-between mt-1 px-2 py-4 mx-1 text-sm text-blue-800 dark:text-blue-300 border border-blue-400 dark:border-blue-900 bg-blue-300/70 dark:bg-blue-800/70 rounded"
+                    class="flex justify-between mt-1 px-2 py-4 mx-0.5 text-sm text-blue-800 dark:text-blue-300 border border-blue-400 dark:border-blue-900 bg-blue-300/70 dark:bg-blue-800/70 rounded"
                 >
                     <span class="font-semibold tracking-wider">Next episode:</span>
                     <span class="font-bold">{{ airingAt }}</span>
@@ -215,11 +215,11 @@
             },
             paginationPages() {
 
-                const totalPages = Math.ceil(this.episodes / 20); // 59
+                const totalPages = Math.ceil(this.episodes / 20);
                 const pagesPerGroup = 5;
                 const currentPage = this.currentPage;
 
-                const currentGroup = Math.ceil(currentPage / pagesPerGroup); // 2
+                const currentGroup = Math.ceil(currentPage / pagesPerGroup);
 
                 const startPage = (currentGroup-1) * pagesPerGroup + 1;
                 const endPage = Math.min(currentGroup * pagesPerGroup, totalPages);

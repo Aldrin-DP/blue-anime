@@ -5,7 +5,7 @@
                 <div class="aspect-2/3">
                     <div class="h-full w-full bg-gray-300 dark:bg-gray-700 rounded"></div>
                 </div>
-                <div class="w-full h-5 bg-gray-300 dark:bg-gray-700 mt-2"></div>
+                <div class="w-full h-5 bg-gray-300 dark:bg-gray-700 mt-3"></div>
             </div>
         </div>
     </div>

@@ -31,6 +31,7 @@
                 </div>
                 <BaseButton
                     variant="primary"
+                    loadingText="Creating account..."
                     :isProcessing="form.processing"
                     class="w-full mt-2 py-3 text-[16px]"
                 >

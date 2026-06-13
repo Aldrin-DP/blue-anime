@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountSettingsController;
 use App\Http\Controllers\AnimeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -24,9 +25,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+
+    Route::get('/account/settings', [AccountSettingsController::class, 'show'])->name('account.settings.show');
+
     Route::post('/logout', [LogoutController::class, 'destroy']);
 });
-
-
-
-

@@ -9,10 +9,11 @@ class SearchService
     /**
      * Create a new class instance.
      */
-    public function getFilteredAnime(array $filters) {
+    public function getFilteredAnime(array $filters)
+    {
 
         $variables = array_filter([
-            'page' => 1,
+            'page' => $filters['page'] ?? 1,
             'perPage' => 18,
             'search' => $filters['search'] ?? null,
             'status' => $filters['status'] ?? null,
@@ -46,7 +47,7 @@ class SearchService
                     }
                 }
             ',
-            'variables' => $variables
+            'variables' => $variables,
         ]);
 
         return $response->json();

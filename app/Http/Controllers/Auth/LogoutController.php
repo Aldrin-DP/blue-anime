@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends Controller
 {
-    public function destroy(Request $request) {
+    public function destroy(Request $request)
+    {
 
         Auth::logout();
 

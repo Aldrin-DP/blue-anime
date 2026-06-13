@@ -20,6 +20,7 @@
                 </div>
                 <BaseButton
                     variant="primary"
+                    loadingText="Logging in..."
                     :isProcessing="form.processing"
                     class="w-full mt-2 py-3 text-[16px]"
                 >
