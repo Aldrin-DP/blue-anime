@@ -33,7 +33,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => "Too many login attempts. Please try again {$seconds} seconds.",
+            'email' => "Too many login attempts. Please try again in {$seconds} seconds.",
         ]);
     }
 
