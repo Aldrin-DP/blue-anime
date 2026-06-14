@@ -27,6 +27,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     Route::get('/account/settings', [AccountSettingsController::class, 'show'])->name('account.settings.show');
+    Route::put('/account/settings', [AccountSettingsController::class, 'update'])->name('account.settings.update');
 
     Route::post('/logout', [LogoutController::class, 'destroy']);
 });
