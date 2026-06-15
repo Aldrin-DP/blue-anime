@@ -24,7 +24,7 @@
                 />
                 <MagnifyingGlassIcon
                     @click="searchAnime"
-                    class="size-8 text-gray-700 mr-5 cursor-pointer"
+                    class="size-8 text-gray-700 dark:text-gray-300 mr-5 cursor-pointer"
                 />
             </div>
             <div>

@@ -8,4 +8,10 @@
 
 @theme {
     --font-sans: 'Outfit Variable', 'ui-sans-serif';
+    --color-sea-950: #051723;
+    --color-sea-900: #092536;
+    --color-sea-800: #123d5a;
+    --color-sea-700: #1d5680;
+    --color-sea-300: #7babcb;
+    --color-sea-100: #c6d7e4;
 }

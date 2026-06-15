@@ -19,7 +19,7 @@
                 </div>
                 <div
                     v-if="anime.nextAiringEpisode"
-                    class="flex justify-between mt-1 px-2 py-4 mx-0.5 text-sm text-blue-800 dark:text-blue-300 border border-blue-400 dark:border-blue-900 bg-blue-300/70 dark:bg-blue-800/70 rounded"
+                    class="flex justify-between mt-1 px-2 py-4 mx-0.5 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
                 >
                     <span class="font-semibold tracking-wider"
                         >Next episode:</span
@@ -44,7 +44,7 @@
                         <span
                             v-for="(genre, index) in genres"
                             :key="index"
-                            class="px-2 py-1 text-sm text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 rounded"
+                            class="px-2 py-1 text-sm text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-800 bg-white/30 dark:bg-gray-900/30 rounded"
                         >
                             {{ genre }}
                         </span>
@@ -54,7 +54,7 @@
 
                     <div
                         v-if="anime.nextAiringEpisode"
-                        class="xl:hidden flex justify-between mt-3 px-2 py-4 text-sm text-blue-800 dark:text-blue-300 border border-blue-400 dark:border-blue-900 bg-blue-300/70 dark:bg-blue-800/70 rounded"
+                        class="xl:hidden flex justify-between mt-3 px-2 py-4 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
                     >
                         <span class="font-semibold tracking-wider"
                             >Next episode:</span
@@ -76,7 +76,7 @@
                     </div>
 
                     <div
-                        class="mt-5 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 xl:dark:bg-transparent rounded"
+                        class="mt-5 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/30 dark:bg-gray-900/30 rounded"
                     >
                         <span
                             class="tracking-wider text-xs lg:text-base font-semibold"

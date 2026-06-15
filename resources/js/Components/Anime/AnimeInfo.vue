@@ -1,6 +1,6 @@
 <template>
     <div
-        class="grid xl:grid-cols-4 gap-5 mt-3 px-2 py-4 text-sm font-semibold text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 rounded"
+        class="grid xl:grid-cols-4 gap-5 mt-3 px-2 py-4 text-sm font-semibold text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-800 bg-white/30 dark:bg-gray-900/30 rounded"
     >
         <div class="xl:hidden flex justify-between items-center">
             <div class="xl:hidden flex items-center gap-1">

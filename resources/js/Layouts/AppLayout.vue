@@ -3,7 +3,7 @@
         <TheHeader />
 
         <main
-            class="bg-gradient-to-bl from-blue-50 to-teal-50 dark:bg-gradient-to-bl dark:from-blue-950 dark:to-teal-950 flex-1"
+            class="bg-gradient-to-br from-sea-100/30 to-sea-300/20 dark:bg-gradient-to-b dark:from-sea-900 dark:from-5% dark:to-sea-950 flex-1"
         >
             <div class="">
                 <slot></slot>
