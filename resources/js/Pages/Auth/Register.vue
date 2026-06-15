@@ -9,7 +9,7 @@
 
             <form
                 @submit.prevent="register"
-                class="my-5 w-full bg-gradient-to-tr from-gray-100 to-blue-100 dark:border dark:border-gray-700 dark:bg-gradient-to-br dark:from-sea-800/20 dark:to-sea-950 shadow-lg dark:shadow-lg p-5 rounded-lg"
+                class="my-5 w-full bg-linear-to-tr from-gray-100 to-blue-100 dark:border dark:border-gray-700 dark:bg-linear-to-br dark:from-sea-800/20 dark:to-sea-950 shadow-lg dark:shadow-lg p-5 rounded-lg"
             >
                 <div class="mb-3">
                     <label

@@ -4,7 +4,7 @@
     <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
         <!-- Change Account -->
         <section
-            class="my-5 w-full bg-gradient-to-tr from-white/30 to-white/40 dark:bg-gradient-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
+            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
         >
             <BaseHeading size="large"> Change Account</BaseHeading>
             <BaseText> Change your Username and Email </BaseText>
@@ -54,7 +54,7 @@
 
         <!-- Change Password -->
         <section
-            class="my-5 w-full bg-gradient-to-tr from-white/30 to-white/40 dark:bg-gradient-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
+            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
         >
             <BaseHeading size="large"> Change Password</BaseHeading>
             <BaseText> Dive back in and pick up where you left off. </BaseText>
@@ -117,7 +117,7 @@
 
         <!-- Delete Account -->
         <section
-            class="my-5 w-full bg-gradient-to-tr from-white/30 to-white/40 dark:bg-gradient-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
+            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
         >
             <BaseHeading size="large"> Delete Account</BaseHeading>
             <BaseText> Dive back in and pick up where you left off. </BaseText>

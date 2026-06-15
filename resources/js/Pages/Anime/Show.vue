@@ -159,7 +159,7 @@
             >
                 <div v-for="ep in currentPageEpisodes">
                     <div
-                        class="cursor-pointer flex items-center gap-3 bg-blue-100 dark:bg-gradient-to-br dark:from-teal-950 dark:to-blue-950 border border-gray-300 dark:border-gray-700 p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
+                        class="cursor-pointer flex items-center gap-3 bg-blue-100 dark:bg-linear-to-br dark:from-teal-950 dark:to-blue-950 border border-gray-300 dark:border-gray-700 p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
                     >
                         <span
                             class="w-15 h-12 tracking-wider font-bold text-xl bg-blue-300 dark:bg-blue-700 text-blue-600 dark:text-blue-300 rounded-lg flex justify-center items-center"
