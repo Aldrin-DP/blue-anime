@@ -9,7 +9,6 @@ class AnimeController extends Controller
 {
     public function show(Request $request, int $animeId, AnilistService $anilistService)
     {
-
         $anime = $anilistService->getAnime($animeId);
 
         return inertia('Anime/Show', [

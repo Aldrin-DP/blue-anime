@@ -81,8 +81,9 @@
                                     <h4 class="lg:max-w-24 truncate">{{ username }}</h4>
                                 </div>
                                 <div {{ :class="isAccountMenuOpen ? 'block' : 'block lg:hidden'" }} class="flex flex-col mt-3 lg:px-2 lg:border lg:rounded-xl lg:bg-gray-100/90 lg:dark:bg-gray-950/80 lg:backdrop-filter-blur lg:border-gray-300 lg:dark:border-gray-800 lg:absolute lg:py-2 lg:w-50  lg:top-13 lg:right-0">
-                                    <NavLink href="/account/settings">Account Settings</NavLink>
-                                    <NavLink>Library</NavLink>
+                                    <NavLink href="/profile">Profile</NavLink>
+                                    <NavLink href="/profile/edit">Edit Profile</NavLink>
+                                    <NavLink>My Library</NavLink>
                                     <div class="lg:mx-2 lg:mb-1">
                                         <BaseButton
                                             @click="logout"

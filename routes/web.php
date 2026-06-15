@@ -7,7 +7,9 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Pest\Plugins\Profile;
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 
@@ -26,8 +28,11 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/account/settings', [AccountSettingsController::class, 'show'])->name('account.settings.show');
-    Route::put('/account/settings', [AccountSettingsController::class, 'update'])->name('account.settings.update');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    Route::patch('/profile/account', [ProfileController::class, 'updateAccount']);
+    Route::patch('/profile/password', [ProfileController::class, 'updatePassword']);
 
     Route::post('/logout', [LogoutController::class, 'destroy']);
 });

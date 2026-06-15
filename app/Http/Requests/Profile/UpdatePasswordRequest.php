@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Profile;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreUserRequest extends FormRequest
+class UpdatePasswordRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,8 +15,7 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => ['required', 'string', 'min:2', 'max:100', 'unique:users', 'alpha_num'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'current_password' => ['required', 'current_password'],
             'password' => ['required', 'string', 'min:8', 'max:255', 'confirmed'],
         ];
     }
@@ -23,9 +23,9 @@ class StoreUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'username.min' => 'Username must be at least 2 characters.',
+            'current_password.current_password' => 'The current password you entered is incorrect.',
             'password.min' => 'Password must be at least 8 characters.',
-            'password.confirmed' => 'Password does not match.',
+            'password.confirmed' => 'The password confirmation does not match.',
         ];
     }
 }
