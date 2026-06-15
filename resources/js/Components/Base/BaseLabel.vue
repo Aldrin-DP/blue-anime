@@ -7,5 +7,3 @@
         </label>
     </div>
 </template>
-
-<script></script>

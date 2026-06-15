@@ -82,9 +82,7 @@
                         placeholder="********"
                         required
                     />
-                    <BaseInputError
-                        :message="passwordForm.errors.password"
-                    />
+                    <BaseInputError :message="passwordForm.errors.password" />
                 </div>
                 <div class="mb-3">
                     <BaseLabel> Confirm Password </BaseLabel>
