@@ -5,7 +5,7 @@
         <div
             v-for="(anime, index) in anime"
             :key="anime.id"
-            class="mb-3 cursor-pointer"
+            class="mb-1 cursor-pointer"
             @click="showAnime(anime.id)"
         >
             <div

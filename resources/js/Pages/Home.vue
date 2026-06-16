@@ -2,22 +2,45 @@
     <Head title="Home - " />
 
     <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
-        <section class="mb-8">
+        <!-- New Anime Episodes -->
+        <section class="mb-10">
+            <BaseHeading> Fresh from Deep </BaseHeading>
+            <BaseText>
+                New episodes have surfaced, watch them now.
+            </BaseText>
+
+            <SkeletonCard v-if="!newEpisodes" />
+            <AnimeCard class="mt-5" :anime="newEpisodes" />
+        </section>
+        <!-- Trending Anime -->
+        <section class="mb-10">
             <BaseHeading> Making Waves </BaseHeading>
             <BaseText>
                 The hottest anime everyone is diving into right now.
             </BaseText>
 
-            <SkeletonCard v-if="isLoading" />
+            <SkeletonCard v-if="!trendingAnime" />
             <AnimeCard class="mt-5" v-else :anime="trendingAnime" />
         </section>
+        <!-- Most Popular Anime -->
+        <section class="mb-10">
+            <BaseHeading> Legends of the Deep </BaseHeading>
+            <BaseText>
+                The most popular anime that have stood the test of time.
+            </BaseText>
 
-        <section class="mb-2">
-            <BaseHeading> Fresh from Deep </BaseHeading>
-            <BaseText> Newly added episodes. </BaseText>
+            <SkeletonCard v-if="!popularAnime" />
+            <AnimeCard class="mt-5" :anime="popularAnime" />
+        </section>
+        <!-- Top Rated Anime -->
+         <section class="mb-8">
+            <BaseHeading> Pearls of the Deep </BaseHeading>
+            <BaseText>
+                The highest rated anime treasured by the deep.
+            </BaseText>
 
-            <SkeletonCard v-if="isLoading" />
-            <AnimeCard class="mt-5" :anime="newEpisodes" />
+            <SkeletonCard v-if="!topRatedAnime" />
+            <AnimeCard class="mt-5" :anime="topRatedAnime" />
         </section>
     </div>
 </template>
@@ -32,168 +55,17 @@ export default {
         AnimeCard,
         SkeletonCard,
     },
-    data() {
-        return {
-            ANILIST_API: "https://graphql.anilist.co",
-            trendingAnime: [],
-            newEpisodes: [],
-            form: useForm(),
-            isLoading: false,
-            hasError: false,
-        };
-    },
-    methods: {
-        async fetchTrendingAnime() {
-            this.isLoading = true;
-            this.hasError = false;
-
-            try {
-                const query = `
-                        query Page($page: Int, $perPage: Int, $type: MediaType, $status: MediaStatus, $sort: [MediaSort]) {
-                            Page(page: $page, perPage: $perPage) {
-                                media(type: $type, status: $status, sort: $sort) {
-                                    id
-                                    title {
-                                        english
-                                        romaji
-                                    }
-                                    coverImage {
-                                        extraLarge
-                                    }
-                                    format
-                                }
-                            }
-                        }
-                    `;
-                const variables = {
-                    page: 1,
-                    perPage: 18,
-                    type: "ANIME",
-                    status: "RELEASING",
-                    sort: "TRENDING_DESC",
-                };
-
-                const response = await fetch(this.ANILIST_API, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        query: query,
-                        variables: variables,
-                    }),
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch trending anime");
-                }
-
-                const data = await response.json();
-                this.trendingAnime = data.data.Page.media;
-            } catch (error) {
-                this.hasError = true;
-                console.error(error);
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async fetchNewEpisodes() {
-            this.isLoading = true;
-            this.hasError = false;
-
-            try {
-                const trendingQuery = `
-                        query($page: Int, $perPage: Int) {
-                            Page (page: $page, perPage: $perPage) {
-                                media (
-                                    type: ANIME
-                                    status: RELEASING
-                                    sort: TRENDING_DESC
-                                ) {
-                                    id
-                                    title {
-                                        romaji
-                                        english
-                                    }
-                                }
-                            }
-                        }
-                    `;
-                const trendingResponse = await fetch(this.ANILIST_API, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        query: trendingQuery,
-                        variables: { page: 1, perPage: 18 },
-                    }),
-                });
-
-                if (!trendingResponse.ok) {
-                    throw new Error("Failed to fetch trending episode.");
-                }
-
-                const trendingData = await trendingResponse.json();
-                const trendingIds = trendingData.data.Page.media.map(
-                    (m) => m.id,
-                );
-
-                const query = `
-                        query($trendingIds: [Int], $page: Int, $perPage: Int) {
-                            Page (page: $page, perPage: $perPage) {
-                                airingSchedules (
-                                    notYetAired: false
-                                    mediaId_in: $trendingIds
-                                    sort: TIME_DESC
-                                ) {
-                                    episode
-                                    airingAt
-                                    media {
-                                        id
-                                        popularity
-                                        trending
-                                        title {
-                                            romaji
-                                            english
-                                        },
-                                        coverImage {
-                                            extraLarge
-                                            large
-                                        }
-                                    }
-                                }
-                            }
-                        }`;
-                const variables = { trendingIds, page: 1, perPage: 18 };
-                const response = await fetch("https://graphql.anilist.co", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ query, variables }),
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch latest episodes.");
-                }
-
-                const data = await response.json();
-
-                this.newEpisodes = data.data.Page.airingSchedules.map(
-                    (item) => ({
-                        ...item.media,
-                        episode: item.episode,
-                    }),
-                );
-            } catch (error) {
-                this.hasError = true;
-                console.error(error);
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        showAnime(animeId) {
-            this.form.get(`/anime/${animeId}`);
-        },
+    props: {
+        trendingAnime: Array,
+        newEpisodes: Array,
+        popularAnime: Array,
+        topRatedAnime: Array
     },
     mounted() {
-        this.fetchTrendingAnime();
-        this.fetchNewEpisodes();
-    },
+        console.log(this.trendingAnime);
+        console.log(this.newEpisodes);
+        console.log(this.popularAnime);
+        console.log(this.topRatedAnime);
+    }
 };
 </script>

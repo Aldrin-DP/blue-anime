@@ -9,6 +9,19 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ];
+    }
+
     protected function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
@@ -35,18 +48,5 @@ class LoginRequest extends FormRequest
         throw ValidationException::withMessages([
             'email' => "Too many login attempts. Please try again in {$seconds} seconds.",
         ]);
-    }
-
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ];
     }
 }
