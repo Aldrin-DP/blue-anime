@@ -75,10 +75,13 @@ import { useForm } from "@inertiajs/vue3";
 export default {
     components: { BaseButton },
     data() {
+        const params = new URLSearchParams(window.location.search);
+
         return {
             form: useForm({
                 email: null,
                 password: null,
+                redirect: params.get('redirect') || null
             }),
         };
     },

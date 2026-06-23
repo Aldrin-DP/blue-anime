@@ -1,9 +1,9 @@
 <template>
-    <Head :title="`${anime.title.english} -  `" />
-    <div class="p-0 m-0 lg:p-10 xl:px-15 xl:py-10">
+    <Head :title="`${animeData.title.english} -  `" />
+    <div class="p-0 m-0 lg:p-10 xl:px-15 xl:py-10 relative">
         <section class="relative h-full bg-cover bg-center lg:flex">
             <img
-                :src="anime.coverImage.extraLarge"
+                :src="animeData.coverImage.extraLarge"
                 class="absolute inset-0 w-full h-full object-cover lg:hidden"
                 alt=""
             />
@@ -12,13 +12,13 @@
                     class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3"
                 >
                     <img
-                        :src="anime.coverImage.extraLarge"
+                        :src="animeData.coverImage.extraLarge"
                         alt=""
                         class="rounded w-full h-full object-cover object-center"
                     />
                 </div>
                 <div
-                    v-if="anime.nextAiringEpisode"
+                    v-if="animeData.nextAiringEpisode"
                     class="flex justify-between mt-1 px-2 py-4 mx-0.5 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
                 >
                     <span class="font-semibold tracking-wider"
@@ -35,9 +35,9 @@
                         class="font-extrabold text-xl lg:text-2xl mt-10 lg:mt-0 text-gray-900 dark:text-gray-100"
                     >
                         {{
-                            anime.title.english
-                                ? anime.title.english
-                                : anime.title.romaji
+                            animeData.title.english
+                                ? animeData.title.english
+                                : animeData.title.romaji
                         }}
                     </h2>
                     <div class="flex gap-2 mt-2">
@@ -50,10 +50,10 @@
                         </span>
                     </div>
 
-                    <AnimeInfo :data="data" />
+                    <AnimeInfo :data="anime" />
 
                     <div
-                        v-if="anime.nextAiringEpisode"
+                        v-if="animeData.nextAiringEpisode"
                         class="xl:hidden flex justify-between mt-3 px-2 py-4 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
                     >
                         <span class="font-semibold tracking-wider"
@@ -63,10 +63,25 @@
                     </div>
 
                     <div class="mt-5 flex gap-1 items-center">
-                        <BaseButton variant="primary" class="flex">
-                            <div class="flex items-center justify-center">
-                                <PlusIcon class="size-6" />
-                                <span>Add to Watch List</span>
+                        <BaseButton
+                            :isProcessing="form.processing"
+                            @click="addToWatchlist"
+                            variant="primary"
+                            class="flex justify-center w-48"
+                        >
+                            <div>
+                                <div v-if="inWatchlist">
+                                    <div class="flex items-center justify-center">
+                                         <CheckIcon class="size-6" />
+                                        <span>Added to Watchlist</span>
+                                    </div>
+
+                                </div>
+                                <div v-else class="flex items-center justify-center">
+                                    <PlusIcon class="size-6" />
+                                    <span> Add to Watchlist </span>
+                                </div>
+
                             </div>
                         </BaseButton>
 
@@ -186,8 +201,8 @@
             >
                 <div
                     class="cursor-pointer"
-                    @click="showAnime(anime.mediaRecommendation.id)"
-                    v-for="anime in anime.recommendations.nodes"
+                    @click="showAnime(animeData.mediaRecommendation.id)"
+                    v-for="anime in animeData.recommendations.nodes"
                 >
                     <div
                         class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative"
@@ -230,8 +245,9 @@ import {
     ChevronLeftIcon,
     BarsArrowUpIcon,
     BarsArrowDownIcon,
+    CheckIcon
 } from "@heroicons/vue/20/solid";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router } from "@inertiajs/vue3";
 import BaseButton from "../../Components/Base/BaseButton.vue";
 import AnimeInfo from "../../Components/Anime/AnimeInfo.vue";
 
@@ -247,13 +263,20 @@ export default {
         ChevronLeftIcon,
         BarsArrowUpIcon,
         BarsArrowDownIcon,
+        CheckIcon
     },
     props: {
-        data: Object,
+        anime: Object,
+        inWatchlist: Boolean
     },
     data() {
         return {
-            form: useForm(),
+            form: useForm({
+                'api_id': '',
+                'title': '',
+                'format': '',
+                'cover_image': ''
+            }),
             now: Math.floor(Date.now() / 1000),
             isTruncated: true,
             isDescriptionOver40: true,
@@ -262,7 +285,7 @@ export default {
         };
     },
     mounted() {
-        console.log(this.data);
+        console.log(this.anime);
         setInterval(() => {
             this.now = Math.floor(Date.now() / 1000);
         }, 1000);
@@ -306,15 +329,15 @@ export default {
             }
             return paginateNumbers;
         },
-        anime() {
-            return this.data.data.Media;
+        animeData() {
+            return this.anime.data.Media;
         },
         genres() {
-            const genres = this.anime.genres;
+            const genres = this.animeData.genres;
             return genres.slice(0, 3);
         },
         airingAt() {
-            const airingAt = this.anime.nextAiringEpisode.airingAt;
+            const airingAt = this.animeData.nextAiringEpisode.airingAt;
             const secondsUntilAiring = airingAt - this.now;
 
             const days = Math.floor(secondsUntilAiring / 86400);
@@ -325,7 +348,7 @@ export default {
             return `${days}d ${hours}h ${mins}m ${secs}s`;
         },
         truncatedDescription() {
-            const description = this.anime.description;
+            const description = this.animeData.description;
             const cleaned = description.replace(/<[^>]*>/g, "\n");
 
             if (this.isTruncated) {
@@ -350,11 +373,10 @@ export default {
             this.isTruncated = !this.isTruncated;
             this.truncatedDescription();
         },
-
         episodes() {
-            return this.anime.nextAiringEpisode
-                ? this.anime.nextAiringEpisode.episode - 1
-                : this.anime.episodes;
+            return this.animeData.nextAiringEpisode
+                ? this.animeData.nextAiringEpisode.episode - 1
+                : this.animeData.episodes;
         },
     },
     methods: {
@@ -378,6 +400,23 @@ export default {
         showAnime(animeId) {
             this.form.get(`/anime/${animeId}`);
         },
+        addToWatchlist() {
+
+            if (!this.$page.props.auth.user) {
+                router.visit(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                return;
+            }
+
+            this.form.api_id = this.animeData.id;
+            this.form.title = this.animeData.title.english;
+            this.form.format = this.animeData.format;
+            this.form.cover_image = this.animeData.coverImage.extraLarge;
+
+            this.form.post('/watchlists', {
+                preserveScroll: true,
+                preserveState: true
+            });
+        }
     },
 };
 </script>

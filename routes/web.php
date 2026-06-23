@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
 use Pest\Plugins\Profile;
 
@@ -35,4 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword']);
 
     Route::post('/logout', [LogoutController::class, 'destroy']);
+
+    Route::get('/watchlists', [WatchlistController::class, 'index'])->name('watchlist.index');
+    Route::post('/watchlists', [WatchlistController::class, 'store']);
 });

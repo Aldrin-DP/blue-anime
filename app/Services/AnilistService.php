@@ -113,7 +113,6 @@ class AnilistService
     public function getNewEpisodes()
     {
         return Cache::remember('anime.new.episodes', now()->addMinutes(15), function (){
-
             $trendingAnime = Http::post($this->ANILIST_API, [
                 'query' => '
                     query($page: Int, $perPage: Int) {

@@ -4,7 +4,7 @@
     <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
         <!-- Change Account -->
         <section
-            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
+            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 shadow-lg dark:shadow p-5 rounded-lg"
         >
             <BaseHeading size="large"> Change Account</BaseHeading>
             <BaseText> Change your Username and Email </BaseText>
@@ -51,10 +51,9 @@
                 </div>
             </form>
         </section>
-
         <!-- Change Password -->
         <section
-            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
+            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 shadow-lg dark:shadow p-5 rounded-lg"
         >
             <BaseHeading size="large"> Change Password</BaseHeading>
             <BaseText> Dive back in and pick up where you left off. </BaseText>
@@ -65,7 +64,7 @@
                     <input
                         v-model="passwordForm.current_password"
                         type="password"
-                        class="px-3 py-1.5 w-full rounded-lg border dark:border-transparent border-gray-200 dark:border-blue-800 focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90"
+                        class="px-3 py-1.5 w-full rounded-lg border dark:border-transparent border-gray-200  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90"
                         placeholder="********"
                         required
                     />
@@ -78,7 +77,7 @@
                     <input
                         v-model="passwordForm.password"
                         type="password"
-                        class="px-3 py-1.5 w-full rounded-lg border dark:border-transparent border-gray-200 dark:border-blue-800 focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90"
+                        class="px-3 py-1.5 w-full rounded-lg border dark:border-transparent border-gray-200  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90"
                         placeholder="********"
                         required
                     />
@@ -89,7 +88,7 @@
                     <input
                         v-model="passwordForm.password_confirmation"
                         type="password"
-                        class="px-3 py-1.5 w-full rounded-lg border dark:border-transparent border-gray-200 dark:border-blue-800 focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90"
+                        class="px-3 py-1.5 w-full rounded-lg border dark:border-transparent border-gray-200  focus:outline-blue-300 dark:outline-none bg-gray-50 dark:bg-gray-300 opacity-90"
                         placeholder="********"
                         required
                     />
@@ -117,7 +116,7 @@
 
         <!-- Delete Account -->
         <section
-            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br/60 dark:from-gray-950/10 dark:to-gray-950/20 shadow-lg dark:shadow p-5 rounded-lg"
+            class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 shadow-lg dark:shadow p-5 rounded-lg"
         >
             <BaseHeading size="large"> Delete Account</BaseHeading>
             <BaseText> Dive back in and pick up where you left off. </BaseText>

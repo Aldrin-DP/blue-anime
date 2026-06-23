@@ -25,7 +25,9 @@ class LoginController extends Controller
             $request->clearRateLimit();
             $request->session()->regenerate();
 
-            return redirect()->route('home');
+            return redirect()->to(
+                $request->input('redirect', route('home'))
+            );
         }
 
         $request->recordFailedAttempt();
