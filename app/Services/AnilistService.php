@@ -81,7 +81,7 @@ class AnilistService
 
     public function getTrending()
     {
-        return Cache::remember('anime.trending', now()->addMinutes(15), function () {
+        return Cache::remember('anime.trending', now()->addHours(5), function () {
             return Http::post($this->ANILIST_API, [
                 'query' => '
                     query Page($page: Int, $perPage: Int, $type: MediaType, $status: MediaStatus, $sort: [MediaSort]) {
@@ -112,7 +112,7 @@ class AnilistService
 
     public function getNewEpisodes()
     {
-        return Cache::remember('anime.new.episodes', now()->addMinutes(15), function (){
+        return Cache::remember('anime.new.episodes', now()->addHours(5), function (){
             $trendingAnime = Http::post($this->ANILIST_API, [
                 'query' => '
                     query($page: Int, $perPage: Int) {
@@ -186,7 +186,7 @@ class AnilistService
 
     public function getPopular()
     {
-        return Cache::remember('anime.popular', now()->addMinutes(15), function (){
+        return Cache::remember('anime.popular', now()->addHours(5), function (){
             return Http::post($this->ANILIST_API, [
                 'query' => '
                     query Query($page: Int, $perPage: Int, $sort: [MediaSort], $type: MediaType) {
@@ -218,7 +218,7 @@ class AnilistService
 
     public function getTopRated()
     {
-        return Cache::remember('anime.top.rated', now()->addMinutes(15), function (){
+        return Cache::remember('anime.top.rated', now()->addHours(5), function (){
             return Http::post($this->ANILIST_API, [
                 'query' => '
                     query Query($page: Int, $perPage: Int, $sort: [MediaSort], $type: MediaType) {

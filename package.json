@@ -19,6 +19,8 @@
         "@heroicons/vue": "^2.2.0",
         "@inertiajs/vue3": "^3.1.1",
         "@vitejs/plugin-vue": "^6.0.7",
+        "hls.js": "^1.6.16",
+        "vidstack": "^1.12.6",
         "vue": "^3.5.34"
     }
 }

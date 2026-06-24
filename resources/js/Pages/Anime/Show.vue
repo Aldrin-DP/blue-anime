@@ -174,6 +174,7 @@
             >
                 <div v-for="ep in currentPageEpisodes">
                     <div
+                        @click="watchEpisode(animeData.id, ep)"
                         class="cursor-pointer flex items-center gap-3 bg-blue-100 dark:bg-linear-to-br dark:from-teal-950 dark:to-blue-950 border border-gray-300 dark:border-gray-700 p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
                     >
                         <span
@@ -277,6 +278,7 @@ export default {
                 'format': '',
                 'cover_image': ''
             }),
+            watchForm: useForm(),
             now: Math.floor(Date.now() / 1000),
             isTruncated: true,
             isDescriptionOver40: true,
@@ -416,6 +418,9 @@ export default {
                 preserveScroll: true,
                 preserveState: true
             });
+        },
+        watchEpisode(id, episode) {
+            this.watchForm.get(`/anime/${id}/episodes/${episode}`);
         }
     },
 };

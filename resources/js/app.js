@@ -9,6 +9,7 @@ import BaseText from './Components/Base/BaseText.vue';
 import BaseLabel from './Components/Base/BaseLabel.vue';
 import BaseInputError from './Components/Base/BaseLabel.vue';
 
+
 createInertiaApp({
     title: (title) => { return `${title} Sea Anime` },
     resolve: name => {
