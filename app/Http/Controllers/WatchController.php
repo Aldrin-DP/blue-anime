@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AnilistService;
 use App\Services\StreamingService;
 
 
 class WatchController extends Controller
 {
-    public function show(StreamingService $streamingService, int $id, int $episode) {
+    public function show(StreamingService $streamingService, AnilistService $anilistService, int $animeId, int $episode) {
 
+        $episodeData = $streamingService->getEpisode($animeId, $episode);
 
-        $episodeData = $streamingService->getEpisode($id, $episode);
-
-        // dd($episodeData);
-
-        // https://anivexa-api-navy.vercel.app/proxy?url=&ref=https%3A%2F%2Fmegaplay.buzz%2F;
+        $anime = $anilistService->getAnime($animeId);
 
         return inertia('Episode/Show', [
+            'anime' => $anime['data']['Media'],
             'episodeData' => $episodeData
         ]);
     }

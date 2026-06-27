@@ -1,7 +1,7 @@
 <template>
     <Head :title="`${animeData.title.english} -  `" />
     <div class="p-0 m-0 lg:p-10 xl:px-15 xl:py-10 relative">
-        <section class="relative h-full bg-cover bg-center lg:flex">
+        <section class="relative bg-cover bg-center lg:flex">
             <img
                 :src="animeData.coverImage.extraLarge"
                 class="absolute inset-0 w-full h-full object-cover lg:hidden"
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div
-                class="w-full lg:w-8/12 xl:w-9/12 relative z-10 p-3 bg-blue-50/80 dark:bg-gray-900/80 xl:bg-transparent xl:dark:bg-transparent h-full"
+                class="w-full lg:w-8/12 xl:w-9/12 relative z-10 p-3 bg-blue-50/80 dark:bg-gray-900/80 xl:bg-transparent xl:dark:bg-transparent"
             >
                 <div>
                     <h2
@@ -71,17 +71,20 @@
                         >
                             <div>
                                 <div v-if="inWatchlist">
-                                    <div class="flex items-center justify-center">
-                                         <CheckIcon class="size-6" />
+                                    <div
+                                        class="flex items-center justify-center"
+                                    >
+                                        <CheckIcon class="size-6" />
                                         <span>Added to Watchlist</span>
                                     </div>
-
                                 </div>
-                                <div v-else class="flex items-center justify-center">
+                                <div
+                                    v-else
+                                    class="flex items-center justify-center"
+                                >
                                     <PlusIcon class="size-6" />
                                     <span> Add to Watchlist </span>
                                 </div>
-
                             </div>
                         </BaseButton>
 
@@ -246,7 +249,7 @@ import {
     ChevronLeftIcon,
     BarsArrowUpIcon,
     BarsArrowDownIcon,
-    CheckIcon
+    CheckIcon,
 } from "@heroicons/vue/20/solid";
 import { useForm, router } from "@inertiajs/vue3";
 import BaseButton from "../../Components/Base/BaseButton.vue";
@@ -264,19 +267,19 @@ export default {
         ChevronLeftIcon,
         BarsArrowUpIcon,
         BarsArrowDownIcon,
-        CheckIcon
+        CheckIcon,
     },
     props: {
         anime: Object,
-        inWatchlist: Boolean
+        inWatchlist: Boolean,
     },
     data() {
         return {
             form: useForm({
-                'api_id': '',
-                'title': '',
-                'format': '',
-                'cover_image': ''
+                api_id: "",
+                title: "",
+                format: "",
+                cover_image: "",
             }),
             watchForm: useForm(),
             now: Math.floor(Date.now() / 1000),
@@ -403,9 +406,10 @@ export default {
             this.form.get(`/anime/${animeId}`);
         },
         addToWatchlist() {
-
             if (!this.$page.props.auth.user) {
-                router.visit(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                router.visit(
+                    `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
+                );
                 return;
             }
 
@@ -414,14 +418,14 @@ export default {
             this.form.format = this.animeData.format;
             this.form.cover_image = this.animeData.coverImage.extraLarge;
 
-            this.form.post('/watchlists', {
+            this.form.post("/watchlists", {
                 preserveScroll: true,
-                preserveState: true
+                preserveState: true,
             });
         },
         watchEpisode(id, episode) {
             this.watchForm.get(`/anime/${id}/episodes/${episode}`);
-        }
+        },
     },
 };
 </script>
