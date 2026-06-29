@@ -16,7 +16,8 @@ class WatchController extends Controller
 
         return inertia('Episode/Show', [
             'anime' => $anime['data']['Media'],
-            'episodeData' => $episodeData
+            'episodeData' => $episodeData,
+            'currentEpisode' => $episode
         ]);
     }
 }

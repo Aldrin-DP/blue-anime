@@ -286,7 +286,7 @@ export default {
             isTruncated: true,
             isDescriptionOver40: true,
             currentPage: 1,
-            sorted: "desc",
+            sorted: "asc",
         };
     },
     mounted() {
