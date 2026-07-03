@@ -17,6 +17,5 @@ export default {
             default: "text-3xl",
         },
     },
-    data() {},
 };
 </script>

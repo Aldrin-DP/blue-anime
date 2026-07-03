@@ -1,241 +1,248 @@
 <template>
-    <Head :title="`${animeData.title.english} -  `" />
-    <div class="p-0 m-0 lg:p-10 xl:px-15 xl:py-10 relative">
-        <section class="relative bg-cover bg-center lg:flex">
-            <img
-                :src="animeData.coverImage.extraLarge"
-                class="absolute inset-0 w-full h-full object-cover lg:hidden"
-                alt=""
-            />
-            <div class="hidden lg:block p-3 lg:p-0 w-4/12 xl:w-3/12">
-                <div
-                    class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3"
-                >
-                    <img
-                        :src="animeData.coverImage.extraLarge"
-                        alt=""
-                        class="rounded w-full h-full object-cover object-center"
-                    />
-                </div>
-                <div
-                    v-if="animeData.nextAiringEpisode"
-                    class="flex justify-between mt-1 px-2 py-4 mx-0.5 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
-                >
-                    <span class="font-semibold tracking-wider"
-                        >Next episode:</span
+    <div>
+        <Head :title="`${animeData.title.english} -  `" />
+        <div class="p-0 m-0 lg:p-10 xl:px-15 xl:py-10 relative">
+            <section class="relative bg-cover bg-center lg:flex">
+                <img
+                    :src="animeData.coverImage.extraLarge"
+                    class="absolute inset-0 w-full h-full object-cover lg:hidden"
+                    alt=""
+                />
+                <div class="hidden lg:block p-3 lg:p-0 w-4/12 xl:w-3/12">
+                    <div
+                        class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3"
                     >
-                    <span class="font-bold">{{ airingAt }}</span>
-                </div>
-            </div>
-            <div
-                class="w-full lg:w-8/12 xl:w-9/12 relative z-10 p-3 bg-blue-50/80 dark:bg-gray-900/80 xl:bg-transparent xl:dark:bg-transparent"
-            >
-                <div>
-                    <h2
-                        class="font-extrabold text-xl lg:text-2xl mt-10 lg:mt-0 text-gray-900 dark:text-gray-100"
-                    >
-                        {{
-                            animeData.title.english
-                                ? animeData.title.english
-                                : animeData.title.romaji
-                        }}
-                    </h2>
-                    <div class="flex gap-2 mt-2">
-                        <span
-                            v-for="(genre, index) in genres"
-                            :key="index"
-                            class="px-2 py-1 text-sm text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-800 bg-white/30 dark:bg-gray-900/30 rounded"
-                        >
-                            {{ genre }}
-                        </span>
+                        <img
+                            :src="animeData.coverImage.extraLarge"
+                            alt=""
+                            class="rounded w-full h-full object-cover object-center"
+                        />
                     </div>
-
-                    <AnimeInfo :data="anime" />
-
                     <div
                         v-if="animeData.nextAiringEpisode"
-                        class="xl:hidden flex justify-between mt-3 px-2 py-4 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
+                        class="flex justify-between mt-1 px-2 py-4 mx-0.5 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
                     >
                         <span class="font-semibold tracking-wider"
                             >Next episode:</span
                         >
                         <span class="font-bold">{{ airingAt }}</span>
                     </div>
-
-                    <div class="mt-5 flex gap-1 items-center">
-                        <BaseButton
-                            :isProcessing="form.processing"
-                            @click="addToWatchlist"
-                            variant="primary"
-                            class="flex justify-center w-48"
+                </div>
+                <div
+                    class="w-full lg:w-8/12 xl:w-9/12 relative z-10 p-3 bg-blue-50/80 dark:bg-gray-900/80 xl:bg-transparent xl:dark:bg-transparent"
+                >
+                    <div>
+                        <h2
+                            class="font-extrabold text-xl lg:text-2xl mt-10 lg:mt-0 text-gray-900 dark:text-gray-100"
                         >
-                            <div>
-                                <div v-if="inWatchlist">
+                            {{
+                                animeData.title.english
+                                    ? animeData.title.english
+                                    : animeData.title.romaji
+                            }}
+                        </h2>
+                        <div class="flex gap-2 mt-2">
+                            <span
+                                v-for="(genre, index) in genres"
+                                :key="index"
+                                class="px-2 py-1 text-sm text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-800 bg-white/30 dark:bg-gray-900/30 rounded"
+                            >
+                                {{ genre }}
+                            </span>
+                        </div>
+
+                        <AnimeInfo :data="anime" />
+
+                        <div
+                            v-if="animeData.nextAiringEpisode"
+                            class="xl:hidden flex justify-between mt-3 px-2 py-4 text-sm text-sea-800 dark:text-blue-300 border border-sea-300 dark:border-sea-700 bg-sea-100 dark:bg-sea-800 rounded"
+                        >
+                            <span class="font-semibold tracking-wider"
+                                >Next episode:</span
+                            >
+                            <span class="font-bold">{{ airingAt }}</span>
+                        </div>
+
+                        <div class="mt-5 flex gap-1 items-center">
+                            <BaseButton
+                                :isProcessing="form.processing"
+                                @click="addToWatchlist"
+                                variant="primary"
+                                class="flex justify-center w-48"
+                            >
+                                <div>
+                                    <div v-if="inWatchlist">
+                                        <div
+                                            class="flex items-center justify-center"
+                                        >
+                                            <CheckIcon class="size-6" />
+                                            <span>Added to Watchlist</span>
+                                        </div>
+                                    </div>
                                     <div
+                                        v-else
                                         class="flex items-center justify-center"
                                     >
-                                        <CheckIcon class="size-6" />
-                                        <span>Added to Watchlist</span>
+                                        <PlusIcon class="size-6" />
+                                        <span> Add to Watchlist </span>
                                     </div>
                                 </div>
-                                <div
-                                    v-else
-                                    class="flex items-center justify-center"
-                                >
-                                    <PlusIcon class="size-6" />
-                                    <span> Add to Watchlist </span>
-                                </div>
-                            </div>
-                        </BaseButton>
+                            </BaseButton>
 
-                        <BaseButton variant="primary">
-                            <HeartIcon class="size-6" />
-                        </BaseButton>
-                    </div>
-
-                    <div
-                        class="mt-5 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/30 dark:bg-gray-900/30 rounded"
-                    >
-                        <span
-                            class="tracking-wider text-xs lg:text-base font-semibold"
-                            >SYNOPSIS</span
-                        >
-                        <div class="mt-3 lg:text-[15px]">
-                            {{ truncatedDescription }}
+                            <BaseButton variant="primary">
+                                <HeartIcon class="size-6" />
+                            </BaseButton>
                         </div>
-                        <span
-                            v-if="isDescriptionOver40"
-                            @click="toggleTruncatedDescription"
-                            class="cursor-pointer block font-bold mt-2 lg:text-[15px]"
+
+                        <div
+                            class="mt-5 px-2 py-4 text-sm text-gray-800 dark:text-gray-300 border-gray-400 dark:border-gray-800 bg-white/30 dark:bg-gray-900/30 rounded"
                         >
-                            {{ isTruncated ? "Read More" : "See Less" }}
-                        </span>
+                            <span
+                                class="tracking-wider text-xs lg:text-base font-semibold"
+                                >SYNOPSIS</span
+                            >
+                            <div class="mt-3 lg:text-[15px]">
+                                {{ truncatedDescription }}
+                            </div>
+                            <span
+                                v-if="isDescriptionOver40"
+                                @click="toggleTruncatedDescription"
+                                class="cursor-pointer block font-bold mt-2 lg:text-[15px]"
+                            >
+                                {{ isTruncated ? "Read More" : "See Less" }}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="backdrop-blur-md mt-3 p-3">
-            <BaseHeading> Episodes </BaseHeading>
-            <BaseText> {{ episodes }} episodes available </BaseText>
+            <section class="backdrop-blur-md mt-3 p-3">
+                <BaseHeading> Episodes </BaseHeading>
+                <BaseText> {{ episodes }} episodes available </BaseText>
 
-            <div class="flex justify-between items-center my-4">
-                <div class="flex items-center gap-1">
-                    <button
-                        @click="prevPage"
-                        :disabled="currentPage === 1"
-                        class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
-                    >
-                        <ChevronLeftIcon
-                            class="size-5 text-gray-800 dark:text-gray-300"
-                            :class="{
-                                'text-slate-400 dark:text-slate-700':
-                                    currentPage === 1,
-                            }"
-                        />
-                    </button>
-                    <div
-                        v-for="(page, index) in paginationPages"
-                        :key="index"
-                        class="flex gap-1 w-8 h-8 border rounded border-gray-300 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-300"
-                    >
+                <div class="flex justify-between items-center my-4">
+                    <div class="flex items-center gap-1">
                         <button
-                            @click="goToPage(page)"
-                            :class="{
-                                'bg-blue-600 rounded text-gray-300':
-                                    page === currentPage,
-                            }"
-                            class="w-full"
+                            @click="prevPage"
+                            :disabled="currentPage === 1"
+                            class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
                         >
-                            {{ page }}
+                            <ChevronLeftIcon
+                                class="size-5 text-gray-800 dark:text-gray-300"
+                                :class="{
+                                    'text-slate-400 dark:text-slate-700':
+                                        currentPage === 1,
+                                }"
+                            />
+                        </button>
+                        <div
+                            v-for="(page, index) in paginationPages"
+                            :key="index"
+                            class="flex gap-1 w-8 h-8 border rounded border-gray-300 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-300"
+                        >
+                            <button
+                                @click="goToPage(page)"
+                                :class="{
+                                    'bg-blue-600 rounded text-gray-300':
+                                        page === currentPage,
+                                }"
+                                class="w-full"
+                            >
+                                {{ page }}
+                            </button>
+                        </div>
+                        <button
+                            @click="nextPage"
+                            :disabled="currentPage * 20 >= episodes"
+                            class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
+                        >
+                            <ChevronRightIcon
+                                class="size-5 text-gray-800 dark:text-gray-300"
+                                :class="{
+                                    'text-slate-400':
+                                        currentPage * 20 >= episodes,
+                                }"
+                            />
                         </button>
                     </div>
+
                     <button
-                        @click="nextPage"
-                        :disabled="currentPage * 20 >= episodes"
-                        class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
+                        @click="toggleSort"
+                        class="p-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 cursor-pointer"
                     >
-                        <ChevronRightIcon
-                            class="size-5 text-gray-800 dark:text-gray-300"
-                            :class="{
-                                'text-slate-400': currentPage * 20 >= episodes,
-                            }"
+                        <BarsArrowUpIcon
+                            v-if="sorted === 'asc'"
+                            class="size-6"
                         />
+                        <BarsArrowDownIcon v-else class="size-6" />
                     </button>
                 </div>
-
-                <button
-                    @click="toggleSort"
-                    class="p-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 cursor-pointer"
+                <div
+                    class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
                 >
-                    <BarsArrowUpIcon v-if="sorted === 'asc'" class="size-6" />
-                    <BarsArrowDownIcon v-else class="size-6" />
-                </button>
-            </div>
-            <div
-                class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-            >
-                <div v-for="ep in currentPageEpisodes">
+                    <div v-for="ep in currentPageEpisodes">
+                        <div
+                            @click="watchEpisode(animeData.id, ep)"
+                            class="cursor-pointer flex items-center gap-3 bg-blue-100 dark:bg-linear-to-br dark:from-teal-950 dark:to-blue-950 border border-gray-300 dark:border-gray-700 p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
+                        >
+                            <span
+                                class="w-15 h-12 tracking-wider font-bold text-xl bg-blue-300 dark:bg-blue-700 text-blue-600 dark:text-blue-300 rounded-lg flex justify-center items-center"
+                                >{{ ep }}</span
+                            >
+                            <p
+                                class="font-semibold text-gray-700 dark:text-gray-300 tracking-wide"
+                            >
+                                Episode {{ ep }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="backdrop-blur-md mt-3 p-3">
+                <h2
+                    class="font-bold text-lg tracking-wide text-gray-700 dark:text-gray-400 mb-3"
+                >
+                    From the Same Depths
+                </h2>
+                <div
+                    class="grid gap-3 lg:gap-5 grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+                >
                     <div
-                        @click="watchEpisode(animeData.id, ep)"
-                        class="cursor-pointer flex items-center gap-3 bg-blue-100 dark:bg-linear-to-br dark:from-teal-950 dark:to-blue-950 border border-gray-300 dark:border-gray-700 p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
+                        class="cursor-pointer"
+                        @click="showAnime(animeData.mediaRecommendation.id)"
+                        v-for="anime in animeData.recommendations.nodes"
                     >
-                        <span
-                            class="w-15 h-12 tracking-wider font-bold text-xl bg-blue-300 dark:bg-blue-700 text-blue-600 dark:text-blue-300 rounded-lg flex justify-center items-center"
-                            >{{ ep }}</span
+                        <div
+                            class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative"
                         >
+                            <span
+                                class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 right-2 font-bold bg-blue-800 text-gray-300"
+                            >
+                                {{ anime.mediaRecommendation.format }}
+                            </span>
+                            <img
+                                :src="
+                                    anime.mediaRecommendation.coverImage
+                                        .extraLarge
+                                "
+                                alt=""
+                                class="rounded w-full h-full object-cover object-center"
+                            />
+                        </div>
                         <p
-                            class="font-semibold text-gray-700 dark:text-gray-300 tracking-wide"
+                            class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1"
                         >
-                            Episode {{ ep }}
+                            {{
+                                anime.mediaRecommendation.title.english
+                                    ? anime.mediaRecommendation.title.english
+                                    : anime.mediaRecommendation.title.romaji
+                            }}
                         </p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="backdrop-blur-md mt-3 p-3">
-            <h2
-                class="font-bold text-lg tracking-wide text-gray-700 dark:text-gray-400 mb-3"
-            >
-                From the Same Depths
-            </h2>
-            <div
-                class="grid gap-3 lg:gap-5 grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-            >
-                <div
-                    class="cursor-pointer"
-                    @click="showAnime(animeData.mediaRecommendation.id)"
-                    v-for="anime in animeData.recommendations.nodes"
-                >
-                    <div
-                        class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative"
-                    >
-                        <span
-                            class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 right-2 font-bold bg-blue-800 text-gray-300"
-                        >
-                            {{ anime.mediaRecommendation.format }}
-                        </span>
-                        <img
-                            :src="
-                                anime.mediaRecommendation.coverImage.extraLarge
-                            "
-                            alt=""
-                            class="rounded w-full h-full object-cover object-center"
-                        />
-                    </div>
-                    <p
-                        class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1"
-                    >
-                        {{
-                            anime.mediaRecommendation.title.english
-                                ? anime.mediaRecommendation.title.english
-                                : anime.mediaRecommendation.title.romaji
-                        }}
-                    </p>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
 </template>
 

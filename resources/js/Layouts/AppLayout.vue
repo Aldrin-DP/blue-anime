@@ -26,9 +26,6 @@ export default {
         TheHeader,
         TheFooter,
     },
-    data() {
-        return {};
-    },
     mounted() {
         init();
     },
