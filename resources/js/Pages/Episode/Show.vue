@@ -35,7 +35,7 @@
                                 @click="togglePlayback"
                                 @timeupdate="updateCurrentTime"
                                 @loadedmetadata="onLoadedMetadata"
-                                @loadeddata="onLoadedData"
+                                @canplay="onLoadedData"
                                 @progress="updateBuffered"
                                 ref="video"
                                 class="w-full roundex-xl"
@@ -276,7 +276,7 @@
                         <div>
                             <div class="flex gap-2">
                                 <div
-                                    class="w-[150px] border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3"
+                                    class="w-37.5 border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3"
                                 >
                                     <img
                                         :src="anime.coverImage.extraLarge"
