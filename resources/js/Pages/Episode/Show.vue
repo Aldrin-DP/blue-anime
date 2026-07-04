@@ -109,7 +109,6 @@
                                     ></path>
                                 </svg>
                             </div>
-
                             <div>
                                 <button
                                     v-if="isIntroVisible"
@@ -459,6 +458,7 @@ export default {
         episodeData: Object,
         anime: Object,
         currentEpisode: Number,
+        resumeTime: Number,
     },
     components: {
         ChevronRightIcon,
@@ -478,6 +478,13 @@ export default {
     data() {
         return {
             form: useForm(),
+            watchHistoryForm: useForm({
+                currentTime: 0,
+                isCompleted: false,
+                title: "",
+                format: "",
+                coverImage: "",
+            }),
             currentPage: 1,
             sorted: "asc",
             isPlaying: true,
@@ -493,12 +500,25 @@ export default {
             showControls: false,
             hideTimeout: null,
             isLoading: true,
+            lastSavedTime: 0,
+            intervalId: null,
         };
+    },
+    beforeUnmount() {
+        this.saveProgress();
+
+        clearInterval(this.intervalId);
     },
     mounted() {
         this.playEpisode();
         this.changeSubtitlePosition();
         this.displayCurrentEpisode();
+
+        if (this.intervalId) clearInterval(this.intervalId);
+
+        this.intervalId = setInterval(() => {
+            this.saveProgress();
+        }, 30000);
     },
     computed: {
         animeTitle() {
@@ -573,6 +593,44 @@ export default {
         },
     },
     methods: {
+        loadProgress() {
+            if (!this.$page.props.auth.user) return;
+
+            const userId = this.$page.props.auth.user.id;
+        },
+        saveProgress() {
+            if (!this.$page.props.auth.user) return;
+            if (!this.$refs.video) return;
+
+            const currentTime = this.$refs.video.currentTime;
+
+            if (
+                this.lastSavedTime !== null &&
+                Math.abs(currentTime - this.lastSavedTime) < 5
+            )
+                return;
+
+            this.lastSavedTime = currentTime;
+
+            const isCompleted = currentTime >= this.$refs.video.duration * 0.9;
+
+            this.watchHistoryForm.currentTime = currentTime;
+            this.watchHistoryForm.isCompleted = isCompleted;
+
+            this.watchHistoryForm.title = this.anime.title.english
+                ? this.anime.title.english
+                : this.anime.title.romaji;
+            this.watchHistoryForm.format = this.anime.format;
+            this.watchHistoryForm.coverImage = this.anime.coverImage.extraLarge;
+
+            this.watchHistoryForm.post(
+                `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`,
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                },
+            );
+        },
         onLoadedData() {
             this.isLoading = false;
         },
@@ -679,6 +737,15 @@ export default {
         },
         onLoadedMetadata() {
             this.duration = this.$refs.video.duration;
+
+            this.resumeCurrentTime();
+        },
+        resumeCurrentTime() {
+            if (!this.resumeTime) return;
+
+            const video = this.$refs.video;
+
+            video.currentTime = this.resumeTime;
         },
         seek(seconds) {
             this.$refs.video.currentTime =

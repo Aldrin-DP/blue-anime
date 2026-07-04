@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\WatchController;
+use App\Http\Controllers\WatchHistoryController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -43,4 +44,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/watchlists', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/watchlists', [WatchlistController::class, 'store']);
+
+    Route::post('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'save']);
 });

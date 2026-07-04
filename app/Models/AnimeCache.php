@@ -11,4 +11,8 @@ class AnimeCache extends Model
     public function watchlists(){
         return $this->hasMany(Watchlist::class);
     }
+    public function watch_histories()
+    {
+        return $this->hasMany(WatchHistory::class);
+    }
 }

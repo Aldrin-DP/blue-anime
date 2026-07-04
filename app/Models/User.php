@@ -21,6 +21,11 @@ class User extends Authenticatable
         return $this->hasMany(Watchlist::class);
     }
 
+    public function watch_histories()
+    {
+        return $this->hasMany(WatchHistory::class);
+    }
+
     protected function casts(): array
     {
         return [
