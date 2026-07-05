@@ -26,20 +26,20 @@
                     <div class="w-full">
                         <!-- video container -->
                         <div
-                            @mousemove="handleMouseMove"
-                            @keydown="handlePlaybackKeydown($event)"
                             ref="videoWrapper"
                             class="w-full relative overflow-hidden rounded-xl shadow-2xl"
+                            @mousemove="handleMouseMove"
+                            @keydown="handleKeyDown($event)"
                         >
                             <video
-                                @click="togglePlayback"
-                                @timeupdate="updateCurrentTime"
-                                @loadedmetadata="onLoadedMetadata"
-                                @canplay="onLoadedData"
-                                @progress="updateBuffered"
                                 ref="video"
-                                class="w-full roundex-xl"
                                 crossorigin="anonymous"
+                                class="w-full roundex-xl"
+                                @click="togglePlayback"
+                                @timeupdate="handleTimeUpdate"
+                                @loadedmetadata="handleLoadedMetaData"
+                                @canplay="handleCanPlay"
+                                @progress="handleProgress"
                             >
                                 <track
                                     :src="episodeData.subtitleEn"
@@ -49,12 +49,12 @@
                                     default
                                 />
                             </video>
-                            <div v-show="showControls">
+                            <div v-show="controlsVisible">
                                 <div
                                     class="flex items-center gap-4 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                                 >
                                     <button
-                                        @click="seek(-10)"
+                                        @click="skipBackward10"
                                         class="cursor-pointer rounded-full p-1.5 text-gray-200 backdrop-blur-md bg-gray-950/20"
                                     >
                                         <span
@@ -74,7 +74,7 @@
                                         </span>
                                     </button>
                                     <button
-                                        @click="seek(10)"
+                                        @click="skipForward10"
                                         class="cursor-pointer rounded-full p-1.5 text-gray-200 backdrop-blur-md bg-gray-950/20"
                                     >
                                         <span
@@ -119,7 +119,7 @@
                                 </button>
                             </div>
                             <div
-                                v-show="showControls"
+                                v-show="controlsVisible"
                                 class="w-full absolute bottom-0 left-0 pt-1 px-3 backdrop-blur-md bg-gray-950/80 text-gray-300"
                             >
                                 <!-- progress bar -->
@@ -161,7 +161,7 @@
                                         </div>
                                         <div class="flex items-center">
                                             <button
-                                                @click="seek(-10)"
+                                                @click="skipBackward10"
                                                 class="border-gray-300 rounded flex cursor-pointer text-4xl"
                                             >
                                                 <span
@@ -170,7 +170,7 @@
                                                 >
                                             </button>
                                             <button
-                                                @click="seek(10)"
+                                                @click="skipForward10"
                                                 class="border-gray-300 rounded flex cursor-pointer"
                                             >
                                                 <span
@@ -326,7 +326,7 @@
                             <div
                                 class="line-clamp-4 text-gray-800 dark:text-gray-300 mt-2"
                             >
-                                {{ anime.description }}
+                                {{ cleanedDescription }}
                             </div>
                         </div>
                     </div>
@@ -497,34 +497,333 @@ export default {
             volume: 0.5,
             savedVolume: 0,
             isIntroVisible: false,
-            showControls: false,
+            controlsVisible: false,
             hideTimeout: null,
             isLoading: true,
             lastSavedTime: 0,
             intervalId: null,
         };
     },
+
+    mounted() {
+        this.initPlayer();
+        this.displayCurrentEpisode();
+        this.initProgressAutoSave();
+    },
     beforeUnmount() {
         this.saveProgress();
 
         clearInterval(this.intervalId);
     },
-    mounted() {
-        this.playEpisode();
-        this.changeSubtitlePosition();
-        this.displayCurrentEpisode();
+    methods: {
+        handleMouseMove() {
+            this.resetControlsTimer();
+        },
+        handleProgress() {
+            this.updateBuffered();
+        },
+        handleLoadedMetaData() {
+            this.setVideoDuration();
+            this.resumeCurrentTime();
+            this.setupSubtitlePosition();
+        },
+        handleTimeUpdate() {
+            this.syncCurrentTime();
+            this.updateIntroVisibility();
+        },
+        handleCanPlay() {
+            this.setIsLoadingToFalse();
+        },
+        handleKeyDown(event) {
+            event.preventDefault();
+            this.handleMouseMove();
 
-        if (this.intervalId) clearInterval(this.intervalId);
+            if (event.code === "Space") {
+                this.togglePlayback();
+            }
+            if (event.code === "KeyF") {
+                this.toggleFullscreen();
+            }
+            if (event.code === "KeyM") {
+                this.toggleMute();
+            }
+            if (event.code === "ArrowLeft") {
+                this.skipBackward10();
+            }
+            if (event.code === "ArrowRight") {
+                this.skipForward10();
+            }
+        },
 
-        this.intervalId = setInterval(() => {
-            this.saveProgress();
-        }, 30000);
+        async toggleFullscreen() {
+            const videoWrapper = this.$refs.videoWrapper;
+
+            console.log(document.fullscreenElement);
+
+            if (document.fullscreenElement !== null) {
+                await document.exitFullscreen();
+                this.isFullscreen = false;
+            } else {
+                await videoWrapper.requestFullscreen();
+                this.isFullscreen = true;
+            }
+        },
+
+        playVideo() {
+            const video = this.getVideoEl();
+            if (!video) return;
+
+            video.play();
+        },
+        pauseVideo() {
+            const video = this.getVideoEl();
+            if (!video) return;
+
+            video.pause();
+        },
+        seek(time) {
+            const t = Number(time);
+            if (!Number.isFinite(t) || t < 0) return;
+
+            this.getVideoEl().currentTime = t;
+        },
+        skipForward10() {
+            const video = this.getVideoEl();
+
+            video.currentTime = video.currentTime + 10;
+        },
+        skipBackward10() {
+            const video = this.getVideoEl();
+            video.currentTime = video.currentTime - 10;
+        },
+        skipIntro() {
+            this.seek(this.episodeData.intro.end);
+        },
+        updateVolume(event) {
+            this.isMuted = false;
+            this.volume = event.target.value;
+
+            this.getVideoEl().volume = this.volume;
+        },
+        toggleMute() {
+            this.isMuted = !this.isMuted;
+
+            const video = this.getVideoEl();
+
+            if (this.isMuted) {
+                video.volume = 0;
+                this.savedVolume = this.volume;
+                this.volume = 0;
+            } else {
+                this.volume = this.savedVolume;
+                video.volume = this.volume;
+            }
+        },
+        handleSeek(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const clientX = event.clientX - rect.left;
+
+            const width = rect.width;
+            const percent = clientX / width;
+
+            const time = percent * this.getVideoEl().duration;
+
+            this.seek(time);
+        },
+        togglePlayback() {
+            if (this.isPlaying) {
+                this.pauseVideo();
+            } else {
+                this.playVideo();
+            }
+            this.isPlaying = !this.isPlaying;
+        },
+        prevEpisode() {
+            const episode = this.currentlyPlayingEpisode - 1;
+
+            this.form.get(`/anime/${this.anime.id}/episodes/${episode}`);
+        },
+        nextEpisode() {
+            const episode = this.currentlyPlayingEpisode + 1;
+
+            this.form.get(`/anime/${this.anime.id}/episodes/${episode}`);
+        },
+        scrollTo() {
+            const episodesEl = this.$refs.episodes;
+
+            episodesEl.scrollIntoView({
+                behavior: "smooth",
+            });
+        },
+        goToAnime(animeId) {
+            this.form.get(`/anime/${animeId}`);
+        },
+        nextPage() {
+            this.currentPage++;
+        },
+        prevPage() {
+            this.currentPage--;
+        },
+        goToPage(page) {
+            this.currentPage = page;
+        },
+        toggleSort() {
+            this.currentPage = 1;
+
+            if (this.sorted === "asc") {
+                this.sorted = "desc";
+            } else if (this.sorted === "desc") {
+                this.sorted = "asc";
+            }
+        },
+
+        initPlayer() {
+            const video = this.getVideoEl();
+            const proxyBase = "https://anidb-proxy.seaanime.workers.dev/?";
+
+            const defaultLoader = Hls.DefaultConfig.loader;
+            const referer = this.episodeData.refererUrl;
+
+            class ProxyLoader extends defaultLoader {
+                load(context, config, callbacks) {
+                    if (!context.url.includes("anidb-proxy")) {
+                        context.url =
+                            proxyBase +
+                            "url=" +
+                            encodeURIComponent(context.url) +
+                            "&ref=" +
+                            encodeURIComponent(referer);
+                    }
+                    super.load(context, config, callbacks);
+                }
+            }
+
+            const hls = new Hls({ enableWorker: false, loader: ProxyLoader });
+            hls.loadSource(this.episodeData.episodeUrl);
+            hls.attachMedia(video);
+
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                video.play();
+            });
+        },
+        initProgressAutoSave() {
+            if (this.intervalId) clearInterval(this.intervalId);
+
+            this.intervalId = setInterval(() => {
+                this.saveProgress();
+            }, 30000);
+        },
+        syncCurrentTime() {
+            this.currentTime = getVideoEl().currentTime;
+        },
+        saveProgress() {
+            if (!this.$page.props.auth.user) return;
+
+            const video = this.getVideoEl();
+            if (!video) return;
+
+            const currentTime = video.currentTime;
+
+            if (
+                this.lastSavedTime !== null &&
+                Math.abs(currentTime - this.lastSavedTime) < 5
+            )
+                return;
+
+            this.lastSavedTime = currentTime;
+
+            const isCompleted = currentTime >= video.duration * 0.9;
+
+            this.watchHistoryForm.currentTime = currentTime;
+            this.watchHistoryForm.isCompleted = isCompleted;
+
+            this.watchHistoryForm.title = this.anime.title.english
+                ? this.anime.title.english
+                : this.anime.title.romaji;
+            this.watchHistoryForm.format = this.anime.format;
+            this.watchHistoryForm.coverImage = this.anime.coverImage.extraLarge;
+
+            this.watchHistoryForm.post(
+                `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`,
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                },
+            );
+        },
+        resetControlsTimer() {
+            if (this.isLoading) return;
+
+            this.controlsVisible = true;
+
+            clearTimeout(this.hideTimeout);
+
+            this.hideTimeout = setTimeout(() => {
+                this.controlsVisible = false;
+            }, 2500);
+        },
+        updateBuffered() {
+            const video = this.getVideoEl();
+
+            if (!video) return;
+
+            if (video.buffered.length > 0) {
+                const bufferedEnd = video.buffered.end(
+                    video.buffered.length - 1,
+                );
+                this.bufferedPercent = (bufferedEnd / video.duration) * 100;
+            }
+        },
+        resumeCurrentTime() {
+            if (!this.resumeTime) return;
+
+            this.seek(this.resumeTime);
+        },
+        updateIntroVisibility() {
+            const episodeIntro = this.episodeData.intro;
+
+            this.isIntroVisible =
+                this.currentTime >= episodeIntro.start &&
+                this.currentTime <= episodeIntro.end;
+        },
+        setupSubtitlePosition() {
+            console.log("Subtitle");
+            const track = this.getVideoEl().textTracks[0];
+            console.log(track);
+            if (track) {
+                for (let cue of track.cues) {
+                    cue.line = -3;
+                    cue.snapToLines = true;
+                }
+            }
+        },
+        displayCurrentEpisode() {
+            const page = Math.ceil(this.currentlyPlayingEpisode / 20);
+
+            this.currentPage = Math.ceil(page);
+        },
+        getVideoEl() {
+            return this.$refs.video;
+        },
+        setIsLoadingToFalse() {
+            this.isLoading = false;
+        },
+        setVideoDuration() {
+            this.duration = this.getVideoEl().duration;
+        },
     },
+
     computed: {
         animeTitle() {
             return this.anime.title.english
                 ? this.anime.title.english
                 : this.anime.title.romaji;
+        },
+        cleanedDescription() {
+            const description = this.anime.description;
+            const cleaned = description.replace(/<[^>]*>/g, "\n");
+
+            return cleaned;
         },
         currentPageEpisodes() {
             const start = (this.currentPage - 1) * 20 + 1;
@@ -590,257 +889,6 @@ export default {
         },
         currentlyPlayingEpisode() {
             return this.currentEpisode;
-        },
-    },
-    methods: {
-        loadProgress() {
-            if (!this.$page.props.auth.user) return;
-
-            const userId = this.$page.props.auth.user.id;
-        },
-        saveProgress() {
-            if (!this.$page.props.auth.user) return;
-            if (!this.$refs.video) return;
-
-            const currentTime = this.$refs.video.currentTime;
-
-            if (
-                this.lastSavedTime !== null &&
-                Math.abs(currentTime - this.lastSavedTime) < 5
-            )
-                return;
-
-            this.lastSavedTime = currentTime;
-
-            const isCompleted = currentTime >= this.$refs.video.duration * 0.9;
-
-            this.watchHistoryForm.currentTime = currentTime;
-            this.watchHistoryForm.isCompleted = isCompleted;
-
-            this.watchHistoryForm.title = this.anime.title.english
-                ? this.anime.title.english
-                : this.anime.title.romaji;
-            this.watchHistoryForm.format = this.anime.format;
-            this.watchHistoryForm.coverImage = this.anime.coverImage.extraLarge;
-
-            this.watchHistoryForm.post(
-                `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`,
-                {
-                    preserveState: true,
-                    preserveScroll: true,
-                },
-            );
-        },
-        onLoadedData() {
-            this.isLoading = false;
-        },
-        displayCurrentEpisode() {
-            const page = Math.ceil(this.currentlyPlayingEpisode / 20);
-
-            this.currentPage = Math.ceil(page);
-        },
-        scrollTo() {
-            const episodesEl = this.$refs.episodes;
-
-            episodesEl.scrollIntoView({
-                behavior: "smooth",
-            });
-        },
-        prevEpisode() {
-            const episode = this.currentlyPlayingEpisode - 1;
-            this.form.get(`/anime/${this.anime.id}/episodes/${episode}`);
-        },
-        nextEpisode() {
-            const episode = this.currentlyPlayingEpisode + 1;
-            console.log(this.anime.id);
-            console.log(episode);
-            this.form.get(`/anime/${this.anime.id}/episodes/${episode}`);
-        },
-        handleMouseMove() {
-            this.showControls = true;
-
-            clearTimeout(this.hideTimeout);
-
-            this.hideTimeout = setTimeout(() => {
-                this.showControls = false;
-            }, 2500);
-        },
-        updateBuffered() {
-            const video = this.$refs.video;
-
-            if (!video) {
-                return;
-            }
-
-            if (video.buffered.length > 0) {
-                const bufferedEnd = video.buffered.end(
-                    video.buffered.length - 1,
-                );
-
-                this.bufferedPercent = (bufferedEnd / video.duration) * 100;
-            }
-        },
-        async toggleFullscreen() {
-            const videoWrapper = this.$refs.videoWrapper;
-
-            console.log(document.fullscreenElement);
-
-            if (document.fullscreenElement !== null) {
-                await document.exitFullscreen();
-                this.isFullscreen = false;
-            } else {
-                await videoWrapper.requestFullscreen();
-                this.isFullscreen = true;
-            }
-        },
-        updateVolume(event) {
-            const video = this.$refs.video;
-            this.isMuted = false;
-
-            this.volume = event.target.value;
-            video.volume = this.volume;
-        },
-        toggleMute() {
-            this.isMuted = !this.isMuted;
-
-            if (this.isMuted) {
-                this.$refs.video.volume = 0;
-                this.savedVolume = this.volume;
-                this.volume = 0;
-            } else {
-                this.volume = this.savedVolume;
-                this.$refs.video.volume = this.volume;
-            }
-        },
-        handleSeek(event) {
-            const rect = event.currentTarget.getBoundingClientRect();
-            const clientX = event.clientX - rect.left;
-
-            const width = rect.width;
-            const percent = clientX / width;
-
-            const time = percent * this.$refs.video.duration;
-
-            this.$refs.video.currentTime = time;
-        },
-        updateCurrentTime() {
-            const video = this.$refs.video;
-
-            this.currentTime = Math.floor(video.currentTime);
-
-            this.isIntroVisible =
-                this.currentTime >= this.episodeData.intro.start &&
-                this.currentTime <= this.episodeData.intro.end;
-        },
-        skipIntro() {
-            this.$refs.video.currentTime = this.episodeData.intro.end;
-        },
-        onLoadedMetadata() {
-            this.duration = this.$refs.video.duration;
-
-            this.resumeCurrentTime();
-        },
-        resumeCurrentTime() {
-            if (!this.resumeTime) return;
-
-            const video = this.$refs.video;
-
-            video.currentTime = this.resumeTime;
-        },
-        seek(seconds) {
-            this.$refs.video.currentTime =
-                this.$refs.video.currentTime + seconds;
-        },
-        handlePlaybackKeydown(event) {
-            event.preventDefault();
-            this.handleMouseMove();
-
-            if (event.code === "Space") {
-                this.togglePlayback();
-            }
-            if (event.code === "KeyF") {
-                this.toggleFullscreen();
-            }
-            if (event.code === "KeyM") {
-                this.toggleMute();
-            }
-            if (event.code === "ArrowLeft") {
-                this.seek(-10);
-            }
-            if (event.code === "ArrowRight") {
-                this.seek(10);
-            }
-        },
-        togglePlayback() {
-            if (this.isPlaying) {
-                this.$refs.video.pause();
-                this.isPlaying = !this.isPlaying;
-            } else {
-                this.$refs.video.play();
-                this.isPlaying = !this.isPlaying;
-            }
-        },
-        playEpisode() {
-            const video = this.$refs.video;
-            const proxyBase = "https://anidb-proxy.seaanime.workers.dev/?";
-
-            const defaultLoader = Hls.DefaultConfig.loader;
-            const referer = this.episodeData.refererUrl;
-
-            class ProxyLoader extends defaultLoader {
-                load(context, config, callbacks) {
-                    if (!context.url.includes("anidb-proxy")) {
-                        context.url =
-                            proxyBase +
-                            "url=" +
-                            encodeURIComponent(context.url) +
-                            "&ref=" +
-                            encodeURIComponent(referer);
-                    }
-                    super.load(context, config, callbacks);
-                }
-            }
-
-            const hls = new Hls({ enableWorker: false, loader: ProxyLoader });
-            hls.loadSource(this.episodeData.episodeUrl);
-            hls.attachMedia(video);
-
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                video.play();
-            });
-        },
-        goToAnime(animeId) {
-            this.form.get(`/anime/${animeId}`);
-        },
-        nextPage() {
-            this.currentPage++;
-        },
-        prevPage() {
-            this.currentPage--;
-        },
-        goToPage(page) {
-            this.currentPage = page;
-        },
-        toggleSort() {
-            this.currentPage = 1;
-            if (this.sorted === "asc") {
-                this.sorted = "desc";
-            } else if (this.sorted === "desc") {
-                this.sorted = "asc";
-            }
-        },
-        changeSubtitlePosition() {
-            const video = this.$refs.video;
-
-            video.addEventListener("loadedmetadata", () => {
-                const track = video.textTracks[0];
-                if (track) {
-                    for (let cue of track.cues) {
-                        cue.line = -3;
-                        cue.snapToLines = true;
-                    }
-                }
-            });
         },
     },
 };
