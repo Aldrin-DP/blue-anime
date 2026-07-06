@@ -73,7 +73,7 @@ export default {
     },
     computed: {
         anime() {
-            return this.data.data.Media;
+            return this.data;
         },
         releaseYear() {
             return `${this.anime.startDate.month}-${this.anime.startDate.day}-${this.anime.startDate.year}`;

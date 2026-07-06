@@ -39,7 +39,8 @@
                         </div>
                         <div>
                             <p
-                                class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1"
+                                class="text-gray-700 dark:text-gray-300 font-semibold cursor-pointer truncate mt-1"
+                                @click="goToAnime(anime.api_id)"
                             >
                                 {{ anime.title }}
                             </p>
@@ -127,6 +128,10 @@ export default {
     methods: {
         continueWatching(api_id, episode) {
             this.form.get(`/anime/${api_id}/episodes/${episode}`);
+        },
+        goToAnime(animeId) {
+            console.log(typeof animeId);
+            this.form.get(`/anime/${animeId}`);
         },
     },
 };

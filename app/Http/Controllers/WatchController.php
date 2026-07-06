@@ -19,7 +19,7 @@ class WatchController extends Controller
         $userId = auth()->id();
 
         $watched = null;
-        $episodesProgress = null;
+        $episodesProgress = [];
 
         $cachedAnime = AnimeCache::firstOrCreate(
             [ 'api_id' => $anilistId, ],
@@ -50,7 +50,7 @@ class WatchController extends Controller
             'episodeData' => $episodeData,
             'currentEpisode' => $episode,
             'resumeTime' => $watched ? $watched->current_time : 'null',
-            'episodesProgress' => $episodesProgress ? $episodesProgress : 'null'
+            'episodesProgress' => $episodesProgress
         ]);
     }
 }

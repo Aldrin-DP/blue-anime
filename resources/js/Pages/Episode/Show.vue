@@ -341,6 +341,12 @@
                 <span v-if="currentEpisode">Episode {{ currentEpisode }}</span>
             </div>
 
+            <!-- <EpisodeSection
+                ref="episodes"
+                :anime="anime"
+                :episodesProgress="episodesProgress"
+                :currentEpisode="currentEpisode"
+            /> -->
             <section ref="episodes" class="mt-5 w-full scroll-mt-20">
                 <div
                     class="w-full p-5 rounded-xl border border-gray-300 dark:border-gray-700"
@@ -427,6 +433,7 @@
                                         Episode {{ ep }}
                                     </p>
                                     <div
+                                        v-if="this.$page.props.auth.user"
                                         class="h-1 w-full rounded mt-2 bg-gray-300 dark:bg-gray-500 overflow-hidden"
                                     >
                                         <div
@@ -451,6 +458,7 @@
 
 <script>
 import Hls from "hls.js";
+import EpisodeSection from "../../Components/Episode/EpisodeSection.vue";
 import {
     ChevronRightIcon,
     ChevronLeftIcon,
@@ -477,6 +485,7 @@ export default {
         episodesProgress: Array,
     },
     components: {
+        EpisodeSection,
         ChevronRightIcon,
         ChevronLeftIcon,
         BarsArrowUpIcon,
@@ -527,7 +536,6 @@ export default {
         this.initPlayer();
         this.displayCurrentEpisode();
         this.initProgressAutoSave();
-        console.log(this.watchedTimeList);
     },
     beforeUnmount() {
         this.saveProgress();
@@ -535,9 +543,6 @@ export default {
         clearInterval(this.intervalId);
     },
     methods: {
-        setWatchProgress(ep) {
-            return this.episodesProgress.find((p) => p.episode === ep);
-        },
         handleMouseMove() {
             this.resetControlsTimer();
         },
@@ -833,6 +838,10 @@ export default {
         },
         getVideoEl() {
             return this.$refs.video;
+        },
+        setWatchProgress(ep) {
+            if (!this.$page.props.auth.user) return;
+            return this.episodesProgress.find((p) => p.episode === ep);
         },
         setIsLoadingToFalse() {
             this.isLoading = false;
