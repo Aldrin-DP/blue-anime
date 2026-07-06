@@ -217,6 +217,7 @@
                             class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative"
                         >
                             <span
+                                v-if="anime.mediaRecommendation.format"
                                 class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 right-2 font-bold bg-blue-800 text-gray-300"
                             >
                                 {{ anime.mediaRecommendation.format }}
@@ -424,6 +425,7 @@ export default {
             this.form.title = this.animeData.title.english;
             this.form.format = this.animeData.format;
             this.form.cover_image = this.animeData.coverImage.extraLarge;
+            this.form.banner_image = this.animeData.bannerImage;
 
             this.form.post("/watchlists", {
                 preserveScroll: true,

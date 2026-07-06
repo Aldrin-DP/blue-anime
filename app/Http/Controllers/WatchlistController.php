@@ -18,7 +18,8 @@ class WatchlistController extends Controller
             [
                 'title' => $request->title,
                 'format' => $request->format,
-                'cover_image' => $request->cover_image
+                'cover_image' => $request->cover_image,
+                'banner_image' => $request->cover_image
             ]
         );
 

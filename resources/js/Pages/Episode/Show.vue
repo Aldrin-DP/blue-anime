@@ -125,7 +125,7 @@
                                 <!-- progress bar -->
                                 <div
                                     @click="handleSeek($event)"
-                                    class="w-full h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative"
+                                    class="w-full h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative overflow-hidden"
                                 >
                                     <div
                                         :style="{
@@ -408,23 +408,38 @@
                     >
                         <div v-for="ep in currentPageEpisodes">
                             <div
-                                @click="watchEpisode(animeData.id, ep)"
+                                @click="watchEpisode(anime.id, ep)"
                                 :class="
                                     ep === currentEpisode
-                                        ? 'border-blue-500 bg-blue-200 dark:bg-blue-500 dark:border-blue-200'
+                                        ? 'border-blue-500 bg-blue-200 dark:bg-sea-800 dark:border-blue-200'
                                         : 'border-gray-300 dark:border-gray-700 bg-blue-100 dark:bg-linear-to-br dark:from-teal-950 dark:to-blue-950'
                                 "
-                                class="cursor-pointer flex items-center gap-3 border p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
+                                class="relative cursor-pointer flex items-center gap-3 border p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
                             >
                                 <span
-                                    class="w-15 h-12 tracking-wider font-bold text-xl bg-blue-300 dark:bg-blue-700 text-blue-600 dark:text-blue-300 rounded-lg flex justify-center items-center"
+                                    class="w-18 h-12 tracking-wider font-bold text-xl bg-blue-300 dark:bg-sea-700 text-blue-600 dark:text-blue-300 rounded-lg flex justify-center items-center"
                                     >{{ ep }}</span
                                 >
-                                <p
-                                    class="font-semibold text-gray-700 dark:text-gray-300 tracking-wide"
-                                >
-                                    Episode {{ ep }}
-                                </p>
+                                <div class="w-full flex flex-col">
+                                    <p
+                                        class="font-semibold dark:text-gray-300 tracking-wide"
+                                    >
+                                        Episode {{ ep }}
+                                    </p>
+                                    <div
+                                        class="h-1 w-full rounded mt-2 bg-gray-300 dark:bg-gray-500 overflow-hidden"
+                                    >
+                                        <div
+                                            v-if="setWatchProgress(ep)"
+                                            :style="{
+                                                width:
+                                                    setWatchProgress(ep)
+                                                        .progress + '%',
+                                            }"
+                                            class="h-1 bg-red-300"
+                                        ></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -459,6 +474,7 @@ export default {
         anime: Object,
         currentEpisode: Number,
         resumeTime: Number,
+        episodesProgress: Array,
     },
     components: {
         ChevronRightIcon,
@@ -480,10 +496,12 @@ export default {
             form: useForm(),
             watchHistoryForm: useForm({
                 currentTime: 0,
+                duration: 0,
                 isCompleted: false,
                 title: "",
                 format: "",
                 coverImage: "",
+                bannerImage: "",
             }),
             currentPage: 1,
             sorted: "asc",
@@ -509,6 +527,7 @@ export default {
         this.initPlayer();
         this.displayCurrentEpisode();
         this.initProgressAutoSave();
+        console.log(this.watchedTimeList);
     },
     beforeUnmount() {
         this.saveProgress();
@@ -516,6 +535,9 @@ export default {
         clearInterval(this.intervalId);
     },
     methods: {
+        setWatchProgress(ep) {
+            return this.episodesProgress.find((p) => p.episode === ep);
+        },
         handleMouseMove() {
             this.resetControlsTimer();
         },
@@ -655,6 +677,9 @@ export default {
                 behavior: "smooth",
             });
         },
+        watchEpisode(animeId, episode) {
+            this.form.get(`/anime/${animeId}/episodes/${episode}`);
+        },
         goToAnime(animeId) {
             this.form.get(`/anime/${animeId}`);
         },
@@ -711,10 +736,10 @@ export default {
 
             this.intervalId = setInterval(() => {
                 this.saveProgress();
-            }, 30000);
+            }, 60000);
         },
         syncCurrentTime() {
-            this.currentTime = getVideoEl().currentTime;
+            this.currentTime = this.getVideoEl().currentTime;
         },
         saveProgress() {
             if (!this.$page.props.auth.user) return;
@@ -730,11 +755,14 @@ export default {
             )
                 return;
 
+            if (currentTime < 20) return;
+
             this.lastSavedTime = currentTime;
 
             const isCompleted = currentTime >= video.duration * 0.9;
 
             this.watchHistoryForm.currentTime = currentTime;
+            this.watchHistoryForm.duration = this.duration;
             this.watchHistoryForm.isCompleted = isCompleted;
 
             this.watchHistoryForm.title = this.anime.title.english
@@ -742,6 +770,7 @@ export default {
                 : this.anime.title.romaji;
             this.watchHistoryForm.format = this.anime.format;
             this.watchHistoryForm.coverImage = this.anime.coverImage.extraLarge;
+            this.watchHistoryForm.bannerImage = this.anime.bannerImage;
 
             this.watchHistoryForm.post(
                 `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`,
@@ -876,7 +905,7 @@ export default {
         },
         formatCurrentTime() {
             let minute = Math.floor(this.currentTime / 60);
-            let second = this.currentTime % 60;
+            let second = Math.floor(this.currentTime % 60);
 
             if (second < 10) {
                 second = "0" + second;

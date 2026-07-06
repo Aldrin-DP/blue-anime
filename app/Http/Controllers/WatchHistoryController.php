@@ -16,6 +16,7 @@ class WatchHistoryController extends Controller
         $format = $request->input('format');
         $coverImage = $request->input('coverImage');
         $currentTime = $request->input('currentTime');
+        $duration = $request->input('duration');
         $isCompleted = $request->input('isCompleted');
 
         $cachedAnime = AnimeCache::firstOrCreate(
@@ -29,7 +30,7 @@ class WatchHistoryController extends Controller
 
         WatchHistory::updateOrCreate(
             ['user_id' => $user->id, 'anime_id' => $cachedAnime->id, 'episode' => $episode],
-            ['current_time' => $currentTime, 'is_completed' => $isCompleted]
+            ['current_time' => $currentTime, 'duration' => $duration, 'is_completed' => $isCompleted]
         );
     }
 }
