@@ -341,117 +341,12 @@
                 <span v-if="currentEpisode">Episode {{ currentEpisode }}</span>
             </div>
 
-            <!-- <EpisodeSection
+            <EpisodeSection
                 ref="episodes"
                 :anime="anime"
                 :episodesProgress="episodesProgress"
                 :currentEpisode="currentEpisode"
-            /> -->
-            <section ref="episodes" class="mt-5 w-full scroll-mt-20">
-                <div
-                    class="w-full p-5 rounded-xl border border-gray-300 dark:border-gray-700"
-                >
-                    <BaseHeading> Episodes </BaseHeading>
-                    <div class="flex justify-between items-center my-4">
-                        <div class="flex items-center gap-1">
-                            <button
-                                @click="prevPage"
-                                :disabled="currentPage === 1"
-                                class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
-                            >
-                                <ChevronLeftIcon
-                                    class="size-5 text-gray-800 dark:text-gray-300"
-                                    :class="{
-                                        'text-slate-400 dark:text-slate-700':
-                                            currentPage === 1,
-                                    }"
-                                />
-                            </button>
-                            <div
-                                v-for="(page, index) in paginationPages"
-                                :key="index"
-                                class="flex gap-1 w-8 h-8 border rounded border-gray-300 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-300"
-                            >
-                                <button
-                                    @click="goToPage(page)"
-                                    :class="{
-                                        'bg-blue-600 rounded text-gray-300':
-                                            page === currentPage,
-                                    }"
-                                    class="w-full"
-                                >
-                                    {{ page }}
-                                </button>
-                            </div>
-                            <button
-                                @click="nextPage"
-                                :disabled="currentPage * 20 >= episodes"
-                                class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
-                            >
-                                <ChevronRightIcon
-                                    class="size-5 text-gray-800 dark:text-gray-300"
-                                    :class="{
-                                        'text-slate-400':
-                                            currentPage * 20 >= episodes,
-                                    }"
-                                />
-                            </button>
-                        </div>
-
-                        <button
-                            @click="toggleSort"
-                            class="p-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 cursor-pointer"
-                        >
-                            <BarsArrowUpIcon
-                                v-if="sorted === 'asc'"
-                                class="size-6"
-                            />
-                            <BarsArrowDownIcon v-else class="size-6" />
-                        </button>
-                    </div>
-                    <div
-                        class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-                    >
-                        <div v-for="ep in currentPageEpisodes">
-                            <div
-                                @click="watchEpisode(anime.id, ep)"
-                                :class="
-                                    ep === currentEpisode
-                                        ? 'border-blue-500 bg-blue-200 dark:bg-sea-800 dark:border-blue-200'
-                                        : 'border-gray-300 dark:border-gray-700 bg-blue-100 dark:bg-linear-to-br dark:from-teal-950 dark:to-blue-950'
-                                "
-                                class="relative cursor-pointer flex items-center gap-3 border p-2 rounded-xl hover:shadow-lg hover:scale-102 transition-all duration-300"
-                            >
-                                <span
-                                    class="w-18 h-12 tracking-wider font-bold text-xl bg-blue-300 dark:bg-sea-700 text-blue-600 dark:text-blue-300 rounded-lg flex justify-center items-center"
-                                    >{{ ep }}</span
-                                >
-                                <div class="w-full flex flex-col">
-                                    <p
-                                        class="font-semibold dark:text-gray-300 tracking-wide"
-                                    >
-                                        Episode {{ ep }}
-                                    </p>
-                                    <div
-                                        v-if="this.$page.props.auth.user"
-                                        class="h-1 w-full rounded mt-2 bg-gray-300 dark:bg-gray-500 overflow-hidden"
-                                    >
-                                        <div
-                                            v-if="setWatchProgress(ep)"
-                                            :style="{
-                                                width:
-                                                    setWatchProgress(ep)
-                                                        .progress + '%',
-                                            }"
-                                            class="h-1 bg-red-300"
-                                        ></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            />
         </div>
     </div>
 </template>
@@ -486,10 +381,6 @@ export default {
     },
     components: {
         EpisodeSection,
-        ChevronRightIcon,
-        ChevronLeftIcon,
-        BarsArrowUpIcon,
-        BarsArrowDownIcon,
         PlayIcon,
         PauseIcon,
         ChevronDoubleRightIcon,
@@ -531,7 +422,6 @@ export default {
             intervalId: null,
         };
     },
-
     mounted() {
         this.initPlayer();
         this.displayCurrentEpisode();
@@ -688,25 +578,6 @@ export default {
         goToAnime(animeId) {
             this.form.get(`/anime/${animeId}`);
         },
-        nextPage() {
-            this.currentPage++;
-        },
-        prevPage() {
-            this.currentPage--;
-        },
-        goToPage(page) {
-            this.currentPage = page;
-        },
-        toggleSort() {
-            this.currentPage = 1;
-
-            if (this.sorted === "asc") {
-                this.sorted = "desc";
-            } else if (this.sorted === "desc") {
-                this.sorted = "asc";
-            }
-        },
-
         initPlayer() {
             const video = this.getVideoEl();
             const proxyBase = "https://anidb-proxy.seaanime.workers.dev/?";
@@ -839,10 +710,6 @@ export default {
         getVideoEl() {
             return this.$refs.video;
         },
-        setWatchProgress(ep) {
-            if (!this.$page.props.auth.user) return;
-            return this.episodesProgress.find((p) => p.episode === ep);
-        },
         setIsLoadingToFalse() {
             this.isLoading = false;
         },
@@ -862,44 +729,6 @@ export default {
             const cleaned = description.replace(/<[^>]*>/g, "\n");
 
             return cleaned;
-        },
-        currentPageEpisodes() {
-            const start = (this.currentPage - 1) * 20 + 1;
-            const end = Math.min(this.currentPage * 20, this.episodes);
-            const pages = [];
-
-            if (this.sorted === "desc") {
-                const sortStart = this.episodes - (this.currentPage - 1) * 20;
-                const sortEnd = Math.max(
-                    this.episodes - this.currentPage * 20 + 1,
-                    1,
-                );
-                for (let i = sortStart; i >= sortEnd; i--) {
-                    pages.push(i);
-                }
-            } else {
-                for (let i = start; i <= end; i++) {
-                    pages.push(i);
-                }
-            }
-            return pages;
-        },
-        paginationPages() {
-            const totalPages = Math.ceil(this.episodes / 20);
-            const pagesPerGroup = 5;
-            const currentPage = this.currentPage;
-
-            const currentGroup = Math.ceil(currentPage / pagesPerGroup);
-
-            const startPage = (currentGroup - 1) * pagesPerGroup + 1;
-            const endPage = Math.min(currentGroup * pagesPerGroup, totalPages);
-
-            const paginateNumbers = [];
-
-            for (let i = startPage; i <= endPage; i++) {
-                paginateNumbers.push(i);
-            }
-            return paginateNumbers;
         },
         episodes() {
             return this.anime.nextAiringEpisode

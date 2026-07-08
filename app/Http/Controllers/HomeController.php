@@ -17,6 +17,7 @@ class HomeController extends Controller
 
         if ($user) {
            $watchHistory = WatchHistory::where('user_id', $user->id)
+                ->where('is_completed', false)
                 ->with('anime')
                 ->latest('updated_at')
                 ->get()

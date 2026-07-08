@@ -76,6 +76,7 @@ export default {
         BarsArrowUpIcon,
         BarsArrowDownIcon,
     },
+    emits: ["sorted"],
     data() {
         return {
             currentPage: 1,
@@ -99,6 +100,7 @@ export default {
             } else if (this.sorted === "desc") {
                 this.sorted = "asc";
             }
+            this.$emit("sorted", this.sorted);
         },
     },
     computed: {

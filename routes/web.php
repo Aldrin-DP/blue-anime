@@ -42,8 +42,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [LogoutController::class, 'destroy']);
 
-    Route::get('/watchlists', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/watchlists', [WatchlistController::class, 'store']);
+    Route::patch('/watchlists/{anilistId}', [WatchlistController::class, 'patch']);
 
     Route::post('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'save']);
+
+    Route::patch('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'update']);
+
 });

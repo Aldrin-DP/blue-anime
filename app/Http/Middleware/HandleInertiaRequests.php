@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
+                'statusUpdated' => session('status-updated'),
                 'accountUpdated' => session('account-updated'),
                 'passwordUpdated' => session('password-updated')
             ]

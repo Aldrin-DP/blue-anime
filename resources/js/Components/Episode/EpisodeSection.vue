@@ -6,9 +6,15 @@
         <EpisodePagination
             :anime="anime"
             :episodesProgress="episodesProgress"
+            @sorted="handleSorted"
         />
 
-        <EpisodeList :anime="anime" :episodesProgress="episodesProgress" />
+        <EpisodeList
+            :anime="anime"
+            :episodesProgress="episodesProgress"
+            :currentEpisode="currentEpisode"
+            :sorted="sorted"
+        />
     </section>
 </template>
 
@@ -31,6 +37,11 @@ export default {
             currentPage: 1,
             sorted: "asc",
         };
+    },
+    methods: {
+        handleSorted(isSorted) {
+            this.sorted = isSorted;
+        },
     },
     computed: {
         episodes() {

@@ -66,7 +66,7 @@
 <script>
 export default {
     props: {
-        data: Array,
+        data: Object,
     },
     data() {
         return {};

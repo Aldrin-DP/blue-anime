@@ -63,31 +63,49 @@
                             <span class="font-bold">{{ airingAt }}</span>
                         </div>
 
-                        <div class="mt-5 flex gap-1 items-center">
+                        <div class="mt-5 flex gap-3 items-center">
                             <BaseButton
+                                v-if="!inWatchlist"
                                 :isProcessing="form.processing"
-                                @click="addToWatchlist"
                                 variant="primary"
                                 class="flex justify-center w-48"
+                                @click="addToWatchlist"
                             >
-                                <div>
-                                    <div v-if="inWatchlist">
-                                        <div
-                                            class="flex items-center justify-center"
-                                        >
-                                            <CheckIcon class="size-6" />
-                                            <span>Added to Watchlist</span>
-                                        </div>
-                                    </div>
-                                    <div
-                                        v-else
-                                        class="flex items-center justify-center"
-                                    >
-                                        <PlusIcon class="size-6" />
-                                        <span> Add to Watchlist </span>
-                                    </div>
+                                <div class="flex items-center justify-center">
+                                    <PlusIcon class="size-6" />
+                                    <span> Add to Watchlist </span>
                                 </div>
                             </BaseButton>
+
+                            <div v-else class="relative">
+                                <button
+                                    class="font-semibold text-gray-300 rounded-lg dark:text-gray-300 bg-gradient-to-b from-sea-700 to-sea-800 w-48 px-2 py-2 flex justify-between items-center hover:cursor-pointer"
+                                    @click="toggleSelection"
+                                >
+                                    <span class="capitalize">{{
+                                        status || "Added to Watchlists"
+                                    }}</span>
+                                    <ChevronRightIcon
+                                        v-if="!isOpen"
+                                        class="size-6"
+                                    />
+                                    <ChevronDownIcon v-else class="size-6" />
+                                </button>
+
+                                <ul
+                                    v-if="isOpen"
+                                    class="absolute w-48 rounded-lg py-1 px-2 top-[45px] bg-gradient-to-b from-sea-700 to-sea-800"
+                                >
+                                    <li
+                                        v-for="status in statuses"
+                                        :key="status"
+                                        class="capitalize py-1.5 px-2 text-center bg-gradient-to-b from-sea-700/40 to-sea-800/40 my-1.5 rounded text-gray-300 font-semibold tracking-wide hover:cursor-pointer hover:text-gray-100 hover:from-sea-700/80 hover:to-sea-800/80 transition-all duration-300"
+                                        @click="updateStatus(anime.id, status)"
+                                    >
+                                        {{ status }}
+                                    </li>
+                                </ul>
+                            </div>
 
                             <BaseButton variant="primary">
                                 <HeartIcon class="size-6" />
@@ -133,6 +151,8 @@ import {
     PlusIcon,
     ArrowsUpDownIcon,
     CheckIcon,
+    ChevronRightIcon,
+    ChevronDownIcon,
 } from "@heroicons/vue/20/solid";
 import { useForm, router } from "@inertiajs/vue3";
 import BaseButton from "../../Components/Base/BaseButton.vue";
@@ -151,32 +171,83 @@ export default {
         PlusIcon,
         ArrowsUpDownIcon,
         CheckIcon,
+        ChevronRightIcon,
+        ChevronDownIcon,
     },
     props: {
         anime: Object,
         inWatchlist: Boolean,
         episodesProgress: Array,
+        status: String,
     },
     data() {
         return {
             form: useForm({
-                api_id: "",
-                title: "",
-                format: "",
-                cover_image: "",
+                anilistId: "",
+            }),
+            updateForm: useForm({
+                status: "",
             }),
             watchForm: useForm(),
             now: Math.floor(Date.now() / 1000),
             isTruncated: true,
             isDescriptionOver40: true,
+
+            selectedLabel: "",
+            statuses: ["watching", "plan to watch", "completed", "dropped"],
+            isOpen: false,
         };
     },
     mounted() {
+        console.log(this.episodesProgress);
         setInterval(() => {
             this.now = Math.floor(Date.now() / 1000);
         }, 1000);
     },
+    methods: {
+        updateStatus(anilistId, status) {
+            this.isOpen = false;
+            if (this.status === status) {
+                return;
+            }
+
+            if (this.status === "plan_to_watch") {
+                this.status.replace("_", " ");
+                return;
+            }
+
+            if (status === "plan to watch") {
+                status = "plan_to_watch";
+            }
+            this.updateForm.status = status;
+            this.updateForm.patch(`/watchlists/${anilistId}`);
+        },
+        toggleSelection() {
+            this.isOpen = !this.isOpen;
+        },
+        addToWatchlist() {
+            if (!this.$page.props.auth.user) {
+                router.visit(
+                    `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
+                );
+                return;
+            }
+
+            this.form.anilistId = this.anime.id;
+
+            this.form.post("/watchlists", {
+                preserveScroll: true,
+                preserveState: true,
+            });
+        },
+    },
     computed: {
+        status() {
+            if (this.status === "plan_to_watch") {
+                return "Plan to Watch";
+            }
+            return this.status;
+        },
         genres() {
             const genres = this.anime.genres;
             return genres.slice(0, 3);
@@ -222,27 +293,6 @@ export default {
             return this.anime.nextAiringEpisode
                 ? this.anime.nextAiringEpisode.episode - 1
                 : this.anime.episodes;
-        },
-    },
-    methods: {
-        addToWatchlist() {
-            if (!this.$page.props.auth.user) {
-                router.visit(
-                    `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
-                );
-                return;
-            }
-
-            this.form.api_id = this.anime.id;
-            this.form.title = this.anime.title.english;
-            this.form.format = this.anime.format;
-            this.form.cover_image = this.anime.coverImage.extraLarge;
-            this.form.banner_image = this.anime.bannerImage;
-
-            this.form.post("/watchlists", {
-                preserveScroll: true,
-                preserveState: true,
-            });
         },
     },
 };
