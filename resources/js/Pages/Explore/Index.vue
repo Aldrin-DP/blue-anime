@@ -1,6 +1,6 @@
 <template>
-    <Head title="Explore - " />
     <div>
+        <Head title="Explore - " />
         <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
             <h1
                 class="text-3xl xl:text-4xl font-extrabold tracking-wider text-gray-800 dark:text-gray-300"

@@ -29,7 +29,7 @@
                     class="rounded w-full h-full object-cover object-center"
                 />
             </div>
-            <p
+            <h3
                 class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1"
             >
                 {{
@@ -37,7 +37,7 @@
                         ? anime.title.english
                         : anime.title.romaji
                 }}
-            </p>
+            </h3>
             <p
                 v-if="anime.episode"
                 class="text-gray-600 dark:text-gray-400 font-semibold text-[13px]"

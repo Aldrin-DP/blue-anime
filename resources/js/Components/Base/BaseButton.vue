@@ -62,6 +62,8 @@ export default {
                         this.variant === "secondary",
                     "bg-gradient-to-b from-red-400 to-red-600 hover:opacity-90 transition-all duration-300":
                         this.variant === "danger",
+                    "border text-[15px]! font-semibold! border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-400 hover:opacity-90 transition-all duration-300":
+                        this.variant === "filter",
                     "opacity-70 cursor-not-allowed":
                         this.disabled || this.isProcessing,
                 },

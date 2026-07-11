@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col h-auto bg-gray-50 dark:bg-gray-950">
+    <div class="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
         <TheHeader />
 
         <main
@@ -10,7 +10,7 @@
             </div>
         </main>
 
-        <TheFooter />
+        <TheFooter class="mt-auto" />
     </div>
 </template>
 

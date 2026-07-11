@@ -82,9 +82,9 @@
                                     class="font-semibold text-gray-300 rounded-lg dark:text-gray-300 bg-gradient-to-b from-sea-700 to-sea-800 w-48 px-2 py-2 flex justify-between items-center hover:cursor-pointer"
                                     @click="toggleSelection"
                                 >
-                                    <span class="capitalize">{{
-                                        status || "Added to Watchlists"
-                                    }}</span>
+                                    <span class="capitalize">
+                                        {{ status }}</span
+                                    >
                                     <ChevronRightIcon
                                         v-if="!isOpen"
                                         class="size-6"
@@ -97,18 +97,24 @@
                                     class="absolute w-48 rounded-lg py-1 px-2 top-[45px] bg-gradient-to-b from-sea-700 to-sea-800"
                                 >
                                     <li
-                                        v-for="status in statuses"
-                                        :key="status"
+                                        v-for="item in statuses"
+                                        :key="item"
                                         class="capitalize py-1.5 px-2 text-center bg-gradient-to-b from-sea-700/40 to-sea-800/40 my-1.5 rounded text-gray-300 font-semibold tracking-wide hover:cursor-pointer hover:text-gray-100 hover:from-sea-700/80 hover:to-sea-800/80 transition-all duration-300"
-                                        @click="updateStatus(anime.id, status)"
+                                        @click="updateStatus(anime.id, item)"
                                     >
-                                        {{ status }}
+                                        {{ item }}
                                     </li>
                                 </ul>
                             </div>
 
-                            <BaseButton variant="primary">
-                                <HeartIcon class="size-6" />
+                            <BaseButton
+                                variant="primary"
+                                @click="toggleFavorite(anime.id)"
+                            >
+                                <HeartIcon
+                                    :class="isFavorited ? 'text-pink-500' : ''"
+                                    class="size-6"
+                                />
                             </BaseButton>
                         </div>
 
@@ -179,6 +185,7 @@ export default {
         inWatchlist: Boolean,
         episodesProgress: Array,
         status: String,
+        isFavorited: Boolean,
     },
     data() {
         return {
@@ -189,6 +196,7 @@ export default {
                 status: "",
             }),
             watchForm: useForm(),
+            favoriteForm: useForm(),
             now: Math.floor(Date.now() / 1000),
             isTruncated: true,
             isDescriptionOver40: true,
@@ -199,26 +207,30 @@ export default {
         };
     },
     mounted() {
-        console.log(this.episodesProgress);
+        console.log(this.status);
         setInterval(() => {
             this.now = Math.floor(Date.now() / 1000);
         }, 1000);
     },
     methods: {
+        toggleFavorite(anilistId) {
+            this.favoriteForm.patch(`/watchlists/${anilistId}/favorite`, {
+                preserveState: true,
+                preserveScroll: true,
+            });
+        },
         updateStatus(anilistId, status) {
             this.isOpen = false;
             if (this.status === status) {
                 return;
             }
-
             if (this.status === "plan_to_watch") {
                 this.status.replace("_", " ");
-                return;
             }
-
             if (status === "plan to watch") {
                 status = "plan_to_watch";
             }
+
             this.updateForm.status = status;
             this.updateForm.patch(`/watchlists/${anilistId}`);
         },
@@ -250,7 +262,7 @@ export default {
         },
         genres() {
             const genres = this.anime.genres;
-            return genres.slice(0, 3);
+            return genres.slice(0, 5);
         },
         airingAt() {
             const airingAt = this.anime.nextAiringEpisode.airingAt;

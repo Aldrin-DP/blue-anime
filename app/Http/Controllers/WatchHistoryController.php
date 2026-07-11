@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WatchHistory;
+use App\Models\Watchlist;
 use App\Services\AnimeService;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,33 @@ class WatchHistoryController extends Controller
         $currentTime = $request->input('currentTime');
         $duration = $request->input('duration');
         $isCompleted = $request->input('isCompleted');
+
+        $watchedPercentage = ($currentTime / $duration) * 100;
+
+        if ($watchedPercentage >= 60) {
+
+            $inWatchlists = Watchlist::where('user_id', $user->id)
+                ->where('anime_id', $cachedAnime->id)
+                ->first();
+
+            if (!$inWatchlists){
+                Watchlist::create([
+                    'user_id' => $user->id,
+                    'anime_id' => $cachedAnime->id,
+                    'status' => 'watching',
+                    'progress' => $watchedPercentage,
+                ]);
+            } elseif ($inWatchlists->status === 'plan_to_watch'){
+                $inWatchlists->status = 'watching';
+                $inWatchlists->progress = $watchedPercentage;
+                $inWatchlists->save();
+            } elseif ($inWatchlists->status === 'watching') {
+                $inWatchlists->progress = $watchedPercentage;
+                $inWatchlists->save();
+            } else {
+                // status completed or dropped
+            }
+        }
 
         WatchHistory::updateOrCreate(
             ['user_id' => $user->id, 'anime_id' => $cachedAnime->id, 'episode' => $episode],

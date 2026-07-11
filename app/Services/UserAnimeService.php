@@ -8,6 +8,18 @@ use App\Models\Watchlist;
 
 class UserAnimeService
 {
+    public function isFavorited(int $animeId, ?User $user): bool 
+    {
+        if (!$user) {
+            return false;
+        }
+
+        return Watchlist::where('user_id', $user->id)
+            ->where('anime_id', $animeId)
+            ->where('is_favorite', true)
+            ->exists();
+    }
+
     public function isInWatchlist(int $animeId, ?User $user): bool 
     {
         if (!$user) {

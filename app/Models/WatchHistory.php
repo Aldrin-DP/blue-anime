@@ -18,4 +18,8 @@ class WatchHistory extends Model
     {
         return $this->belongsTo(AnimeCache::class);
     }
+
+    protected $casts = [
+        'is_completed' => 'boolean'
+    ];
 }

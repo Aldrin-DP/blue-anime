@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AnimeCache extends Model
 {
-    protected $fillable = ['api_id', 'title', 'format', 'cover_image', 'banner_image'];
+    protected $fillable = ['api_id', 'title', 'format', 'cover_image', 'banner_image', 'score', 'season', 'genres', 'episodes'];
 
     public function watchlists(): HasMany
     {
@@ -15,6 +15,11 @@ class AnimeCache extends Model
     }
     public function watch_histories(): HasMany
     {
-        return $this->hasMany(WatchHistory::class);
+        return $this->hasMany(WatchHistory::class, 'anime_id');
     }
+
+    
+    protected $casts = [
+        'genres' => 'array'
+    ];
 }

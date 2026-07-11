@@ -3,14 +3,52 @@
 namespace App\Http\Controllers;
 
 use App\Models\AnimeCache;
+use App\Models\WatchHistory;
 use App\Models\Watchlist;
 use App\Services\AnimeService;
 use App\Services\UserAnimeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
+
 class WatchlistController extends Controller
-{
+{   
+    public function index() {
+
+        $user = auth()->user();
+
+        $watchlists = Watchlist::with([
+            'anime', 
+            'anime.watch_histories' => function($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->where('current_time', '>', 0);
+            }])
+        ->where('user_id', $user->id)
+        ->latest('updated_at')
+        ->get();
+
+        $userWatchlists = $watchlists->map(fn($watchlist) => [
+            'anilistId' => $watchlist->anime->api_id,
+            'status' => $watchlist->status,
+            'progress' => $watchlist->progress,
+            'isFavorite' => $watchlist->is_favorite,
+            'title' => $watchlist->anime->title,
+            'format' => $watchlist->anime->format,
+            'coverImage' => $watchlist->anime->cover_image,
+            'score' => $watchlist->anime->score,
+            'genres' => $watchlist->anime->genres,
+            'episodes' => $watchlist->anime->episodes,
+            'lastWatchedEpisode' => $watchlist->anime->watch_histories->last()?->episode,
+            'lastWatched' => $watchlist->anime->watch_histories->last()?->duration ? 
+                    ($watchlist->anime->watch_histories->last()?->current_time / $watchlist->anime->watch_histories->last()?->duration * 100) : null,
+            'completed_at' => $watchlist->completed_at?->diffForHumans()
+            ]);
+
+        return inertia('Watchlist/Index', [
+            'watchlists' => $userWatchlists
+        ]);
+    }
+
     public function store(Request $request, AnimeService $animeService): RedirectResponse
     {
         $user = $request->user();
@@ -19,7 +57,8 @@ class WatchlistController extends Controller
 
         Watchlist::create([
             'user_id' => $user->id,
-            'anime_id' => $cachedAnime->id
+            'anime_id' => $cachedAnime->id,
+            'status' => 'plan_to_watch'
         ]);
 
         return back()->with('success', 'Added to Watchlists');
@@ -53,11 +92,38 @@ class WatchlistController extends Controller
                 ]);
                 break;
             case 'completed':
+                $watchlist->update([
+                    'status' => $request->input('status'),
+                    'completed_at' => now()
+                ]);
                 break;
             case 'dropped':
+                $watchlist->update([
+                    'status' => $request->input('status'),
+                ]);
                 break;
         }
 
         return back()->with('status-updated', 'Updated status');
     }
+
+    public function toggleFavorite(Request $request, int $anilistId, AnimeService $animeService) {
+        $user = $request->user();
+
+        $cachedAnime = $animeService->getOrCacheAnime($anilistId);
+
+        $watchlist = Watchlist::firstOrNew([
+            'user_id' => $user->id,
+            'anime_id' => $cachedAnime->id
+        ]);
+
+        if (!$watchlist->exists) {
+            $watchlist->status = 'plan_to_watch';
+        }
+
+        $watchlist->is_favorite = !$watchlist->is_favorite;
+        $watchlist->save();
+
+        return back();
+    }   
 }

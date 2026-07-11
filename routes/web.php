@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\WatchController;
 use App\Http\Controllers\WatchHistoryController;
+use App\Models\Watchlist;
 use Illuminate\Support\Facades\Route;
 
 
@@ -42,11 +43,16 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [LogoutController::class, 'destroy']);
 
+    Route::get('/watchlists', [WatchlistController::class, 'index']);
     Route::post('/watchlists', [WatchlistController::class, 'store']);
     Route::patch('/watchlists/{anilistId}', [WatchlistController::class, 'patch']);
+    Route::patch('/watchlists/{anilistId}/favorite', [WatchlistController::class, 'toggleFavorite']);
+
+    
 
     Route::post('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'save']);
 
     Route::patch('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'update']);
 
+    
 });

@@ -18,12 +18,15 @@ class AnimeController extends Controller
         $inWatchlist = $userAnimeService->isInWatchlist($cachedAnime->id, $user);
         $episodeProgress = $userAnimeService->getEpisodeProgress($cachedAnime->id, $user);
         $status = $userAnimeService->getUserAnimeStatus($cachedAnime->id, $user);
+        
+        $isFavorited = $userAnimeService->isFavorited($cachedAnime->id, $user);
 
         return inertia('Anime/Show', [
             'anime' => $anime['data']['Media'],
             'inWatchlist' => $inWatchlist,
             'episodesProgress' => $episodeProgress,
-            'status' => $status
+            'status' => $status,
+            'isFavorited' => $isFavorited
         ]);
     }
 
