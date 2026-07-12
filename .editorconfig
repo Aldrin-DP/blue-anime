@@ -3,16 +3,26 @@ root = true
 [*]
 charset = utf-8
 end_of_line = lf
-indent_size = 4
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+# PHP (Laravel)
+[*.php]
+indent_size = 4
+
+# Frontend files
+[*.{vue,js,ts,css,scss,html,json}]
+indent_size = 2
+
+# Markdown
 [*.md]
 trim_trailing_whitespace = false
 
+# YAML
 [*.{yml,yaml}]
 indent_size = 2
 
+# Docker Compose
 [{compose,docker-compose}.{yml,yaml}]
 indent_size = 4
