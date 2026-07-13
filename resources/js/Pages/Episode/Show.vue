@@ -121,7 +121,10 @@
                 <!-- progress bar -->
                 <div
                   @click="handleSeek($event)"
-                  class="w-full h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative overflow-hidden"
+                  @pointermove="drag"
+                  @pointerup="stopDrag"
+                  ref="progressTrack"
+                  class="w-full h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative"
                 >
                   <div
                     :style="{
@@ -133,6 +136,13 @@
                   <div
                     :style="{ width: progressBar + '%' }"
                     class="h-full bg-red-500 transition-all duration-300 absolute"
+                  ></div>
+
+                  <div
+                    :style="{ left: progressBar + '%' }"
+                    class="h-3 w-3 -bottom-1 rounded-full bg-red-500 absolute z-10 -left-1"
+                    ref="thumb"
+                    @pointerdown="startDrag"
                   ></div>
                 </div>
 
@@ -312,12 +322,13 @@
         <span v-if="currentEpisode">Episode {{ currentEpisode }}</span>
       </div>
 
-      <EpisodeSection
-        ref="episodes"
-        :anime="anime"
-        :episodesProgress="episodesProgress"
-        :currentEpisode="currentEpisode"
-      />
+      <div ref="episodes">
+        <EpisodeSection
+          :anime="anime"
+          :episodesProgress="episodesProgress"
+          :currentEpisode="currentEpisode"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -354,6 +365,7 @@ export default {
     EpisodeSection,
     PlayIcon,
     PauseIcon,
+    ChevronRightIcon,
     ChevronDoubleRightIcon,
     ChevronDoubleLeftIcon,
     SpeakerWaveIcon,
@@ -391,6 +403,7 @@ export default {
       isLoading: true,
       lastSavedTime: 0,
       intervalId: null,
+      isDragging: false,
     };
   },
   mounted() {
@@ -517,6 +530,31 @@ export default {
       const time = percent * this.getVideoEl().duration;
 
       this.seek(time);
+    },
+    startDrag(event) {
+      this.isDragging = true;
+
+      event.target.setPointerCapture(event.pointerId);
+    },
+    drag(event) {
+      if (!this.isDragging) return;
+
+      const rect = event.currentTarget.getBoundingClientRect();
+      const clientX = event.clientX - rect.left;
+
+      const width = rect.width;
+      const percent = clientX / width;
+
+      const time = percent * this.getVideoEl().duration;
+
+      this.$refs.progressTrack = percent * this.getVideoEl().duration;
+
+      this.seek(time);
+    },
+    stopDrag() {
+      this.isDragging = false;
+
+      event.target.releasePointerCapture(event.pointerId);
     },
     togglePlayback() {
       if (this.isPlaying) {

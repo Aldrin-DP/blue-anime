@@ -119,7 +119,8 @@ export default {
     };
   },
   mounted() {
-    console.log(this.continueAnime);
+    console.log(this.newEpisodes);
+    console.log(this.trendingAnime);
   },
   methods: {
     continueWatching(api_id, episode) {
@@ -132,3 +133,5 @@ export default {
   },
 };
 </script>
+
+console.log(this.newEpisodes);

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Head title="Explore - " />
+    <Head title="Watchlists - " />
     <div class="p-2 lg:p-10 xl:px-15 xl:py-10">
       <div class="w-full">
         <div
@@ -11,7 +11,7 @@
           >
             Watchlists
           </h2>
-
+          <!-- filter status -->
           <div
             class="flex justify-betweeen items-center gap-2 text-base tracking-wide font-semibold w-full lg:w-auto overflow-x-auto whitespace-nowrap pb-3"
           >
@@ -108,11 +108,6 @@
       </div>
 
       <section class="mt-2 lg:mt-4">
-        <!-- <h2
-                    class="font-semibold tracking-wider text-base lg:text-lg text-gray-800 dark:text-gray-300 mb-2"
-                >
-                    Watching
-                </h2> -->
         <div
           class="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-5"
         >
@@ -187,12 +182,12 @@
                   "
                   class="hidden lg:flex items-center gap-2"
                 >
-                  <div class="h-3 lg:h-4.5 bg-gray-400 -mt-1 w-1/2">
+                  <div class="h-3 lg:h-4.5 bg-gray-400/30 -mt-1 w-1/2">
                     <div
                       :style="{
                         width: watchlist.lastWatched + '%',
                       }"
-                      class="bg-gray-500 h-full"
+                      class="bg-gray-400/50 h-full"
                     ></div>
                   </div>
                   <div class="w-1/2 -mt-1 text-gray-800 dark:text-gray-300">
@@ -281,14 +276,42 @@
                   <button @click="toggleFavorite(watchlist.anilistId)">
                     <HeartIcon
                       :class="watchlist.isFavorite ? 'text-pink-500' : ''"
-                      class="size-5 lg:size-6 cursor-pointer"
+                      class="size-5 lg:size-6 cursor-pointer text-gray-700 dark:text-gray-400"
                     />
                   </button>
-                  <button>
-                    <EllipsisVerticalIcon
-                      class="size-5 lg:size-6 text-gray-700 dark:text-gray-400 cursor-pointer"
-                    />
-                  </button>
+                  <div class="relative">
+                    <button @click="toggleKebab(watchlist.anilistId)">
+                      <EllipsisVerticalIcon
+                        class="size-5 lg:size-6 text-gray-700 dark:text-gray-400 cursor-pointer"
+                      />
+                    </button>
+                    <div
+                      v-if="isKebabOpen && id === watchlist.anilistId"
+                      class="absolute bottom-[120%] right-[90%] bg-gray-300 w-45 h-auto p-2"
+                    >
+                      <div class="pb-1">
+                        <ul
+                          class="w-full rounded-lg bg-gradient-to-b from-sea-700 to-sea-800"
+                        >
+                          <li
+                            v-for="item in statuses"
+                            :key="item"
+                            class="capitalize py-1 text-center bg-gradient-to-b from-sea-700/40 to-sea-800/40 my-0.5 rounded text-gray-300 font-semibold tracking-wide hover:cursor-pointer hover:text-gray-100 hover:from-sea-700/80 hover:to-sea-800/80 transition-all duration-300"
+                            @click="updateStatus(anime.id, item)"
+                          >
+                            {{ item }}
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="border-t">
+                        <BaseButton
+                          variant="danger"
+                          class="w-full! py-1.5! mt-1"
+                          >Remove</BaseButton
+                        >
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -386,7 +409,12 @@
             >
               Finished series will show up here.
             </p>
-            <BaseButton variant="primary" class="mt-3 flex items-center w-auto">
+            <BaseButton
+              variant="primary"
+              :isProcessing="isProcessing"
+              class="mt-3 flex items-center w-auto"
+              @click="goToExplore()"
+            >
               <div class="flex items-center justify-center gap-2">
                 <span> Explore Anime </span>
                 <ArrowLongRightIcon class="size-6" />
@@ -455,12 +483,24 @@ export default {
       favoriteForm: useForm(),
       activeTab: "all",
       isProcessing: false,
+      isKebabOpen: false,
+      id: 0,
+      lastSavedId: 0,
+      statuses: ["watching", "planning", "completed", "dropped"],
     };
   },
   mounted() {
     console.log(this.watchlists);
   },
   methods: {
+    toggleKebab(anilistId) {
+      if (anilistId !== this.lastSavedId) {
+        this.isKebabOpen = false;
+      }
+      this.id = anilistId;
+      this.lastSavedId = anilistId;
+      this.isKebabOpen = !this.isKebabOpen;
+    },
     goToExplore() {
       router.visit("/explore", {
         onStart: () => {

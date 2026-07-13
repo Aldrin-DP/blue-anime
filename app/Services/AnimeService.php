@@ -16,13 +16,19 @@ class AnimeService
 
     public function getOrCacheAnime(int $anilistId) {
 
-        $anime = $this->anilistService->getAnime($anilistId);
+        $cached = AnimeCache::where('api_id', $anilistId)->first();
+
+        if ($cached && $cached->updated_at->gt(now()->subDay())) {
+            return $cached;
+        }
+
+        $anime = $this->anilistService->getAnime($anilistId);  
         $media = $anime['data']['Media'] ?? [];
 
-        return AnimeCache::firstOrCreate(
-            [ 'api_id' => $anilistId, ],
+        return AnimeCache::updateOrCreate(
+            ['api_id' => $anilistId],
             [
-                'title' => $media['title']['english'],
+                'title' => $media['title']['english'] ?? $media['title']['romaji'],
                 'format' => $media['format'],
                 'cover_image' => $media['coverImage']['extraLarge'],
                 'banner_image' => $media['bannerImage'],

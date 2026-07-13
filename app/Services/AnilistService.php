@@ -247,4 +247,56 @@ class AnilistService
             ])->json()['data']['Page']['media'];
         });
     }
+
+    public function getPopularAnimePage(int $page, int $perPage) {
+        return Http::post($this->ANILIST_API, [
+            'query' => '
+                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort]) {
+                    Page(perPage: $perPage, page: $page) {
+                        media(sort: $sort) {
+                        title {
+                            english
+                            romaji
+                        }
+                        averageScore
+                        bannerImage
+                        countryOfOrigin
+                        coverImage {
+                            extraLarge
+                        }
+                        description
+                        episodes
+                        format
+                        genres
+                        status
+                        id
+                        nextAiringEpisode {
+                            episode
+                            airingAt
+                        }
+                        seasonYear
+                        season
+                        popularity
+                        studios {
+                            nodes {
+                                name
+                                }
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            total
+                            perPage
+                            currentPage
+                            lastPage
+                        }
+                    }
+                }',
+            'variables' => [
+                'page' => $page,
+                'perPage' => $perPage,
+                'sort' => 'POPULARITY_DESC'
+            ]
+        ])->json();
+    }
 }

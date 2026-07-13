@@ -6,7 +6,7 @@
       v-for="(anime, index) in anime"
       :key="anime.id"
       class="mb-1 cursor-pointer"
-      @click="showAnime(anime.id)"
+      @click="handleClick(anime.id, anime.episode)"
     >
       <div
         class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative"
@@ -52,11 +52,16 @@ export default {
   data() {
     return {
       form: useForm(),
+      watchForm: useForm(),
     };
   },
   methods: {
-    showAnime(animeId) {
-      this.form.get(`/anime/${animeId}`);
+    handleClick(anilistId, episode) {
+      if (episode) {
+        this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`);
+        return;
+      }
+      this.form.get(`/anime/${anilistId}`);
     },
   },
 };

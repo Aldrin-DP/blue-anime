@@ -70,6 +70,7 @@ export default {
     episodesProgress: Array,
     currentEpisode: Number,
     sorted: String,
+    currentPage: Number,
   },
   data() {
     return {
@@ -79,7 +80,6 @@ export default {
         duration: 0,
         isCompleted: false,
       }),
-      currentPage: 1,
       isCompleted: false,
     };
   },

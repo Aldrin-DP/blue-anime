@@ -75,7 +75,7 @@ export default {
     BarsArrowUpIcon,
     BarsArrowDownIcon,
   },
-  emits: ["sorted"],
+  emits: ["sorted", "page"],
   data() {
     return {
       currentPage: 1,
@@ -91,6 +91,7 @@ export default {
     },
     goToPage(page) {
       this.currentPage = page;
+      this.$emit("page", this.currentPage);
     },
     toggleSort() {
       this.currentPage = 1;

@@ -17,17 +17,21 @@ class StreamingService
 
             $response->json();
 
-            $episodeLinks = collect($response['ssub']['streams'])
+            $episodeLink = collect($response['ssub']['streams'])
                 ->first(fn($link) => $link['default'] === true);
+
+            $subtitleLink = collect($response['ssub']['subtitles'])
+                ->first(fn($link) => $link['default'] === true);
+
 
             $subtitle = 
                 'https://anidb-proxy.seaanime.workers.dev/?url='
-                . urlencode($response['ssub']['subtitles'][0]['file'])   
+                . urlencode($subtitleLink['file'])   
                 . '&ref=' . urlencode('https://megaplay.buzz/');
                 
             return [
-                'episodeUrl' => $episodeLinks['url'], 
-                'refererUrl' => $episodeLinks['referer'],
+                'episodeUrl' => $episodeLink['url'], 
+                'refererUrl' => $episodeLink['referer'],
                 'subtitleEn' => $subtitle,
                 'intro' => $response['ssub']['intro']
             ];

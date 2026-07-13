@@ -7,6 +7,7 @@
       :anime="anime"
       :episodesProgress="episodesProgress"
       @sorted="handleSorted"
+      @page="handlePage"
     />
 
     <EpisodeList
@@ -14,6 +15,7 @@
       :episodesProgress="episodesProgress"
       :currentEpisode="currentEpisode"
       :sorted="sorted"
+      :currentPage="currentPage"
     />
   </section>
 </template>
@@ -31,6 +33,7 @@ export default {
     anime: Object,
     episodesProgress: Array,
     currentEpisode: Number,
+    currentPage: Number,
   },
   data() {
     return {
@@ -41,6 +44,9 @@ export default {
   methods: {
     handleSorted(isSorted) {
       this.sorted = isSorted;
+    },
+    handlePage(page) {
+      this.currentPage = page;
     },
   },
   computed: {

@@ -5,6 +5,7 @@
       :episodesProgress="episodesProgress"
       :sorted="sorted"
       :currentEpisode="currentEpisode"
+      :currentPage="currentPage"
     />
   </div>
 </template>
@@ -21,6 +22,7 @@ export default {
     episodesProgress: Array,
     sorted: String,
     currentEpisode: Number,
+    currentPage: Number,
   },
 };
 </script>
