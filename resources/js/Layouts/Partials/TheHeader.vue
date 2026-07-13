@@ -36,22 +36,12 @@
         </div>
       </div>
 
+      <SearchBar />
+
       <div
         :class="isOpen ? 'flex' : 'hidden'"
         class="lg:flex flex-col justify-between border-b absolute w-full lg:w-auto px-3 lg:px-0 py-4 lg:py-0 bg-gray-50 dark:bg-gray-950 lg:bg-transparent lg:dark:bg-transparent border-t border-gray-300 dark:border-gray-800 lg:flex-1 h-auto z-20 lg:flex-row lg:relative lg:z-0 lg:border-none"
       >
-        <div
-          tabindex="0"
-          class="flex items-center mb-3 lg:mb-0 lg:mx-5 xl:mx-10 gap-2 border px-3 py-2 lg:py-1 rounded-full border-gray-300 dark:border-gray-900 focus-within:outline-2 focus-within:outline-blue-700"
-        >
-          <input
-            type="text"
-            class="w-full lg:w-auto outline:none focus:border-none focus:outline-0 placeholder:text-gray-400"
-            placeholder="Search anime..."
-          />
-          <MagnifyingGlassIcon class="size-5" />
-        </div>
-
         <div
           class="flex flex-col flex-1 justify-between lg:flex-row lg:items-center"
         >
@@ -91,6 +81,7 @@
 
             <div class="w-full lg:w-auto relative">
               <div
+                ref="accountMenuWrapper"
                 v-if="$page.props.auth.user"
                 class="lg:cursor-pointer lg:border rounded-xl lg:border-gray-300 lg:dark:border-gray-800 hover:dark:text-gray-100 hover:text-gray-800"
               >
@@ -146,6 +137,8 @@
 import AppLogo from "./AppLogo.vue";
 import BaseButton from "../../Components/Base/BaseButton.vue";
 import NavLink from "../../Components/NavLink.vue";
+import SearchBar from "../../Components/Search/SearchBar.vue";
+
 import {
   MagnifyingGlassIcon,
   SunIcon,
@@ -167,6 +160,7 @@ export default {
     AppLogo,
     BaseButton,
     NavLink,
+    SearchBar,
     MagnifyingGlassIcon,
     SunIcon,
     MoonIcon,
@@ -182,7 +176,18 @@ export default {
       form: useForm(),
     };
   },
+  mounted() {
+    document.addEventListener("click", this.handleClickOutside);
+  },
+  beforeUnmount() {
+    document.addEventListener("click", this.handleClickOutside);
+  },
   methods: {
+    handleClickOutside(event) {
+      if (!this.$refs.accountMenuWrapper.contains(event.target)) {
+        this.isAccountMenuOpen = false;
+      }
+    },
     toggleNav() {
       this.isOpen = !this.isOpen;
     },

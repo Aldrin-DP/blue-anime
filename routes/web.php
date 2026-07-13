@@ -8,18 +8,20 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\WatchlistController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\WatchController;
 use App\Http\Controllers\WatchHistoryController;
-use App\Models\Watchlist;
+use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 
+Route::get('/anime/search', [SearchController::class, 'search']);
 Route::get('/anime/{id}', [AnimeController::class, 'show'])->name('anime.show');
 
 Route::get('/anime/{id}/episodes/{episode}', [WatchController::class, 'show']);
+
 
 
 Route::get('/explore', [ExploreController::class, 'index'])->name('explore.index');
