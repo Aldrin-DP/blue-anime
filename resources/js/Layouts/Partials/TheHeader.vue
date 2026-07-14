@@ -140,7 +140,6 @@ import NavLink from "../../Components/NavLink.vue";
 import SearchBar from "../../Components/Search/SearchBar.vue";
 
 import {
-  MagnifyingGlassIcon,
   SunIcon,
   MoonIcon,
   ArrowRightEndOnRectangleIcon,
@@ -161,7 +160,6 @@ export default {
     BaseButton,
     NavLink,
     SearchBar,
-    MagnifyingGlassIcon,
     SunIcon,
     MoonIcon,
     ArrowRightEndOnRectangleIcon,

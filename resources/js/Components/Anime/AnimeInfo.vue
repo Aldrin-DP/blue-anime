@@ -52,7 +52,10 @@
       <span class="uppercase text-xs text-gray-600">Format:</span>
       <span class="">{{ anime.format }}</span>
     </div>
-    <div class="hidden xl:flex items-center gap-1">
+    <div
+      v-if="anime.studios.nodes[0]"
+      class="hidden xl:flex items-center gap-1"
+    >
       <span class="uppercase text-xs text-gray-600">Studio:</span>
       <span class="">{{ anime.studios.nodes[0].name }} </span>
     </div>

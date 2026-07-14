@@ -4,26 +4,25 @@ namespace App\Console\Commands;
 
 use App\Models\AnimeCache;
 use App\Services\AnilistService;
-use App\Services\AnimeService;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('app:sync-popular-anime')]
+#[Signature('app:sync-popular-chinese-anime')]
 #[Description('Command description')]
-class SyncPopularAnime extends Command
+class SyncPopularChineseAnime extends Command
 {
     /**
      * Execute the console command.
      */
-    public function handle(AnilistService $anilistService, AnimeService $animeService)
+    public function handle(AnilistService $anilistService)
     {
         $page = 1;
         $perPage = 50;
         $hasNextPage = true;
 
         while($hasNextPage) {
-            $response = $anilistService->getPopularAnimePage($page, $perPage);
+            $response = $anilistService->getPopularChineAnimePage($page, $perPage);
         
             foreach ($response['data']['Page']['media'] as $anime) {
                 AnimeCache::updateOrCreate(
@@ -58,3 +57,4 @@ class SyncPopularAnime extends Command
         }
     }
 }
+

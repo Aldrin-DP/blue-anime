@@ -329,7 +329,10 @@
             </p>
             <BaseButton
               variant="primary"
-              class="mt-3 flex items-center w-auto"
+              :disabled="isProcessing"
+              :isProcessing="isProcessing"
+              loadingText="Loading..."
+              class="mt-3 flex items-center justify-center w-42"
               @click="goToExplore"
             >
               <div class="flex items-center justify-center gap-2">
@@ -385,8 +388,11 @@
             </p>
             <BaseButton
               variant="primary"
-              class="mt-3 flex items-center w-auto"
-              @click=""
+              :disabled="isProcessing"
+              :isProcessing="isProcessing"
+              loadingText="Loading..."
+              class="mt-3 flex items-center justify-center w-42"
+              @click="goToExplore"
             >
               <div class="flex items-center justify-center gap-2">
                 <span> Explore Anime </span>
@@ -411,9 +417,11 @@
             </p>
             <BaseButton
               variant="primary"
+              :disabled="isProcessing"
               :isProcessing="isProcessing"
-              class="mt-3 flex items-center w-auto"
-              @click="goToExplore()"
+              loadingText="Loading..."
+              class="mt-3 flex items-center justify-center w-42"
+              @click="goToExplore"
             >
               <div class="flex items-center justify-center gap-2">
                 <span> Explore Anime </span>

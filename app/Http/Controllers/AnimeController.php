@@ -12,8 +12,6 @@ class AnimeController extends Controller
     {
         $user = auth()->user();
 
-        $popularAnimePage = $anilistService->getPopularAnimePage(1, 50);
-
         $anime = $anilistService->getAnime($anilistId);
         
         $cachedAnime = $animeService->getOrCacheAnime($anilistId);

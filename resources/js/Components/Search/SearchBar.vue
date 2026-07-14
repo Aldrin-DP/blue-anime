@@ -39,8 +39,12 @@
 
 <script>
 import { useForm } from "@inertiajs/vue3";
+import { MagnifyingGlassIcon } from "@heroicons/vue/20/solid";
 
 export default {
+  components: {
+    MagnifyingGlassIcon,
+  },
   data() {
     return {
       form: useForm(),

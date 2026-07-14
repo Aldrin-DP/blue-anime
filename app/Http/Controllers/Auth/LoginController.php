@@ -21,7 +21,7 @@ class LoginController extends Controller
 
         $request->ensureIsNotRateLimited();
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, true)) {
             $request->clearRateLimit();
             $request->session()->regenerate();
 
