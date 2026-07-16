@@ -134,7 +134,6 @@
 
 <script>
 import {
-  StarIcon,
   HeartIcon,
   PlusIcon,
   ArrowsUpDownIcon,
@@ -154,7 +153,6 @@ export default {
     AnimeRecommendation,
     BaseButton,
     AnimeInfo,
-    StarIcon,
     HeartIcon,
     PlusIcon,
     ArrowsUpDownIcon,
@@ -189,7 +187,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this.status);
     setInterval(() => {
       this.now = Math.floor(Date.now() / 1000);
     }, 1000);
@@ -236,12 +233,6 @@ export default {
     },
   },
   computed: {
-    status() {
-      if (this.status === "plan_to_watch") {
-        return "Plan to Watch";
-      }
-      return this.status;
-    },
     genres() {
       const genres = this.anime.genres;
       return genres.slice(0, 5);

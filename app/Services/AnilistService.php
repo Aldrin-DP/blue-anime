@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AnilistService
 {
@@ -11,9 +13,10 @@ class AnilistService
 
     public function getAnime(int $animeId)
     {
-        return Cache::remember("anime.detail.{$animeId}", now()->addHours(6), function () use ($animeId) {
-            return Http::post($this->ANILIST_API, [
-                'query' => '
+        try {
+            return Cache::remember("anime.detail.{$animeId}", now()->addHours(6), function () use ($animeId) {
+                return Http::post($this->ANILIST_API, [
+                    'query' => '
                     query Media($mediaId: Int) {
                         Media(id: $mediaId) {
                             episodes
@@ -72,22 +75,29 @@ class AnilistService
                         }
                     }
                 ',
-                'variables' => [
-                    'mediaId' => $animeId,
-                ],
-            ])->json();
-        });
+                    'variables' => [
+                        'mediaId' => $animeId,
+                    ],
+                ])->json();
+            });
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
     }
 
     public function getTrending()
     {
-        return Cache::remember('anime.trending', now()->addHours(5), function () {
-            return Http::post($this->ANILIST_API, [
-                'query' => '
+        try {
+            return Cache::remember('anime.trending', now()->addHours(5), function () {
+                return Http::timeout(10)->post($this->ANILIST_API, [
+                    'query' => '
                     query Page($page: Int, $perPage: Int, $type: MediaType, $status: MediaStatus, $sort: [MediaSort]) {
                         Page(page: $page, perPage: $perPage) {
                             media(type: $type, status: $status, sort: $sort) {
                                 id
+                                averageScore
+                                genres
                                 title {
                                     english
                                     romaji
@@ -99,22 +109,27 @@ class AnilistService
                             }
                         }
                     }',
-                'variables' => [
-                    'page' => 1,
-                    'perPage' => 18,
-                    'type' => 'ANIME',
-                    'status' => 'RELEASING',
-                    'sort' => 'TRENDING_DESC',
-                ]
-            ])->json()['data']['Page']['media'];
-        });
+                    'variables' => [
+                        'page' => 1,
+                        'perPage' => 18,
+                        'type' => 'ANIME',
+                        'status' => 'RELEASING',
+                        'sort' => 'TRENDING_DESC',
+                    ]
+                ])->json()['data']['Page']['media'];
+            });
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
     }
 
     public function getNewEpisodes()
     {
-        return Cache::remember('anime.new.episodes', now()->addHours(5), function (){
-            $trendingAnime = Http::post($this->ANILIST_API, [
-                'query' => '
+        try {
+            return Cache::remember('anime.new.episodes', now()->addHours(5), function () {
+                $trendingAnime = Http::post($this->ANILIST_API, [
+                    'query' => '
                     query($page: Int, $perPage: Int) {
                         Page (page: $page, perPage: $perPage) {
                             media (
@@ -123,6 +138,8 @@ class AnilistService
                                 sort: TRENDING_DESC
                             ) {
                                 id
+                                averageScore
+                                genres
                                 title {
                                     romaji
                                     english
@@ -130,16 +147,16 @@ class AnilistService
                             }
                         }
                     }',
-                'variables' => [
-                    'page' => 1,
-                    'perPage' => 18
-                ]
-            ])->json()['data']['Page']['media'];
+                    'variables' => [
+                        'page' => 1,
+                        'perPage' => 18
+                    ]
+                ])->json()['data']['Page']['media'];
 
-            $trendingIds = array_map(fn($anime) => $anime['id'], $trendingAnime);
+                $trendingIds = array_map(fn($anime) => $anime['id'], $trendingAnime);
 
-            $response = Http::post($this->ANILIST_API, [
-                'query' => '
+                $response = Http::post($this->ANILIST_API, [
+                    'query' => '
                     query($trendingIds: [Int], $page: Int, $perPage: Int) {
                         Page (page: $page, perPage: $perPage) {
                             airingSchedules (
@@ -152,6 +169,9 @@ class AnilistService
                                 media {
                                     id
                                     popularity
+                                    genres
+                                    format
+                                    averageScore
                                     trending
                                     title {
                                         romaji
@@ -165,30 +185,38 @@ class AnilistService
                             }
                         }
                     }',
-                'variables' => [
-                    'trendingIds' => $trendingIds,
-                    'page' => 1,
-                    'perPage' => 18
-                ]
-            ])->json()['data']['Page']['airingSchedules'];
+                    'variables' => [
+                        'trendingIds' => $trendingIds,
+                        'page' => 1,
+                        'perPage' => 18
+                    ]
+                ])->json()['data']['Page']['airingSchedules'];
 
-            $newEpisodes =
-                array_map(fn($anime) => [
-                    'episode' => $anime['episode'],
-                    'id' => $anime['media']['id'],
-                    'title' => $anime['media']['title'],
-                    'coverImage' => $anime['media']['coverImage']
-                ], $response);
+                $newEpisodes =
+                    array_map(fn($anime) => [
+                        'episode' => $anime['episode'],
+                        'id' => $anime['media']['id'],
+                        'title' => $anime['media']['title'],
+                        'format' => $anime['media']['format'],
+                        'averageScore' => $anime['media']['averageScore'],
+                        'genres' => $anime['media']['genres'],
+                        'coverImage' => $anime['media']['coverImage']
+                    ], $response);
 
-            return $newEpisodes;
-        });
+                return $newEpisodes;
+            });
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
     }
 
     public function getPopular()
     {
-        return Cache::remember('anime.popular', now()->addHours(5), function (){
-            return Http::post($this->ANILIST_API, [
-                'query' => '
+        try {
+            return Cache::remember('anime.popular', now()->addHours(5), function () {
+                return Http::post($this->ANILIST_API, [
+                    'query' => '
                     query Query($page: Int, $perPage: Int, $sort: [MediaSort], $type: MediaType) {
                         Page(page: $page, perPage: $perPage) {
                             media(sort: $sort, type: $type) {
@@ -198,6 +226,8 @@ class AnilistService
                                     romaji
                                 }
                                 id
+                                averageScore
+                                genres
                                 format
                                 coverImage {
                                     extraLarge
@@ -206,21 +236,26 @@ class AnilistService
                             }
                         }
                     }',
-                'variables' => [
-                    'page' => 1,
-                    'perPage' => 18,
-                    'sort' => 'POPULARITY_DESC',
-                    'type' => 'ANIME'
-                ]
-            ])->json()['data']['Page']['media'];
-        });
+                    'variables' => [
+                        'page' => 1,
+                        'perPage' => 18,
+                        'sort' => 'POPULARITY_DESC',
+                        'type' => 'ANIME'
+                    ]
+                ])->json()['data']['Page']['media'];
+            });
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
     }
 
     public function getTopRated()
     {
-        return Cache::remember('anime.top.rated', now()->addHours(5), function (){
-            return Http::post($this->ANILIST_API, [
-                'query' => '
+        try {
+            return Cache::remember('anime.top.rated', now()->addHours(5), function () {
+                return Http::post($this->ANILIST_API, [
+                    'query' => '
                     query Query($page: Int, $perPage: Int, $sort: [MediaSort], $type: MediaType) {
                         Page(page: $page, perPage: $perPage) {
                             media(sort: $sort, type: $type) {
@@ -230,6 +265,8 @@ class AnilistService
                                     romaji
                                 }
                                 id
+                                averageScore
+                                genres
                                 format
                                 coverImage {
                                     extraLarge
@@ -238,19 +275,25 @@ class AnilistService
                             }
                         }
                     }',
-                'variables' => [
-                    'page' => 1,
-                    'perPage' => 18,
-                    'sort' => 'SCORE_DESC',
-                    'type' => 'ANIME'
-                ]
-            ])->json()['data']['Page']['media'];
-        });
+                    'variables' => [
+                        'page' => 1,
+                        'perPage' => 18,
+                        'sort' => 'SCORE_DESC',
+                        'type' => 'ANIME'
+                    ]
+                ])->json()['data']['Page']['media'];
+            });
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
     }
 
-    public function getPopularAnimePage(int $page, int $perPage) {
-        return Http::post($this->ANILIST_API, [
-            'query' => '
+    public function getPopularAnimePage(int $page, int $perPage)
+    {
+        try {
+            return Http::post($this->ANILIST_API, [
+                'query' => '
                 query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort]) {
                     Page(perPage: $perPage, page: $page) {
                         media(sort: $sort) {
@@ -292,17 +335,23 @@ class AnilistService
                         }
                     }
                 }',
-            'variables' => [
-                'page' => $page,
-                'perPage' => $perPage,
-                'sort' => 'POPULARITY_DESC'
-            ]
-        ])->json();
+                'variables' => [
+                    'page' => $page,
+                    'perPage' => $perPage,
+                    'sort' => 'POPULARITY_DESC'
+                ]
+            ])->json();
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
     }
 
-    public function getPopularChineAnimePage(int $page, int $perPage) {
-        return Http::post($this->ANILIST_API, [
-            'query' => '
+    public function getPopularChineAnimePage(int $page, int $perPage)
+    {
+        try {
+            return Http::post($this->ANILIST_API, [
+                'query' => '
                 query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort], $countryOfOrigin: CountryCode) {
                     Page(perPage: $perPage, page: $page) {
                         media(sort: $sort, countryOfOrigin: $countryOfOrigin) {
@@ -344,12 +393,16 @@ class AnilistService
                         }
                     }
                 }',
-            'variables' => [
-                'page' => $page,
-                'perPage' => $perPage,
-                'sort' => 'POPULARITY_DESC',
-                'countryOfOrigin' => 'CN',
-            ]
-        ])->json();
+                'variables' => [
+                    'page' => $page,
+                    'perPage' => $perPage,
+                    'sort' => 'POPULARITY_DESC',
+                    'countryOfOrigin' => 'CN',
+                ]
+            ])->json();
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
     }
 }

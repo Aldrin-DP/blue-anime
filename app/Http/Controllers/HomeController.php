@@ -16,6 +16,7 @@ class HomeController extends Controller
         if ($user) {
             $watchHistory = WatchHistory::where('user_id', $user->id)
                 ->where('is_completed', false)
+                ->where('hidden_from_continue_watching', false)
                 ->with('anime')
                 ->latest('updated_at')
                 ->get()
@@ -29,6 +30,7 @@ class HomeController extends Controller
                     ? ($watchItem->current_time / $watchItem->duration) * 100
                     : 0;
 
+                $continueWatchingList[$index]['id'] = $watchItem->id;
                 $continueWatchingList[$index]['title'] = $watchItem->anime->title;
                 $continueWatchingList[$index]['episode'] = $episode;
                 $continueWatchingList[$index]['progress'] = $progress;

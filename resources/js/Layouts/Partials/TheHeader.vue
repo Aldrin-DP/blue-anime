@@ -36,18 +36,22 @@
         </div>
       </div>
 
-      <SearchBar />
-
       <div
         :class="isOpen ? 'flex' : 'hidden'"
         class="lg:flex flex-col justify-between border-b absolute w-full lg:w-auto px-3 lg:px-0 py-4 lg:py-0 bg-gray-50 dark:bg-gray-950 lg:bg-transparent lg:dark:bg-transparent border-t border-gray-300 dark:border-gray-800 lg:flex-1 h-auto z-20 lg:flex-row lg:relative lg:z-0 lg:border-none"
       >
+        <SearchBar />
+
         <div
           class="flex flex-col flex-1 justify-between lg:flex-row lg:items-center"
         >
           <div class="flex flex-col items-center lg:flex-row lg:gap-2">
-            <NavLink class="w-full lg:w-auto" href="/"> Surface </NavLink>
-            <NavLink class="w-full lg:w-auto" href="/explore"> Explore</NavLink>
+            <NavLink class="w-full lg:w-auto" href="/" @click="closeNav">
+              Surface
+            </NavLink>
+            <NavLink class="w-full lg:w-auto" href="/explore" @click="closeNav">
+              Explore</NavLink
+            >
           </div>
 
           <div
@@ -105,8 +109,10 @@
                   <NavLink href="/watchlists" @click="toggleAccountMenu()"
                     >Watchlists</NavLink
                   >
-                  <NavLink href="/profile">Profile</NavLink>
-                  <NavLink href="/profile/edit">Edit Profile</NavLink>
+                  <!-- <NavLink href="/profile">Profile</NavLink> -->
+                  <NavLink href="/profile/edit" @click="closeNav"
+                    >Edit Profile</NavLink
+                  >
                   <div class="lg:mx-2 lg:mb-1">
                     <BaseButton
                       @click="logout"
@@ -182,6 +188,8 @@ export default {
   },
   methods: {
     handleClickOutside(event) {
+      if (!this.$refs.accountMenuWrapper) return;
+
       if (!this.$refs.accountMenuWrapper.contains(event.target)) {
         this.isAccountMenuOpen = false;
       }
@@ -189,8 +197,12 @@ export default {
     toggleNav() {
       this.isOpen = !this.isOpen;
     },
+    closeNav() {
+      this.isOpen = false;
+    },
     toggleAccountMenu() {
       this.isAccountMenuOpen = !this.isAccountMenuOpen;
+      this.isOpen = false;
     },
     logout() {
       this.form.post("/logout", {

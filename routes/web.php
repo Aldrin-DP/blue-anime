@@ -49,12 +49,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/watchlists', [WatchlistController::class, 'store']);
     Route::patch('/watchlists/{anilistId}', [WatchlistController::class, 'patch']);
     Route::patch('/watchlists/{anilistId}/favorite', [WatchlistController::class, 'toggleFavorite']);
-
+    Route::delete('/watchlists/{id}', [WatchlistController::class, 'destroy']);
     
 
     Route::post('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'save']);
 
     Route::patch('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'update']);
+    Route::patch('/watch-histories/{id}', [WatchHistoryController::class, 'hide']);
 
     
 });

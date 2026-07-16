@@ -15,7 +15,7 @@ class StreamingService
                 throw new \Exception("Failed to fetch episode $episode");
             }
 
-            $response->json();
+            $response = $response->json();
 
             $episodeLink = collect($response['ssub']['streams'])
                 ->first(fn($link) => $link['default'] === true);

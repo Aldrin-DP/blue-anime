@@ -1,13 +1,13 @@
 <template>
   <div>
     <Head title="Watchlists - " />
-    <div class="p-2 lg:p-10 xl:px-15 xl:py-10">
+    <div class="p-2 lg:p-10 xl:px-15 xl:py-10 relative">
       <div class="w-full">
         <div
           class="w-full flex flex-col lg:flex-row lg:justify-between lg:items-center"
         >
           <h2
-            class="mb-2 font-semibold tracking-wider text-xl lg:text-2xl text-gray-700 dark:text-gray-400"
+            class="mb-2 font-semibold tracking-wider text-xl lg:text-2xl text-gray-800 dark:text-gray-300"
           >
             Watchlists
           </h2>
@@ -287,30 +287,84 @@
                     </button>
                     <div
                       v-if="isKebabOpen && id === watchlist.anilistId"
-                      class="absolute bottom-[120%] right-[90%] bg-gray-300 w-45 h-auto p-2"
+                      class="absolute bottom-[120%] right-[90%] bg-gray-200 dark:bg-gray-800 w-45 rounded-md h-auto p-1 border border-gray-300 dark:border-gray-700"
                     >
-                      <div class="pb-1">
-                        <ul
-                          class="w-full rounded-lg bg-gradient-to-b from-sea-700 to-sea-800"
-                        >
+                      <div class="">
+                        <ul class="w-full rounded-lg">
+                          <label
+                            class="text-gray-600 dark:text-gray-500 block w-full py-0.5 pl-1 border-b border-gray-300 dark:border-gray-600"
+                            >Change status to:</label
+                          >
                           <li
                             v-for="item in statuses"
+                            :class="
+                              watchlist.status === item
+                                ? 'bg-gray-300! dark:bg-gray-900!'
+                                : ''
+                            "
                             :key="item"
-                            class="capitalize py-1 text-center bg-gradient-to-b from-sea-700/40 to-sea-800/40 my-0.5 rounded text-gray-300 font-semibold tracking-wide hover:cursor-pointer hover:text-gray-100 hover:from-sea-700/80 hover:to-sea-800/80 transition-all duration-300"
-                            @click="updateStatus(anime.id, item)"
+                            class="capitalize py-0.5 pl-3 my-0.5 rounded text-gray-700 dark:text-gray-400 font-medium tracking-wide hover:text-gray-800 hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-gray-200 hover:cursor-pointer transition-all duration-300"
+                            @click="updateStatus(watchlist.anilistId, item)"
                           >
                             {{ item }}
                           </li>
                         </ul>
                       </div>
-                      <div class="border-t">
-                        <BaseButton
-                          variant="danger"
-                          class="w-full! py-1.5! mt-1"
-                          >Remove</BaseButton
+                      <div
+                        class="border-t border-gray-300 dark:border-gray-600"
+                      >
+                        <button
+                          class="mt-2 mb-1 text-red-400 cursor-pointer tracking-wide font-medium w-full hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-red-500 hover:text-red-500 text-start pl-3 py-0.5 rounded"
+                          @click="
+                            requestRemoveWatchlist(
+                              watchlist.title,
+                              watchlist.id,
+                            )
+                          "
                         >
+                          Remove
+                        </button>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="showConfirmationModal" class="fixed inset-0 z-50">
+              <div
+                class="absolute inset-0 bg-black/20 backdrop-blur-none"
+              ></div>
+
+              <div class="relative flex h-full items-center justify-center">
+                <div
+                  class="rounded-lg bg-gray-200 dark:bg-gray-800 p-6 shadow-xl w-120"
+                >
+                  <h3
+                    class="mb-3 font-semibold text-xl lg:text-2xl text-gray-800 dark:text-gray-300"
+                  >
+                    Remove from watchlist?
+                  </h3>
+                  <p class="text-gray-800 dark:text-gray-400">
+                    <span class="font-medium">{{ titleToBeRemoved }}</span>
+                    will be removed from your watchlist. You can add it back
+                    anytime.
+                  </p>
+                  <div class="mt-7 flex justify-between items-center w-full">
+                    <button
+                      class="px-4 py-1.5 border border-gray-400 dark:border-gray-700 text-gray-700 dark:text-gray-400 cursor-pointer tracking-wide font-medium rounded-full"
+                      @click="cancelRemoveWatchlist()"
+                    >
+                      Cancel
+                    </button>
+                    <BaseButton
+                      variant="danger"
+                      :disabled="deleteForm.processing"
+                      :isProcessing="deleteForm.processing"
+                      @click="confirmRemoveWatchlist"
+                    >
+                      Remove
+                    </BaseButton>
                   </div>
                 </div>
               </div>
@@ -487,20 +541,60 @@ export default {
   data() {
     return {
       form: useForm(),
+      deleteForm: useForm(),
       watchForm: useForm(),
       favoriteForm: useForm(),
+      updateForm: useForm({
+        status: "",
+      }),
       activeTab: "all",
       isProcessing: false,
       isKebabOpen: false,
       id: 0,
       lastSavedId: 0,
       statuses: ["watching", "planning", "completed", "dropped"],
+      showConfirmationModal: false,
+      titleToBeRemoved: "",
+      idToBeRemoved: null,
     };
   },
-  mounted() {
-    console.log(this.watchlists);
-  },
   methods: {
+    confirmRemoveWatchlist() {
+      console.log(this.idToBeRemoved);
+      this.deleteForm.delete(`/watchlists/${this.idToBeRemoved}`, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {
+          this.$inertia.reload({
+            only: ["watchlists"],
+          });
+          this.showConfirmationModal = false;
+        },
+      });
+    },
+    requestRemoveWatchlist(title, id) {
+      this.titleToBeRemoved = title;
+      this.idToBeRemoved = id;
+      this.showConfirmationModal = true;
+    },
+    cancelRemoveWatchlist() {
+      this.showConfirmationModal = false;
+    },
+    updateStatus(anilistId, status) {
+      console.log(anilistId, status);
+      if (status === "planning") {
+        status = "plan_to_watch";
+      }
+      this.updateForm.status = status;
+      this.updateForm.patch(`/watchlists/${anilistId}`, {
+        onSuccess: this.$inertia.reload({
+          only: ["watchlists"],
+        }),
+        onFinish: () => {
+          this.isKebabOpen = false;
+        },
+      });
+    },
     toggleKebab(anilistId) {
       if (anilistId !== this.lastSavedId) {
         this.isKebabOpen = false;
@@ -553,7 +647,6 @@ export default {
     continueWatching(api_id, episode) {
       this.form.get(`/anime/${api_id}/episodes/${episode}`);
     },
-
     status(status) {
       if (status === "plan_to_watch") {
         status = "Plan to Watch";

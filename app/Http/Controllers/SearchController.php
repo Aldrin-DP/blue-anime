@@ -11,8 +11,8 @@ class SearchController extends Controller
         $search = $request->input('search');
 
         $searchList = AnimeCache::select('id', 'api_id', 'title', 'romaji_title', 'cover_image')
-            ->where('title', 'LIKE', "{$search}%")
-            ->orWhere('romaji_title', 'LIKE', "{$search}%")
+            ->where('title', 'LIKE', "%{$search}%")
+            ->orWhere('romaji_title', 'LIKE', "%{$search}%")
             ->limit(7)
             ->get();
 

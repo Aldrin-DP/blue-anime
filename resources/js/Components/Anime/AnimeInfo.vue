@@ -27,7 +27,7 @@
     </div>
     <div class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Score:</span>
-      <span class="">{{ anime.averageScore }}%</span>
+      <span class="">{{ formattedScore(anime.averageScore).toFixed(1) }}</span>
     </div>
     <div
       v-if="anime.nextAiringEpisode"
@@ -38,7 +38,7 @@
     </div>
     <div v-else class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Episodes:</span>
-      <span class="">{{ anime.episodes }} Episodes</span>
+      <span class="">{{ anime.episodes ? anime.episodes : "" }}</span>
     </div>
     <div class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Released Year:</span>
@@ -67,12 +67,21 @@
 </template>
 
 <script>
+import { StarIcon } from "@heroicons/vue/20/solid";
 export default {
   props: {
     data: Object,
   },
+  components: {
+    StarIcon,
+  },
   data() {
     return {};
+  },
+  methods: {
+    formattedScore(score) {
+      return (score / 100) * 10;
+    },
   },
   computed: {
     anime() {

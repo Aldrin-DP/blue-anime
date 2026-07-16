@@ -55,7 +55,7 @@
                     @click="skipBackward10"
                     class="cursor-pointer rounded-full p-1.5 text-gray-200 backdrop-blur-md bg-gray-950/20"
                   >
-                    <span class="material-symbols-outlined text-5xl!"
+                    <span class="material-symbols-outlined text-lg lg:text-5xl!"
                       >replay_10</span
                     >
                   </button>
@@ -64,17 +64,17 @@
                     class="cursor-pointer rounded-full p-3 text-gray-200 backdrop-blur-md bg-gray-950/20"
                   >
                     <span v-if="isPlaying">
-                      <PauseIcon class="size-16" />
+                      <PauseIcon class="size-8 md:size-16" />
                     </span>
                     <span v-else>
-                      <PlayIcon class="size-16" />
+                      <PlayIcon class="size-8 md:size-16" />
                     </span>
                   </button>
                   <button
                     @click="skipForward10"
                     class="cursor-pointer rounded-full p-1.5 text-gray-200 backdrop-blur-md bg-gray-950/20"
                   >
-                    <span class="material-symbols-outlined text-5xl!"
+                    <span class="material-symbols-outlined text-lg lg:text-5xl!"
                       >forward_10</span
                     >
                   </button>
@@ -124,7 +124,7 @@
                   @pointermove="drag"
                   @pointerup="stopDrag"
                   ref="progressTrack"
-                  class="w-full h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative"
+                  class="w-full lg:h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative"
                 >
                   <div
                     :style="{
@@ -160,7 +160,7 @@
                       {{ formatCurrentTime }}
                       <!-- skip intro -->
                     </div>
-                    <div class="flex items-center">
+                    <div class="hidden sm:flex items-center">
                       <button
                         @click="skipBackward10"
                         class="border-gray-300 rounded flex cursor-pointer text-4xl"
@@ -293,9 +293,9 @@
                     <div class="flex items-center">
                       <StarIcon class="size-5 text-gray-800 dark:text-gray-300">
                       </StarIcon>
-                      <span class="text-gray-800 dark:text-gray-300"
-                        >{{ anime.averageScore }}%</span
-                      >
+                      <span class="text-gray-800 dark:text-gray-300">{{
+                        formattedScore(anime.averageScore).toFixed(1)
+                      }}</span>
                     </div>
                     <span
                       class="block w-1 h-1 rounded-full bg-gray-900 dark:bg-gray-400"
@@ -366,6 +366,7 @@ export default {
     PlayIcon,
     PauseIcon,
     ChevronRightIcon,
+    ChevronLeftIcon,
     ChevronDoubleRightIcon,
     ChevronDoubleLeftIcon,
     SpeakerWaveIcon,
@@ -626,44 +627,52 @@ export default {
     syncCurrentTime() {
       this.currentTime = this.getVideoEl().currentTime;
     },
-    saveProgress() {
-      if (!this.$page.props.auth.user) return;
 
+    async saveProgress() {
+      if (!this.$page.props.auth.user) return;
       const video = this.getVideoEl();
       if (!video) return;
-
       const currentTime = video.currentTime;
-
       if (
         this.lastSavedTime !== null &&
         Math.abs(currentTime - this.lastSavedTime) < 5
       )
         return;
-
       if (currentTime < 20) return;
-
       this.lastSavedTime = currentTime;
-
       const isCompleted = currentTime >= video.duration * 0.9;
-
-      this.watchHistoryForm.currentTime = currentTime;
-      this.watchHistoryForm.duration = this.duration;
-      this.watchHistoryForm.isCompleted = isCompleted;
-
-      this.watchHistoryForm.title = this.anime.title.english
-        ? this.anime.title.english
-        : this.anime.title.romaji;
-      this.watchHistoryForm.format = this.anime.format;
-      this.watchHistoryForm.coverImage = this.anime.coverImage.extraLarge;
-      this.watchHistoryForm.bannerImage = this.anime.bannerImage;
-
-      this.watchHistoryForm.post(
-        `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`,
-        {
-          preserveState: true,
-          preserveScroll: true,
-        },
-      );
+      const data = {
+        currentTime: currentTime,
+        duration: this.duration,
+        isCompleted: isCompleted,
+        title: this.anime.title.english
+          ? this.anime.title.english
+          : this.anime.title.romaji,
+        format: this.anime.format,
+        coverImage: this.anime.coverImage.extraLarge,
+        bannerImage: this.anime.bannerImage,
+      };
+      console.log(data);
+      try {
+        console.log("saveProgress called!", this.currentlyPlayingEpisode);
+        const response = await fetch(
+          `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+                .content,
+              "X-Requested-With": "XMLHttpRequest",
+            },
+            body: JSON.stringify(data),
+          },
+        );
+        console.log(response);
+        console.log("it runs");
+      } catch (error) {
+        console.error("saveprogress fetch failed", error);
+      }
     },
     resetControlsTimer() {
       if (this.isLoading) return;
@@ -699,15 +708,16 @@ export default {
         this.currentTime <= episodeIntro.end;
     },
     setupSubtitlePosition() {
-      console.log("Subtitle");
       const track = this.getVideoEl().textTracks[0];
-      console.log(track);
       if (track) {
         for (let cue of track.cues) {
           cue.line = -3;
           cue.snapToLines = true;
         }
       }
+    },
+    formattedScore(score) {
+      return (score / 100) * 10;
     },
     displayCurrentEpisode() {
       const page = Math.ceil(this.currentlyPlayingEpisode / 20);

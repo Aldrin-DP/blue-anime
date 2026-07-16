@@ -10,12 +10,25 @@
       class="w-full lg:w-auto outline:none focus:border-none focus:outline-0 placeholder:text-gray-400"
       placeholder="Search anime..."
     />
-    <MagnifyingGlassIcon class="size-5" />
+    <MagnifyingGlassIcon class="size-5 hidden" />
 
     <ul
-      class="w-full h-auto border-gray-300 lg:absolute top-11 rounded-md left-0 z-10 bg-gray-200 dark:bg-gray-800"
+      class="w-full h-auto border-gray-300 absolute top-12 rounded-md left-0 z-10 bg-gray-200 dark:bg-gray-800"
     >
       <li
+        v-if="isProcessing"
+        class="px-2 py-1 flex gap-2 items-center cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-900 transition-all duration-300"
+      >
+        Loading...
+      </li>
+      <li
+        v-else-if="results.length < 1 && search.length > 1"
+        class="px-2 py-1 flex gap-2 items-center cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-900 transition-all duration-300"
+      >
+        No results
+      </li>
+      <li
+        v-else-if="results.length > 0"
         v-for="result in results"
         :key="result.id"
         class="px-2 py-1 flex gap-2 items-center cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-900 transition-all duration-300"
@@ -51,6 +64,7 @@ export default {
       search: "",
       timeout: null,
       results: [],
+      isProcessing: false,
     };
   },
   mounted() {
@@ -61,13 +75,16 @@ export default {
   },
   methods: {
     handleClickOutside(event) {
-      if (!this.$refs.searchWrapper.contains(event.target)) {
+      if (
+        this.$refs.searchWrapper &&
+        !this.$refs.searchWrapper.contains(event.target)
+      ) {
         this.results = [];
       }
     },
     goToAnime(anilistId) {
       this.form.get(`/anime/${anilistId}`, {
-        onFinish: (this.results = []),
+        onSuccess: () => (this.results = []),
       });
     },
   },
@@ -80,14 +97,16 @@ export default {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(async () => {
         try {
+          this.isProcessing = true;
           const response = await fetch(
             `/anime/search?search=${encodeURIComponent(this.search)}`,
           );
           const data = await response.json();
           this.results = data.searchList;
-          console.log(this.results);
         } catch (error) {
           console.error(error);
+        } finally {
+          this.isProcessing = false;
         }
       }, 200);
     },

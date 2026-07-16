@@ -13,7 +13,7 @@ class AnimeController extends Controller
         $user = auth()->user();
 
         $anime = $anilistService->getAnime($anilistId);
-        
+
         $cachedAnime = $animeService->getOrCacheAnime($anilistId);
 
         $inWatchlist = $userAnimeService->isInWatchlist($cachedAnime->id, $user);

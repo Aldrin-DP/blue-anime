@@ -33,7 +33,6 @@ export default {
     anime: Object,
     episodesProgress: Array,
     currentEpisode: Number,
-    currentPage: Number,
   },
   data() {
     return {

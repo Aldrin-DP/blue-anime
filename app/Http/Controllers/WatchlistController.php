@@ -28,6 +28,7 @@ class WatchlistController extends Controller
         ->get();
 
         $userWatchlists = $watchlists->map(fn($watchlist) => [
+            'id' => $watchlist->id,
             'anilistId' => $watchlist->anime->api_id,
             'status' => $watchlist->status,
             'progress' => $watchlist->progress,
@@ -107,7 +108,8 @@ class WatchlistController extends Controller
         return back()->with('status-updated', 'Updated status');
     }
 
-    public function toggleFavorite(Request $request, int $anilistId, AnimeService $animeService) {
+    public function toggleFavorite(Request $request, int $anilistId, AnimeService $animeService) 
+    {
         $user = $request->user();
 
         $cachedAnime = $animeService->getOrCacheAnime($anilistId);
@@ -126,4 +128,17 @@ class WatchlistController extends Controller
 
         return back();
     }   
+
+    public function destroy(int $id)
+    {
+        $user = auth()->user();
+        
+        $watchlist = Watchlist::where('user_id', $user->id)
+            ->where('id', $id)
+            ->first();
+        
+        $watchlist->delete();
+
+        return back()->with('success', 'Watchlist removed');
+    }
 }

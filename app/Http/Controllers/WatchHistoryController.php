@@ -52,7 +52,8 @@ class WatchHistoryController extends Controller
         );
     }
 
-    public function update(Request $request, int $anilistId, int $episode, AnimeService $animeService) {
+    public function update(Request $request, int $anilistId, int $episode, AnimeService $animeService) 
+    {
 
         $user = $request->user();
 
@@ -70,4 +71,19 @@ class WatchHistoryController extends Controller
             ]
         );
     }
+
+    public function hide(int $id) 
+    {
+        $user = auth()->user();
+
+        $watchItem = WatchHistory::where('user_id', $user->id)
+            ->where('id', $id)
+            ->first();
+
+        $watchItem->hidden_from_continue_watching = true;
+        $watchItem->save();
+
+        return back();
+    }
 }
+

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WatchHistory extends Model
 {
-    protected $fillable = ['user_id', 'anime_id', 'episode', 'current_time', 'duration', 'is_completed'];
+    protected $fillable = ['user_id', 'anime_id', 'episode', 'current_time', 'duration', 'is_completed', 'hidden_from_continue_watching'];
 
     public function user(): BelongsTo
     {
@@ -20,6 +20,7 @@ class WatchHistory extends Model
     }
 
     protected $casts = [
-        'is_completed' => 'boolean'
+        'is_completed' => 'boolean',
+        'hidden_from_continue_watching' => 'boolean'
     ];
 }
