@@ -32,9 +32,9 @@
         />
         <div
           v-if="showDetails && currentActiveAnimeId === anime.id"
-          class="absolute top-0 left-0 w-full h-full bg-gray-600/70"
+          class="absolute top-0 left-0 w-full h-full bg-gray-600/60"
         >
-          <div class="bg-gray-700/70 p-2 w-full h-full">
+          <div class="bg-gray-700/50 p-2 w-full h-full">
             <h3
               class="text-gray-300 font-semibold mb-1 text-sm md:text-base line-clamp-4"
             >

@@ -19,7 +19,9 @@
               >
                 <img
                   class="w-full h-full object-cover object-center transition-all duration-200 rounded-md"
-                  :src="anime.bannerImage"
+                  :src="
+                    anime.bannerImage ? anime.bannerImage : anime.coverImage
+                  "
                   alt=""
                 />
 
@@ -240,5 +242,3 @@ export default {
   },
 };
 </script>
-
-console.log(this.newEpisodes);

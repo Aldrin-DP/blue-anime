@@ -1,7 +1,7 @@
 <template>
   <div>
     <Head title="Watchlists - " />
-    <div class="p-2 lg:p-10 xl:px-15 xl:py-10 relative">
+    <div class="p-4 lg:p-10 xl:px-15 xl:py-10 relative">
       <div class="w-full">
         <div
           class="w-full flex flex-col lg:flex-row lg:justify-between lg:items-center"

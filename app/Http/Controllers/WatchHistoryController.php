@@ -20,7 +20,7 @@ class WatchHistoryController extends Controller
         $isCompleted = $request->input('isCompleted');
 
         $watchedPercentage = ($currentTime / $duration) * 100;
-
+        
         if ($watchedPercentage >= 60) {
 
             $inWatchlists = Watchlist::where('user_id', $user->id)
@@ -50,11 +50,20 @@ class WatchHistoryController extends Controller
             ['user_id' => $user->id, 'anime_id' => $cachedAnime->id, 'episode' => $episode],
             ['current_time' => $currentTime, 'duration' => $duration, 'is_completed' => $isCompleted]
         );
+
+        if ($watchedPercentage >= 90 && $episode < $cachedAnime->episodes) {
+            $nextEpisode = $episode + 1;
+
+            WatchHistory::firstOrCreate(
+                ['user_id' => $user->id, 'anime_id' => $cachedAnime->id, 'episode' => $nextEpisode],
+                ['current_time' => 0, 'duration' => 0, 'is_completed' => false]);
+        }
+
+        return response()->json(['success' => true]);
     }
 
     public function update(Request $request, int $anilistId, int $episode, AnimeService $animeService) 
     {
-
         $user = $request->user();
 
         $cachedAnime = $animeService->getOrCacheAnime($anilistId);
@@ -70,6 +79,8 @@ class WatchHistoryController extends Controller
                 'is_completed' => $request->input('isCompleted')
             ]
         );
+
+        return response()->json(['success' => true]);
     }
 
     public function hide(int $id) 

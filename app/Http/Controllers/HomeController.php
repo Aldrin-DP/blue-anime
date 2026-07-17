@@ -36,6 +36,7 @@ class HomeController extends Controller
                 $continueWatchingList[$index]['progress'] = $progress;
                 $continueWatchingList[$index]['bannerImage'] = $watchItem->anime->banner_image;
                 $continueWatchingList[$index]['api_id'] = $watchItem->anime->api_id;
+                $continueWatchingList[$index]['coverImage'] = $watchItem->anime->cover_image;
             }
         }
 

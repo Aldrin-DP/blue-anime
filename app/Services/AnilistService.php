@@ -82,7 +82,7 @@ class AnilistService
             });
         } catch (Exception $e) {
             Log::error('Anilist fetch failed:' . $e->getMessage());
-            return [];
+            return null;
         }
     }
 

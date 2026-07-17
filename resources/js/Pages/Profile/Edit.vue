@@ -1,10 +1,10 @@
 <template>
   <Head title="Edit Profile - " />
 
-  <div class="p-5 lg:p-10 xl:px-15 xl:py-10">
+  <div class="p-4 lg:p-10 xl:px-15 xl:py-10">
     <!-- Change Account -->
     <section
-      class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 shadow-lg dark:shadow p-5 rounded-lg"
+      class="lg:my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 shadow-lg dark:shadow p-5 rounded-lg"
     >
       <BaseHeading size="large"> Change Account</BaseHeading>
       <BaseText> Change your Username and Email </BaseText>

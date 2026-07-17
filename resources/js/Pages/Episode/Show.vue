@@ -2,19 +2,19 @@
   <div>
     <Head></Head>
     <div class="p-0 m-0 px-5 lg:p-10 xl:px-15 xl:py-5">
-      <div
-        class="mt-5 lg:mt-0 mb-5 flex items-center justify-start flex-wrap gap-2"
-      >
+      <div class="mt-5 lg:mt-0 mb-5 flex items-center justify-start gap-2">
         <p
           @click="goToAnime(anime.id)"
           class="text-base lg:text-[17px] text-gray-600 dark:text-gray-400 tracking-wide truncate cursor-pointer hover:text-blue-500 transition-all duration-300"
         >
           {{ animeTitle }}
         </p>
-        <ChevronRightIcon class="size-5 text-gray-600 dark:text-gray-400" />
+        <ChevronRightIcon
+          class="size-5 text-gray-600 dark:text-gray-400 shrink-0"
+        />
         <p
           v-if="currentEpisode"
-          class="tracking-wide text-gray-900 dark:text-gray-200 text-base lg:text-[17px]"
+          class="tracking-wide text-gray-900 dark:text-gray-200 text-base lg:text-[17px] shrink-0"
         >
           Episode {{ currentEpisode }}
         </p>
@@ -116,7 +116,7 @@
               </div>
               <div
                 v-show="controlsVisible"
-                class="w-full absolute bottom-0 left-0 pt-1 px-3 backdrop-blur-md bg-gray-950/80 text-gray-300"
+                class="w-full absolute bottom-0 left-0 pt-1 px-3 backdrop-blur-md lg:bg-gray-950/80 text-gray-300"
               >
                 <!-- progress bar -->
                 <div
@@ -124,8 +124,17 @@
                   @pointermove="drag"
                   @pointerup="stopDrag"
                   ref="progressTrack"
-                  class="w-full lg:h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative"
+                  @mousemove="timePreview"
+                  @mouseleave="removeTimePreview"
+                  class="w-full h-1.5 cursor-pointer bg-gray-700 rounded my-2 relative"
                 >
+                  <div
+                    :class="isPreviewTimeVisible ? 'opacity-100' : 'opacity-0'"
+                    :style="{ left: widthPercent + '%' }"
+                    class="bg-red-500 text-gray-200 px-1.5 py-0.5 absolute -top-9 text-center z-50 rounded transition-all duration-700"
+                  >
+                    {{ formattedPreviewTime }}
+                  </div>
                   <div
                     :style="{
                       width: bufferedPercent + '%',
@@ -139,8 +148,8 @@
                   ></div>
 
                   <div
-                    :style="{ left: progressBar + '%' }"
-                    class="h-3 w-3 -bottom-1 rounded-full bg-red-500 absolute z-10 -left-1"
+                    :style="{ left: progressBar - 1 + '%' }"
+                    class="h-3 w-3 -bottom-1 rounded-full bg-red-500 absolute z-10"
                     ref="thumb"
                     @pointerdown="startDrag"
                   ></div>
@@ -405,6 +414,9 @@ export default {
       lastSavedTime: 0,
       intervalId: null,
       isDragging: false,
+      isPreviewTimeVisible: false,
+      previewTime: 0,
+      widthPercent: 0,
     };
   },
   mounted() {
@@ -470,7 +482,23 @@ export default {
         this.isFullscreen = true;
       }
     },
+    timePreview(event) {
+      this.isPreviewTimeVisible = true;
+      const rect = event.currentTarget.getBoundingClientRect();
+      const clientX = event.clientX - rect.left;
 
+      const width = rect.width;
+      const percent = clientX / width;
+
+      const time = percent * this.getVideoEl().duration;
+
+      const leftWidthPercent = (time / this.getVideoEl().duration) * 100;
+      this.previewTime = time;
+      this.widthPercent = leftWidthPercent - 3;
+    },
+    removeTimePreview() {
+      this.isPreviewTimeVisible = false;
+    },
     playVideo() {
       const video = this.getVideoEl();
       if (!video) return;
@@ -751,6 +779,16 @@ export default {
       return this.anime.nextAiringEpisode
         ? this.anime.nextAiringEpisode.episode - 1
         : this.anime.episodes;
+    },
+    formattedPreviewTime() {
+      let minute = Math.floor(this.previewTime / 60);
+      let second = Math.floor(this.previewTime % 60);
+
+      if (second < 10) {
+        second = "0" + second;
+      }
+
+      return `${minute}:${second}`;
     },
     formattedDuration() {
       const minute = Math.floor(this.duration / 60);
