@@ -66,6 +66,7 @@ export default {
   props: {
     anime: Object,
     episodesProgress: Array,
+    currentEpisode: Number,
   },
   components: {
     EpisodeList,
@@ -82,7 +83,21 @@ export default {
       sorted: "asc",
     };
   },
+  mounted() {
+    this.handleSyncPageNumber();
+  },
   methods: {
+    handleSyncPageNumber() {
+      if (!this.currentEpisode) {
+        return;
+      } else {
+        const totalPage = Math.ceil(this.episodes / 20);
+        const pageNumber = Math.ceil(
+          (this.currentEpisode / this.episodes) * totalPage,
+        );
+        this.goToPage(pageNumber);
+      }
+    },
     nextPage() {
       this.currentPage++;
     },

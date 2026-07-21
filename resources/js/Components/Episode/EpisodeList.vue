@@ -7,6 +7,7 @@
       :currentEpisode="currentEpisode"
       :currentPage="currentPage"
     />
+    asdasd
   </div>
 </template>
 
@@ -23,6 +24,9 @@ export default {
     sorted: String,
     currentEpisode: Number,
     currentPage: Number,
+  },
+  mounted() {
+    console.log(this.currentPage);
   },
 };
 </script>

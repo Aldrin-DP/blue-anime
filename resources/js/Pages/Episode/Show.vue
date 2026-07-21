@@ -116,7 +116,7 @@
               </div>
               <div
                 v-show="controlsVisible"
-                class="w-full absolute bottom-0 left-0 pt-1 px-3 backdrop-blur-md lg:bg-gray-950/80 text-gray-300"
+                class="w-full absolute bottom-0 left-0 pt-1 px-3 lg:backdrop-blur-md bg-transparent lg:bg-gray-950/80 text-gray-300"
               >
                 <!-- progress bar -->
                 <div
@@ -131,7 +131,7 @@
                   <div
                     :class="isPreviewTimeVisible ? 'opacity-100' : 'opacity-0'"
                     :style="{ left: widthPercent + '%' }"
-                    class="bg-red-500 text-gray-200 px-1.5 py-0.5 absolute -top-9 text-center z-50 rounded transition-all duration-700"
+                    class="bg-red-500 text-gray-200 px-1.5 py-0.5 absolute -top-9 text-center z-50 rounded transition-opacity duration-500"
                   >
                     {{ formattedPreviewTime }}
                   </div>

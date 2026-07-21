@@ -42,7 +42,7 @@ class WatchlistController extends Controller
             'lastWatchedEpisode' => $watchlist->anime->watch_histories->last()?->episode,
             'lastWatched' => $watchlist->anime->watch_histories->last()?->duration ? 
                     ($watchlist->anime->watch_histories->last()?->current_time / $watchlist->anime->watch_histories->last()?->duration * 100) : null,
-            'completed_at' => $watchlist->completed_at?->diffForHumans()
+            'completed_at' => $watchlist->completed_at?->format('M d, Y')
             ]);
 
         return inertia('Watchlist/Index', [

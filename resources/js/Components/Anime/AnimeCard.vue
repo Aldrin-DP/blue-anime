@@ -26,7 +26,7 @@
           {{ anime.format }}
         </span>
         <img
-          :src="anime.coverImage.extraLarge"
+          :src="anime.coverImage?.extraLarge"
           alt=""
           class="rounded w-full h-full object-cover object-center"
         />

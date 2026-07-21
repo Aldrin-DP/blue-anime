@@ -46,7 +46,8 @@ class SyncPopularAnime extends Command
                         'season_year' => $anime['seasonYear'],
                         'popularity' => $anime['popularity'],
                         'studio' => $anime['studios']['nodes'][0]['name'] ?? null,
-                        'genres' => $anime['genres']
+                        'genres' => $anime['genres'],
+                        'total_episode' => $anime['episodes'] ?? null
                     ]
                 );
             }

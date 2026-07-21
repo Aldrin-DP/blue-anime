@@ -14,7 +14,7 @@
         class="flex lg:justify-between items-center mt-4 mb-3 gap-2 border rounded-2xl border-gray-300 dark:border-gray-700 focus-within:outline-2 focus-within:outline-blue-700"
       >
         <input
-          v-model="form.search"
+          v-model="searchForm.search"
           @keydown.enter="searchAnime"
           type="text"
           class="w-full text-lg pl-5 py-3 outline:none focus:border-none focus:outline-0 text-gray-800 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500"
@@ -25,146 +25,291 @@
           class="size-8 text-gray-700 dark:text-gray-300 mr-5 cursor-pointer"
         />
       </div>
-      <div>
-        <button
-          @click="showFilters"
-          class="flex border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-300 font-bold tracking-wide gap-1 items-center border px-3 py-2 rounded-lg cursor-pointer"
-        >
-          <AdjustmentsHorizontalIcon class="size-6" />
-          Filters
-        </button>
-      </div>
+
+      <button
+        @click="showFilters"
+        class="flex w-36 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-300 font-bold tracking-wide gap-1 items-center border px-3 py-2 rounded-lg cursor-pointer"
+      >
+        <AdjustmentsHorizontalIcon class="size-6" />
+        {{ isFilterOpen ? "Hide Filter" : "Show Filter" }}
+      </button>
 
       <div
         v-if="isFilterOpen"
-        class="lg:grid gap-5 grid-cols-3 mt-4 border border-gray-300 dark:border-gray-700 shadow rounded-xl p-5 bg-gray-100/70 dark:bg-gray-800/50 backdrop-blur-md"
+        class="mt-4 border border-gray-300 dark:border-gray-700 shadow rounded-xl p-5 bg-gray-100/70 dark:bg-gray-800/50 backdrop-blur-md"
       >
-        <div class="mb-2">
-          <label
-            class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
-            >Status</label
-          >
-          <div class="relative">
-            <span class="absolute block top-3 right-3">
-              <ChevronDownIcon class="size-4 dark:text-gray-400" />
-            </span>
-            <select
-              @input="handleInput"
-              v-model="form.status"
-              class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+        <button
+          @click="clearFilter"
+          class="flex mb-4 border-gray-300 font-medium dark:border-gray-700 text-gray-800 dark:text-gray-300 tracking-wide gap-1 items-center border px-3 py-2 rounded-lg cursor-pointer"
+        >
+          Clear Filter
+        </button>
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+          <div class="mb-2">
+            <label
+              class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
+              >Status</label
             >
-              <option value="" selected>All Status</option>
-              <option value="RELEASING">Ongoing</option>
-              <option value="FINISHED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
-              <option value="NOT_YET_RELEASED">Not Yet Released</option>
-            </select>
+            <div class="relative">
+              <span class="absolute block top-3 right-3">
+                <ChevronDownIcon
+                  class="size-4 dark:text-gray-400 text-gray-600"
+                />
+              </span>
+              <select
+                v-model="searchForm.status"
+                class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+              >
+                <option value="">All Status</option>
+                <option
+                  v-for="status in statusOptions"
+                  :key="status.value"
+                  :value="status.value"
+                >
+                  {{ status.label }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label
+              class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
+              >Format</label
+            >
+            <div class="relative">
+              <span class="absolute block top-3 right-3">
+                <ChevronDownIcon
+                  class="size-4 dark:text-gray-400 text-gray-600"
+                />
+              </span>
+              <select
+                v-model="searchForm.format"
+                class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+              >
+                <option value="">All Format</option>
+                <option v-for="format in formats" :key="format" :value="format">
+                  {{ format }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label
+              class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
+              >Season</label
+            >
+            <div class="relative">
+              <span class="absolute block top-3 right-3">
+                <ChevronDownIcon
+                  class="size-4 dark:text-gray-400 text-gray-600"
+                />
+              </span>
+              <select
+                v-model="searchForm.season"
+                class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+              >
+                <option value="">All Season</option>
+                <option v-for="season in seasons" :key="season" :value="season">
+                  {{ season }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label
+              class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
+              >Year</label
+            >
+            <div class="relative">
+              <span class="absolute block top-3 right-3">
+                <ChevronDownIcon
+                  class="size-4 dark:text-gray-400 text-gray-600"
+                />
+              </span>
+              <select
+                v-model="searchForm.year"
+                class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+              >
+                <option value="">All Year</option>
+                <option v-for="year in years" :key="year" :value="year">
+                  {{ year }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label
+              class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
+              >Country</label
+            >
+            <div class="relative">
+              <span class="absolute block top-3 right-3">
+                <ChevronDownIcon
+                  class="size-4 dark:text-gray-400 text-gray-600"
+                />
+              </span>
+              <select
+                v-model="searchForm.country"
+                class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+              >
+                <option value="">All Countries</option>
+                <option
+                  v-for="country in countryOrigins"
+                  :key="country.value"
+                  :value="country.value"
+                >
+                  {{ country.label }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label
+              class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
+              >Sort</label
+            >
+            <div class="relative">
+              <span class="absolute block top-3 right-3">
+                <ChevronDownIcon
+                  class="size-4 dark:text-gray-400 text-gray-600"
+                />
+              </span>
+              <select
+                v-model="searchForm.sort"
+                class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+              >
+                <option value="">Default</option>
+                <option v-for="sort in sorts" :key="sort" :value="sort">
+                  {{ sort }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="mb-2">
+
+        <div class="my-2">
+          <button
+            :class="'block lg:hidden'"
+            class="border mb-2 px-2 py-1 uppercase text-sm tracking-wide cursor-pointer font-semibold rounded text-gray-800 dark:text-gray-300 border-gray-300 dark:border-gray-700"
+          >
+            Show Genres
+          </button>
           <label
             class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
-            >Format</label
+            >Genres</label
           >
+
           <div class="relative">
-            <span class="absolute block top-3 right-3">
-              <ChevronDownIcon class="size-4 dark:text-gray-400" />
-            </span>
-            <select
-              v-model="form.format"
-              class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
+            <div
+              class="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
             >
-              <option value="">All Format</option>
-              <option value="TV">TV</option>
-              <option value="MOVIE">Movie</option>
-              <option value="ONA">ONA</option>
-              <option value="OVA">OVA</option>
-            </select>
-          </div>
-        </div>
-        <div class="mb-2">
-          <label
-            class="block mb-1 tracking-wider text-gray-600 dark:text-gray-400 text-xs lg:text-sm uppercase"
-            >Season</label
-          >
-          <div class="relative">
-            <span class="absolute block top-3 right-3">
-              <ChevronDownIcon class="size-4 dark:text-gray-400" />
-            </span>
-            <select
-              v-model="form.season"
-              class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
-            >
-              <option value="">All Season</option>
-              <option value="SUMMER">SUMMER</option>
-              <option value="WINTER">WINTER</option>
-              <option value="FALL">FALL</option>
-              <option value="OVA">OVA</option>
-            </select>
+              <div
+                v-for="genre in genres"
+                :key="genre"
+                class="w-full flex gap-2"
+              >
+                <input
+                  v-model="searchForm.genres"
+                  type="checkbox"
+                  :value="genre"
+                />
+                <label for="" class="text-gray-800 dark:text-gray-300">{{
+                  genre
+                }}</label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <section>
-        <div class="mt-5">
-          <div class="flex justify-between items-center mb-3">
-            <p class="mb-2 text-gray-700 dark:text-gray-400">Results</p>
-            <div class="flex items-center gap-1">
-              <button
-                @click="prevPage"
-                :disabled="currentPage === 1"
-                class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
-              >
-                <ChevronLeftIcon
-                  class="size-5 text-gray-800 dark:text-gray-300"
-                  :class="{
-                    'text-slate-400 dark:text-slate-700': currentPage === 1,
-                  }"
-                />
-              </button>
-              <div
-                v-for="(page, index) in paginationPages"
-                :key="index"
-                class="flex gap-1 w-8 h-8 border rounded border-gray-300 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-300"
-              >
-                <button
-                  @click="goToPage(page)"
-                  :class="{
-                    'bg-blue-600 rounded text-gray-300': page === currentPage,
-                  }"
-                  class="w-full"
+      <div
+        class="mt-5 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5"
+      >
+        <div
+          v-for="(anime, index) in anime"
+          :key="anime.id"
+          class="mb-1 cursor-pointer"
+          @click="goToAnime(anime.api_id)"
+        >
+          <div
+            class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative overflow-hidden"
+            @mouseenter="handleMouseEnter(anime.id)"
+            @mouseleave="handleMouseLeave(anime.id)"
+          >
+            <span
+              v-if="anime.episode"
+              class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 left-2 font-bold bg-blue-800 text-gray-300"
+            >
+              EP {{ anime.episode }}
+            </span>
+            <span
+              v-if="anime.format && !anime.episode"
+              class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 right-2 font-bold bg-blue-800 text-gray-300"
+            >
+              {{ anime.format }}
+            </span>
+            <img
+              :src="anime.cover_image"
+              alt=""
+              class="rounded w-full h-full object-cover object-center"
+            />
+            <div
+              v-if="showDetails && currentActiveAnimeId === anime.id"
+              class="absolute top-0 left-0 w-full h-full bg-gray-600/60"
+            >
+              <div class="bg-gray-700/50 p-2 w-full h-full">
+                <h3
+                  class="text-gray-300 font-semibold mb-1 text-sm md:text-base line-clamp-4"
                 >
-                  {{ page }}
-                </button>
+                  {{ anime.title ? anime.title : anime.title_romaji }}
+                </h3>
+                <span v-if="anime.episode" class="text-gray-300 font-semibold">
+                  Episode {{ anime.episode }}
+                </span>
+
+                <div class="flex items-center gap-2 mt-1">
+                  <div class="flex items-center">
+                    <StarIcon class="size-5 text-gray-300"> </StarIcon>
+                    <span class="text-gray-300 text-sm md:text-base">{{
+                      formattedScore(anime.score).toFixed(1)
+                    }}</span>
+                  </div>
+                  <span class="block w-1 h-1 rounded-full bg-gray-400"></span>
+                  <span class="text-gray-300 text-sm md:text-base">{{
+                    anime.format
+                  }}</span>
+                </div>
+
+                <div class="flex flex-wrap gap-1 mt-2 mb-2">
+                  <span
+                    v-for="(genre, index) in anime.genres"
+                    :key="index"
+                    class="px-1 py-0.5 text-sm text-gray-200 border border-gray-500 bg-white/30 rounded"
+                  >
+                    {{ genre }}
+                  </span>
+                </div>
               </div>
-              <button
-                @click="nextPage"
-                :disabled="currentPage * 18 >= episodes"
-                class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
-              >
-                <ChevronRightIcon
-                  class="size-5 text-gray-800 dark:text-gray-300"
-                  :class="{
-                    'text-slate-400': currentPage * 18 >= episodes,
-                  }"
-                />
-              </button>
             </div>
           </div>
-          <div v-if="form.processing">
-            <SkeletonCard></SkeletonCard>
-          </div>
-          <div v-else-if="filteredAnime.length > 0">
-            <AnimeCard :anime="filteredAnime" />
-          </div>
-          <div
-            v-else
-            class="font-bold text-[17px] tracking-wide text-gray-700 dark:text-gray-400"
+          <h3
+            class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-2 lg:line-clamp-1 mt-1"
           >
-            We couldn't find any results for your search.
-          </div>
+            {{ anime.title ? anime.title : anime.title_romaji }}
+          </h3>
+          <p
+            v-if="anime.episode"
+            class="text-gray-600 dark:text-gray-400 font-semibold text-[13px]"
+          >
+            Episode {{ anime.episode }}
+          </p>
         </div>
-      </section>
+      </div>
     </div>
   </div>
 </template>
@@ -176,6 +321,7 @@ import {
   AdjustmentsHorizontalIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
+  StarIcon,
 } from "@heroicons/vue/24/solid";
 import AnimeCard from "../../Components/Anime/AnimeCard.vue";
 import SkeletonCard from "../../Components/Skeleton/SkeletonCard.vue";
@@ -190,62 +336,126 @@ export default {
     SkeletonCard,
     ChevronRightIcon,
     ChevronLeftIcon,
+    StarIcon,
   },
   props: {
     data: Object,
   },
   data() {
     return {
+      statusOptions: [
+        { label: "Finished", value: "FINISHED" },
+        { label: "Ongoing", value: "RELEASING" },
+        { label: "Upcoming", value: "NOT_YET_RELEASED" },
+        { label: "Hiatus", value: "HIATUS" },
+        { label: "Cancelled", value: "CANCELLED" },
+      ],
+      formats: ["TV", "MOVIE", "OVA", "ONA", "SPECIAL"],
+      seasons: ["WINTER", "SPRING", "SUMMER", "FALL"],
+      years: [],
+      sorts: ["POPULARITY", "SCORE", "NEWEST", "OLDEST"],
+      countryOrigins: [
+        { label: "Japan", value: "JP" },
+        { label: "China", value: "CN" },
+        { label: "South Korea", value: "KR" },
+        { label: "Taiwan", value: "TW" },
+      ],
+      genres: [
+        "Action",
+        "Adventure",
+        "Comedy",
+        "Drama",
+        "Ecchi",
+        "Fantasy",
+        "Horror",
+        "Mahou Shoujo",
+        "Mecha",
+        "Music",
+        "Mystery",
+        "Psychological",
+        "Romance",
+        "Sci-Fi",
+        "Slice of Life",
+        "Sports",
+        "Supernatural",
+        "Thriller",
+      ],
       ANILIST_API: "https://graphql.anilist.co",
-      form: useForm({
+      searchForm: useForm({
         search: "",
         status: "",
         format: "",
         season: "",
+        year: "",
+        country: "",
+        sort: "",
+        genres: [],
         page: 1,
       }),
+      form: useForm(),
       isLoading: false,
       hasError: false,
       isFilterOpen: false,
+      showDetails: false,
+      currentActiveAnimeId: null,
     };
   },
-  computed: {
-    pageInfo() {
-      return this.data.data.Page.pageInfo;
-    },
-    animeData() {
-      return this.data.data.Page.media;
-    },
-    filteredAnime() {
-      const filters = ["MOVIE", "TV", "OVA", "ONA"];
-      return this.data.data.Page.media.filter((anime) =>
-        filters.includes(anime.format),
-      );
-    },
-    paginationPages() {
-      const totalPages = Math.ceil(this.pageInfo.total / this.pageInfo.perPage);
-      const pagesPerGroup = 5;
-      const currentPage = this.currentPage;
-
-      const currentGroup = Math.ceil(currentPage / pagesPerGroup);
-
-      const startPage = (currentGroup - 1) * pagesPerGroup + 1;
-      const endPage = Math.min(currentGroup * pagesPerGroup, totalPages);
-
-      const paginateNumbers = [];
-
-      for (let i = startPage; i <= endPage; i++) {
-        paginateNumbers.push(i);
-      }
-      return paginateNumbers;
-    },
-    currentPage() {
-      return this.pageInfo.currentPage;
-    },
+  mounted() {
+    this.addYear();
+    console.log(this.data);
   },
   methods: {
+    clearFilter() {
+      this.searchForm.status = "";
+      this.searchForm.format = "";
+      this.searchForm.season = "";
+      this.searchForm.year = "";
+      this.searchForm.country = "";
+      this.searchForm.sort = "";
+      this.searchForm.genres = [];
+      this.searchForm.page = 1;
+    },
+    handleMouseEnter(animeId) {
+      this.currentActiveAnimeId = animeId;
+      this.showDetails = true;
+    },
+    handleMouseLeave(animeId) {
+      this.currentActiveAnimeId = animeId;
+      this.showDetails = false;
+    },
+    // handleClick(anilistId, episode) {
+    //   if (episode) {
+    //     this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`);
+    //     return;
+    //   }
+    //   this.searchForm.get(`/anime/${anilistId}`);
+    // },
+    formattedScore(score) {
+      return (score / 100) * 10;
+    },
+    addGenre(event) {
+      const value = event.target.value;
+
+      if (event.target.checked) {
+        this.searchForm.genres.push(event.target.value);
+      } else {
+        const index = this.searchForm.genres.indexOf(value);
+        if (index !== -1) {
+          this.searchForm.genres.splice(index, 1);
+        }
+      }
+    },
+    addYear() {
+      const currentYear = new Date().getFullYear();
+      for (let i = currentYear; i >= 1970; i--) {
+        this.years.push(i);
+      }
+      console.log(this.years);
+    },
     searchAnime() {
-      this.form.get("/explore", {
+      console.log(this.searchForm);
+      console.log("asd");
+      this.searchForm.get("/explore", {
         preserveState: true,
         preserveScroll: true,
       });
@@ -254,28 +464,50 @@ export default {
       this.isFilterOpen = !this.isFilterOpen;
     },
     goToPage(page) {
-      this.form.page = page;
+      this.searchForm.page = page;
       this.searchAnime();
     },
     prevPage() {
-      this.form.page--;
+      this.searchForm.page--;
       this.searchAnime();
     },
     nextPage() {
-      this.form.page++;
+      this.searchForm.page++;
       this.searchAnime();
+    },
+    goToAnime(anilistId) {
+      this.form.get(`/anime/${anilistId}`, {
+        preserveState: true,
+        preserveScroll: true,
+      });
     },
   },
-  mounted() {},
+  computed: {
+    anime() {
+      return this.data.data;
+    },
+  },
   watch: {
-    "form.status"() {
+    "searchForm.status"() {
       this.searchAnime();
     },
-    "form.format"() {
+    "searchForm.format"() {
       this.searchAnime();
     },
-    "form.season"() {
+    "searchForm.season"() {
       this.searchAnime();
+    },
+    "searchForm.year"() {
+      this.searchAnime();
+    },
+    "searchForm.country"() {
+      this.searchAnime();
+    },
+    "searchForm.genres": {
+      handler() {
+        this.searchAnime();
+      },
+      deep: true,
     },
   },
 };

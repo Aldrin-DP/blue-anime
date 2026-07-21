@@ -338,7 +338,8 @@ class AnilistService
                 'variables' => [
                     'page' => $page,
                     'perPage' => $perPage,
-                    'sort' => 'POPULARITY_DESC'
+                    'sort' => 'POPULARITY_DESC',
+                    'type' => 'ANIME'
                 ]
             ])->json();
         } catch (Exception $e) {
@@ -398,6 +399,7 @@ class AnilistService
                     'perPage' => $perPage,
                     'sort' => 'POPULARITY_DESC',
                     'countryOfOrigin' => 'CN',
+                    'type' => 'ANIME'
                 ]
             ])->json();
         } catch (Exception $e) {

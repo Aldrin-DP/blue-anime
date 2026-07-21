@@ -33,6 +33,7 @@ class AnimeService
                 'cover_image' => $media['coverImage']['extraLarge'],
                 'banner_image' => $media['bannerImage'],
                 'score' => $media['averageScore'],
+                'totalEpisodes' => $media['episodes'] ?? null,
                 'episodes' => $media['episodes']
                     ?? (isset($media['nextAiringEpisode']['episode'])
                         ? $media['nextAiringEpisode']['episode'] - 1

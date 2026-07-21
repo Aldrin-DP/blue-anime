@@ -6,6 +6,7 @@
     <EpisodePagination
       :anime="anime"
       :episodesProgress="episodesProgress"
+      :currentEpisode="currentEpisode"
       @sorted="handleSorted"
       @page="handlePage"
     />
@@ -42,6 +43,7 @@ export default {
   },
   methods: {
     handleSorted(isSorted) {
+      this.currentPage = 1;
       this.sorted = isSorted;
     },
     handlePage(page) {

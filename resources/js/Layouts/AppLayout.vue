@@ -12,7 +12,9 @@
       </div>
     </main>
 
-    <TheFooter class="mt-auto" />
+    <TheFooter
+      class="mt-auto bg-linear-to-br from-sea-100/30 to-sea-300/20 dark:bg-linear-to-b dark:from-sea-900 dark:from-5% dark:to-sea-950"
+    />
   </div>
 </template>
 

@@ -213,7 +213,7 @@
                   v-if="watchlist.status === 'completed'"
                   class="hidden lg:block text-sm lg:text-base text-gray-800 dark:text-gray-300"
                 >
-                  Completed {{ watchlist.completed_at }}
+                  Finished {{ watchlist.completed_at }}
                 </div>
                 <div
                   v-if="watchlist.status"
