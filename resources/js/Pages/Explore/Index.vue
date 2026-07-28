@@ -184,8 +184,12 @@
                 class="font-semibold text-gray-700 dark:text-gray-300 bg-blue-100 dark:bg-gray-800 appearance-none w-full border rounded-md px-2 py-2 border-gray-300 dark:border-gray-700"
               >
                 <option value="">Default</option>
-                <option v-for="sort in sorts" :key="sort" :value="sort">
-                  {{ sort }}
+                <option
+                  v-for="sort in sorts"
+                  :key="sort.value"
+                  :value="sort.value"
+                >
+                  {{ sort.label }}
                 </option>
               </select>
             </div>
@@ -227,87 +231,140 @@
         </div>
       </div>
 
-      <div
-        class="mt-5 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5"
-      >
+      <div v-if="!data">No results found.</div>
+
+      <div v-else>
+        <div class="mt-5 w-full flex justify-between items-center">
+          <div>Results</div>
+          <div class="flex items-center gap-1">
+            <button
+              @click="prevPage"
+              :disabled="currentPage === 1"
+              class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
+            >
+              <ChevronLeftIcon
+                class="size-5 text-gray-800 dark:text-gray-300"
+                :class="{
+                  'text-slate-400 dark:text-slate-700': currentPage === 1,
+                }"
+              />
+            </button>
+            <div
+              v-for="(page, index) in paginationPages"
+              :key="index"
+              class="flex gap-1 w-8 h-8 border rounded border-gray-300 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-300"
+            >
+              <button
+                :disabled="searchForm.processing"
+                @click="goToPage(page)"
+                :class="{
+                  'bg-blue-600 rounded text-gray-300': page === currentPage,
+                }"
+                class="w-full"
+              >
+                {{ page }}
+              </button>
+            </div>
+            <button
+              @click="nextPage"
+              :disabled="currentPage * 20 >= episodes"
+              class="w-8 h-8 flex justify-center items-center border rounded border-gray-300 dark:border-gray-700"
+            >
+              <ChevronRightIcon
+                class="size-5 text-gray-800 dark:text-gray-300"
+                :class="{
+                  'text-slate-400': currentPage * 20 >= episodes,
+                }"
+              />
+            </button>
+          </div>
+        </div>
+
         <div
-          v-for="(anime, index) in anime"
-          :key="anime.id"
-          class="mb-1 cursor-pointer"
-          @click="goToAnime(anime.api_id)"
+          class="mt-5 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5"
         >
           <div
-            class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative overflow-hidden"
-            @mouseenter="handleMouseEnter(anime.id)"
-            @mouseleave="handleMouseLeave(anime.id)"
+            v-for="(anime, index) in filteredAnime"
+            :key="anime.id"
+            class="mb-1 cursor-pointer"
+            @click="goToAnime(anime.api_id)"
           >
-            <span
-              v-if="anime.episode"
-              class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 left-2 font-bold bg-blue-800 text-gray-300"
-            >
-              EP {{ anime.episode }}
-            </span>
-            <span
-              v-if="anime.format && !anime.episode"
-              class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 right-2 font-bold bg-blue-800 text-gray-300"
-            >
-              {{ anime.format }}
-            </span>
-            <img
-              :src="anime.cover_image"
-              alt=""
-              class="rounded w-full h-full object-cover object-center"
-            />
             <div
-              v-if="showDetails && currentActiveAnimeId === anime.id"
-              class="absolute top-0 left-0 w-full h-full bg-gray-600/60"
+              class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative overflow-hidden"
+              @mouseenter="handleMouseEnter(anime.id)"
+              @mouseleave="handleMouseLeave(anime.id)"
             >
-              <div class="bg-gray-700/50 p-2 w-full h-full">
-                <h3
-                  class="text-gray-300 font-semibold mb-1 text-sm md:text-base line-clamp-4"
-                >
-                  {{ anime.title ? anime.title : anime.title_romaji }}
-                </h3>
-                <span v-if="anime.episode" class="text-gray-300 font-semibold">
-                  Episode {{ anime.episode }}
-                </span>
+              <span
+                v-if="anime.episode"
+                class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 left-2 font-bold bg-blue-800 text-gray-300"
+              >
+                EP {{ anime.episode }}
+              </span>
+              <span
+                v-if="anime.format && !anime.episode"
+                class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 right-2 font-bold bg-blue-800 text-gray-300"
+              >
+                {{ anime.format }}
+              </span>
+              <img
+                :src="anime.cover_image"
+                alt=""
+                class="rounded w-full h-full object-cover object-center"
+              />
+              <div
+                v-if="showDetails && currentActiveAnimeId === anime.id"
+                class="absolute top-0 left-0 w-full h-full bg-gray-600/60"
+              >
+                <div class="bg-gray-700/50 p-2 w-full h-full">
+                  <h3
+                    class="text-gray-300 font-semibold mb-1 text-sm md:text-base line-clamp-4"
+                  >
+                    {{ anime.title ? anime.title : anime.title_romaji }}
+                  </h3>
+                  <span
+                    v-if="anime.episode"
+                    class="text-gray-300 font-semibold"
+                  >
+                    Episode {{ anime.episode }}
+                  </span>
 
-                <div class="flex items-center gap-2 mt-1">
-                  <div class="flex items-center">
-                    <StarIcon class="size-5 text-gray-300"> </StarIcon>
+                  <div class="flex items-center gap-2 mt-1">
+                    <div class="flex items-center">
+                      <StarIcon class="size-5 text-gray-300"> </StarIcon>
+                      <span class="text-gray-300 text-sm md:text-base">{{
+                        formattedScore(anime.score).toFixed(1)
+                      }}</span>
+                    </div>
+                    <span class="block w-1 h-1 rounded-full bg-gray-400"></span>
                     <span class="text-gray-300 text-sm md:text-base">{{
-                      formattedScore(anime.score).toFixed(1)
+                      anime.format
                     }}</span>
                   </div>
-                  <span class="block w-1 h-1 rounded-full bg-gray-400"></span>
-                  <span class="text-gray-300 text-sm md:text-base">{{
-                    anime.format
-                  }}</span>
-                </div>
 
-                <div class="flex flex-wrap gap-1 mt-2 mb-2">
-                  <span
-                    v-for="(genre, index) in anime.genres"
-                    :key="index"
-                    class="px-1 py-0.5 text-sm text-gray-200 border border-gray-500 bg-white/30 rounded"
-                  >
-                    {{ genre }}
-                  </span>
+                  <div class="flex flex-wrap gap-1 mt-2 mb-2">
+                    <span
+                      v-for="(genre, index) in anime.genres"
+                      :key="index"
+                      class="px-1 py-0.5 text-sm text-gray-200 border border-gray-500 bg-white/30 rounded"
+                    >
+                      {{ genre }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
+            <h3
+              class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-2 lg:line-clamp-1 mt-1"
+            >
+              {{ anime.title ? anime.title : anime.title_romaji }}
+            </h3>
+            <p
+              v-if="anime.episode"
+              class="text-gray-600 dark:text-gray-400 font-semibold text-[13px]"
+            >
+              Episode {{ anime.episode }}
+            </p>
           </div>
-          <h3
-            class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-2 lg:line-clamp-1 mt-1"
-          >
-            {{ anime.title ? anime.title : anime.title_romaji }}
-          </h3>
-          <p
-            v-if="anime.episode"
-            class="text-gray-600 dark:text-gray-400 font-semibold text-[13px]"
-          >
-            Episode {{ anime.episode }}
-          </p>
         </div>
       </div>
     </div>
@@ -326,20 +383,22 @@ import {
 import AnimeCard from "../../Components/Anime/AnimeCard.vue";
 import SkeletonCard from "../../Components/Skeleton/SkeletonCard.vue";
 import { useForm } from "@inertiajs/vue3";
+import { ArrowUpTrayIcon } from "@heroicons/vue/16/solid";
 
 export default {
   components: {
+    AnimeCard,
+    SkeletonCard,
     MagnifyingGlassIcon,
     ChevronDownIcon,
     AdjustmentsHorizontalIcon,
-    AnimeCard,
-    SkeletonCard,
     ChevronRightIcon,
     ChevronLeftIcon,
     StarIcon,
   },
   props: {
     data: Object,
+    selectedFilters: Array,
   },
   data() {
     return {
@@ -353,7 +412,12 @@ export default {
       formats: ["TV", "MOVIE", "OVA", "ONA", "SPECIAL"],
       seasons: ["WINTER", "SPRING", "SUMMER", "FALL"],
       years: [],
-      sorts: ["POPULARITY", "SCORE", "NEWEST", "OLDEST"],
+      sorts: [
+        { label: "Most Popular", value: "POPULARITY" },
+        { label: "Top Rated", value: "SCORE" },
+        { label: "Newest", value: "season_year" },
+        { label: "Oldest", value: "oldest" },
+      ],
       countryOrigins: [
         { label: "Japan", value: "JP" },
         { label: "China", value: "CN" },
@@ -382,15 +446,15 @@ export default {
       ],
       ANILIST_API: "https://graphql.anilist.co",
       searchForm: useForm({
-        search: "",
-        status: "",
-        format: "",
-        season: "",
-        year: "",
-        country: "",
-        sort: "",
-        genres: [],
-        page: 1,
+        search: this.selectedFilters.search,
+        status: this.selectedFilters.status,
+        format: this.selectedFilters.format,
+        season: this.selectedFilters.season,
+        year: this.selectedFilters.year,
+        country: this.selectedFilters.country,
+        sort: this.selectedFilters.sort,
+        genres: this.selectedFilters.genres,
+        page: this.selectedFilters.page,
       }),
       form: useForm(),
       isLoading: false,
@@ -398,11 +462,13 @@ export default {
       isFilterOpen: false,
       showDetails: false,
       currentActiveAnimeId: null,
+      currentPage: 1,
     };
   },
   mounted() {
     this.addYear();
     console.log(this.data);
+    console.log(this.selectedFilters);
   },
   methods: {
     clearFilter() {
@@ -465,14 +531,17 @@ export default {
     },
     goToPage(page) {
       this.searchForm.page = page;
+      this.currentPage = page;
       this.searchAnime();
     },
-    prevPage() {
-      this.searchForm.page--;
+    prevPage(page) {
+      this.searchForm.page = page;
+      this.currentPage--;
       this.searchAnime();
     },
-    nextPage() {
-      this.searchForm.page++;
+    nextPage(page) {
+      this.searchForm.page = page;
+      this.currentPage++;
       this.searchAnime();
     },
     goToAnime(anilistId) {
@@ -483,8 +552,25 @@ export default {
     },
   },
   computed: {
-    anime() {
+    filteredAnime() {
       return this.data.data;
+    },
+    paginationPages() {
+      const totalPages = Math.ceil(this.data.total / 20);
+      const pagesPerGroup = 5;
+      const currentPage = this.currentPage;
+
+      const currentGroup = Math.ceil(currentPage / pagesPerGroup);
+
+      const startPage = (currentGroup - 1) * pagesPerGroup + 1;
+      const endPage = Math.min(currentGroup * pagesPerGroup, totalPages);
+
+      const paginateNumbers = [];
+
+      for (let i = startPage; i <= endPage; i++) {
+        paginateNumbers.push(i);
+      }
+      return paginateNumbers;
     },
   },
   watch: {
@@ -501,6 +587,9 @@ export default {
       this.searchAnime();
     },
     "searchForm.country"() {
+      this.searchAnime();
+    },
+    "searchForm.sort"() {
       this.searchAnime();
     },
     "searchForm.genres": {

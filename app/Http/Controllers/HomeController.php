@@ -2,50 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WatchHistory;
 use App\Services\AnilistService;
+use App\Services\AnimeService;
+use App\Services\UserAnimeService;
+use App\Services\WatchHistoryService;
 
 class HomeController extends Controller
 {
-    public function home(AnilistService $anilistService)
+    public function home(
+        AnilistService $anilistService, 
+        AnimeService $animeService, 
+        UserAnimeService $userAnimeService,
+        WatchHistoryService $watchHistoryService)
     {
         $user = auth()->user();
 
+        $newEpisodes = $anilistService->getNewEpisodes();
+        $popularAnime = $animeService->getPopularAnime();
+        $trendingAnime = $animeService->getTrendingAnime();
+        $topRatedAnime = $animeService->getTopRatedAnime();
+        $featuredAnime = $animeService->getProcessedFeaturedAnime();
+    
         $continueWatchingList = [];
+        $watchHistoryIds = [];
 
         if ($user) {
-            $watchHistory = WatchHistory::where('user_id', $user->id)
-                ->where('is_completed', false)
-                ->where('hidden_from_continue_watching', false)
-                ->with('anime')
-                ->latest('updated_at')
-                ->get()
-                ->unique('anime_id')
-                ->values();
-
-
-            foreach ($watchHistory as $index => $watchItem) {
-                $episode = $watchItem['episode'];
-                $progress = $watchItem->duration
-                    ? ($watchItem->current_time / $watchItem->duration) * 100
-                    : 0;
-
-                $continueWatchingList[$index]['id'] = $watchItem->id;
-                $continueWatchingList[$index]['title'] = $watchItem->anime->title;
-                $continueWatchingList[$index]['episode'] = $episode;
-                $continueWatchingList[$index]['progress'] = $progress;
-                $continueWatchingList[$index]['bannerImage'] = $watchItem->anime->banner_image;
-                $continueWatchingList[$index]['api_id'] = $watchItem->anime->api_id;
-                $continueWatchingList[$index]['coverImage'] = $watchItem->anime->cover_image;
-            }
+            $watchHistoryIds = $watchHistoryService->getWatchHistoryIds();    
+            $continueWatchingList = $userAnimeService->getContinueWatchingList($user->id);
         }
 
         return inertia('Home', [
-            'trendingAnime' => $anilistService->getTrending(),
-            'newEpisodes' => $anilistService->getNewEpisodes(),
-            'popularAnime' => $anilistService->getPopular(),
-            'topRatedAnime' => $anilistService->getTopRated(),
-            'continueAnime' => $continueWatchingList
+            'newEpisodes' => $newEpisodes,
+            'trendingAnime' => $trendingAnime,
+            'popularAnime' => $popularAnime,
+            'topRatedAnime' => $topRatedAnime,
+            'continueAnime' => $continueWatchingList,
+            'featuredAnime' => $featuredAnime,
+            'watchHistoryIds' => $watchHistoryIds
         ]);
     }
+    
 }

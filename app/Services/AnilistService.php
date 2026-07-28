@@ -26,6 +26,7 @@ class AnilistService
                             description
                             title {
                                 english
+                                romaji
                             }
                             coverImage {
                                 extraLarge
@@ -98,6 +99,8 @@ class AnilistService
                                 id
                                 averageScore
                                 genres
+                                bannerImage
+                                seasonYear
                                 title {
                                     english
                                     romaji
@@ -195,12 +198,12 @@ class AnilistService
                 $newEpisodes =
                     array_map(fn($anime) => [
                         'episode' => $anime['episode'],
-                        'id' => $anime['media']['id'],
-                        'title' => $anime['media']['title'],
+                        'api_id' => $anime['media']['id'],
+                        'title' => $anime['media']['title']['english'] ?? $anime['media']['title']['romaji'],
                         'format' => $anime['media']['format'],
-                        'averageScore' => $anime['media']['averageScore'],
+                        'score' => $anime['media']['averageScore'],
                         'genres' => $anime['media']['genres'],
-                        'coverImage' => $anime['media']['coverImage']
+                        'cover_image' => $anime['media']['coverImage']['extraLarge']
                     ], $response);
 
                 return $newEpisodes;
@@ -215,7 +218,7 @@ class AnilistService
     {
         try {
             return Cache::remember('anime.popular', now()->addHours(5), function () {
-                return Http::post($this->ANILIST_API, [
+                $popular = Http::post($this->ANILIST_API, [
                     'query' => '
                     query Query($page: Int, $perPage: Int, $sort: [MediaSort], $type: MediaType) {
                         Page(page: $page, perPage: $perPage) {
@@ -265,6 +268,8 @@ class AnilistService
                                     romaji
                                 }
                                 id
+                                bannerImage
+                                seasonYear
                                 averageScore
                                 genres
                                 format
@@ -294,9 +299,9 @@ class AnilistService
         try {
             return Http::post($this->ANILIST_API, [
                 'query' => '
-                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort]) {
+                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort], $type: MediaType) {
                     Page(perPage: $perPage, page: $page) {
-                        media(sort: $sort) {
+                        media(sort: $sort, type: $type) {
                         title {
                             english
                             romaji
@@ -353,9 +358,9 @@ class AnilistService
         try {
             return Http::post($this->ANILIST_API, [
                 'query' => '
-                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort], $countryOfOrigin: CountryCode) {
+                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort], $countryOfOrigin: CountryCode, $type: MediaType) {
                     Page(perPage: $perPage, page: $page) {
-                        media(sort: $sort, countryOfOrigin: $countryOfOrigin) {
+                        media(sort: $sort, countryOfOrigin: $countryOfOrigin, type: $type) {
                         title {
                             english
                             romaji

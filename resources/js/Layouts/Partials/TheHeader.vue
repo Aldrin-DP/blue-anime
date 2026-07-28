@@ -110,7 +110,7 @@
                     >Watchlists</NavLink
                   >
                   <!-- <NavLink href="/profile">Profile</NavLink> -->
-                  <NavLink href="/profile/edit" @click="closeNav"
+                  <NavLink href="/profile/edit" @click="toggleAccountMenu()"
                     >Edit Profile</NavLink
                   >
                   <div class="lg:mx-2 lg:mb-1">

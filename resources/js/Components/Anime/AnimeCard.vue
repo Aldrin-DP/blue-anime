@@ -4,20 +4,20 @@
   >
     <div
       v-for="(anime, index) in anime"
-      :key="anime.id"
+      :key="anime.api_id"
       class="mb-1 cursor-pointer"
-      @click="handleClick(anime.id, anime.episode)"
+      @click="handleClick(anime.api_id, anime.episodes)"
     >
       <div
         class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative overflow-hidden"
-        @mouseenter="handleMouseEnter(anime.id)"
-        @mouseleave="handleMouseLeave(anime.id)"
+        @mouseenter="handleMouseEnter(anime.api_id)"
+        @mouseleave="handleMouseLeave(anime.api_id)"
       >
         <span
-          v-if="anime.episode"
+          v-if="anime.episodes"
           class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 left-2 font-bold bg-blue-800 text-gray-300"
         >
-          EP {{ anime.episode }}
+          EP {{ anime.episodes }}
         </span>
         <span
           v-if="anime.format && !anime.episode"
@@ -26,31 +26,29 @@
           {{ anime.format }}
         </span>
         <img
-          :src="anime.coverImage?.extraLarge"
+          :src="anime.cover_image"
           alt=""
           class="rounded w-full h-full object-cover object-center"
         />
         <div
-          v-if="showDetails && currentActiveAnimeId === anime.id"
+          v-if="showDetails && currentActiveAnimeId === anime.api_id"
           class="absolute top-0 left-0 w-full h-full bg-gray-600/60"
         >
           <div class="bg-gray-700/50 p-2 w-full h-full">
             <h3
               class="text-gray-300 font-semibold mb-1 text-sm md:text-base line-clamp-4"
             >
-              {{
-                anime.title.english ? anime.title.english : anime.title.romaji
-              }}
+              {{ anime.title ? anime.title : anime.romaji_title }}
             </h3>
-            <span v-if="anime.episode" class="text-gray-300 font-semibold">
-              Episode {{ anime.episode }}
+            <span v-if="anime.episodes" class="text-gray-300 font-semibold">
+              Episode {{ anime.episodes }}
             </span>
 
             <div class="flex items-center gap-2 mt-1">
               <div class="flex items-center">
                 <StarIcon class="size-5 text-gray-300"> </StarIcon>
                 <span class="text-gray-300 text-sm md:text-base">{{
-                  formattedScore(anime.averageScore).toFixed(1)
+                  formattedScore(anime.score).toFixed(1)
                 }}</span>
               </div>
               <span class="block w-1 h-1 rounded-full bg-gray-400"></span>
@@ -74,7 +72,7 @@
       <h3
         class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-2 lg:line-clamp-1 mt-1"
       >
-        {{ anime.title.english ? anime.title.english : anime.title.romaji }}
+        {{ anime.title ? anime.title : anime.romaji_title }}
       </h3>
       <p
         v-if="anime.episode"

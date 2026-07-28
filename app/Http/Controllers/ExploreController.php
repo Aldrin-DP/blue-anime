@@ -11,10 +11,22 @@ class ExploreController extends Controller
     {
         $filters = $request->only(['search', 'status', 'format', 'season', 'year', 'country', 'sort', 'genres', 'page']);
 
+        $selectedFilters = [
+            'search' => $filters['search'] ?? '',
+            'status' => $filters['status'] ?? '',
+            'format' => $filters['format'] ?? '',
+            'season' => $filters['season'] ?? '',
+            'year' => $filters['year'] ?? '',
+            'country' => $filters['country'] ?? '',
+            'sort' => $filters['sort'] ?? '',
+            'genres' => $filters['genres'] ?? [],
+            'page' => $filters['page'] ?? 1
+        ];
         $filteredAnime = $searchService->getFilteredAnime($filters);   
-
+        
         return inertia('Explore/Index', [
             'data' => $filteredAnime,
+            'selectedFilters' => $selectedFilters
         ]);
     }
 }

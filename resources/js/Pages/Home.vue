@@ -4,14 +4,14 @@
 
     <div class="p-4 lg:p-10 xl:px-15 xl:py-10">
       <!-- Continue Watching -->
-      <section v-if="continueAnime.length > 0" class="mb-10">
+      <section v-if="continueAnime.length > 0" class="mb-8">
         <BaseHeading> Continue Watching </BaseHeading>
         <BaseText>
           The deep remembers where you stopped, continue your journey.
         </BaseText>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 mt-5 gap-5">
-          <div v-for="anime in continueAnime">
+        <div class="mt-3 flex items-center gap-2 overflow-x-auto w-full pb-5">
+          <div v-for="anime in continueAnime" class="w-72 shrink-0">
             <div class="rounded-md">
               <div
                 class="aspect-4/2 relative"
@@ -118,33 +118,137 @@
           </div>
         </div>
       </section>
+
+      <!-- Anime Banner Carousel -->
+      <section class="mb-8">
+        <div class="relative">
+          <div v-for="(anime, index) in featuredAnime" :key="anime.id">
+            <div
+              v-if="index === counter"
+              :style="{
+                backgroundImage: `url(${anime.banner_image ? anime.banner_image : anime.cover_image})`,
+              }"
+              class="w-full h-65 lg:h-[450px] md:aspect-21/9 sm:aspect-3/1 bg-cover bg-center object-cover object-center rounded-xl flex items-center justify-center lg:items-end"
+            >
+              <div
+                class="w-full h-full pb-9 text-center lg:text-start px-3 lg:p-5 flex flex-col items-center lg:items-start lg:justify-end"
+              >
+                <h3
+                  class="w-fit mt-3 text-lg md:text-xl lg:text-4xl lg:tracking-wider font-bold p-1 lg:p-2 inline-block backdrop-blur-sm rounded bg-black/40 text-gray-300"
+                >
+                  {{ anime.title ? anime.title : anime.romaji_title }}
+                </h3>
+                <div class="flex items-center justify-center gap-2 mt-1">
+                  <div
+                    class="lg:tracking-wider lg:mt-2 font-semibold px-1 py-0.5 text-center w-[55px] h-[25px] backdrop-blur-sm rounded bg-black/40 text-gray-300"
+                  >
+                    {{ anime.format }}
+                  </div>
+                  <div
+                    class="flex gap-1 items-center lg:mt-2 font-semibold px-1 py-0.5 text-center w-[55px] h-[25px] backdrop-blur-sm rounded bg-black/40 text-gray-300"
+                  >
+                    <StarIcon class="size-4 text-gray-300"> </StarIcon>
+                    <span class="text-gray-300 text-sm md:text-base">{{
+                      formattedScore(anime.score).toFixed(1)
+                    }}</span>
+                  </div>
+                  <div
+                    class="lg:tracking-wider lg:mt-2 font-semibold px-1 py-0.5 text-center w-[50px] h-[25px] backdrop-blur-sm rounded bg-black/40 text-gray-300"
+                  >
+                    {{ anime.season_year }}
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-1 mt-2 mb-2">
+                  <span
+                    v-for="(genre, index) in anime.genres"
+                    :key="index"
+                    class="px-1.5 py-0.5 text-sm text-gray-200 font-semibold bg-black/40 rounded-full"
+                  >
+                    {{ genre }}
+                  </span>
+                </div>
+                <div
+                  class="mt-auto text-lg lg:mt-2 w-full"
+                  @click="
+                    watchNow(anime.api_id, 1, isInWatchHistories(anime.id))
+                  "
+                >
+                  <button
+                    v-if="isInWatchHistories(anime.id)"
+                    class="flex justify-center items-center gap-2 cursor-pointer w-full md:w-auto px-3 py-1 trancking-wide font-semibold hover:text-gray-900 transition-all duration-300 bg-gray-100 rounded"
+                  >
+                    <PlayIcon class="size-6 text-gray-800" /> Continue Watching
+                  </button>
+
+                  <button
+                    v-else
+                    class="flex justify-center items-center gap-2 cursor-pointer w-full md:w-auto px-3 py-1 trancking-wide font-semibold hover:text-gray-900 transition-all duration-300 bg-gray-100 rounded"
+                  >
+                    <PlayIcon class="size-6 text-gray-800" />
+                    Watch now
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center gap-1 p-1 rounded lg:backdrop-blur-sm bg-transparent lg:bg-black/20"
+            >
+              <button :disabled="counter === 0" @click="prevBanner">
+                <ChevronLeftIcon
+                  :class="counter === 0 ? 'text-gray-600' : ''"
+                  class="size-5 text-gray-400 cursor-pointer"
+                />
+              </button>
+
+              <div
+                v-for="(item, i) in featuredAnime.length"
+                :class="i === counter ? 'bg-gray-400' : ''"
+                class="h-3 w-3 rounded-full border border-gray-300 lg:border-gray-500 cursor-pointer shrink-0"
+                @click="showSelectedBanner(i)"
+              ></div>
+              <button
+                :disabled="counter === featuredAnime.length - 1"
+                @click="nextBanner"
+              >
+                <ChevronRightIcon
+                  :class="
+                    counter === featuredAnime.length - 1 ? 'text-gray-600' : ''
+                  "
+                  class="size-5 text-gray-400 cursor-pointer"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- New Anime Episodes -->
-      <section class="mb-10">
+      <section class="mb-8">
         <BaseHeading> Fresh from Deep </BaseHeading>
         <BaseText> New episodes have surfaced, watch them now. </BaseText>
 
         <SkeletonCard v-if="!newEpisodes" />
-        <AnimeCard class="mt-5" :anime="newEpisodes" />
+        <AnimeCard class="mt-3" :anime="newEpisodes" />
       </section>
       <!-- Trending Anime -->
-      <section class="mb-10">
+      <section class="mb-8">
         <BaseHeading> Making Waves </BaseHeading>
         <BaseText>
           The hottest anime everyone is diving into right now.
         </BaseText>
 
         <SkeletonCard v-if="!trendingAnime" />
-        <AnimeCard class="mt-5" v-else :anime="trendingAnime" />
+        <AnimeCard class="mt-3" v-else :anime="trendingAnime" />
       </section>
       <!-- Most Popular Anime -->
-      <section class="mb-10">
+      <section class="mb-8">
         <BaseHeading> Legends of the Deep </BaseHeading>
         <BaseText>
           The most popular anime that have stood the test of time.
         </BaseText>
 
         <SkeletonCard v-if="!popularAnime" />
-        <AnimeCard class="mt-5" :anime="popularAnime" />
+        <AnimeCard class="mt-3" :anime="popularAnime" />
       </section>
       <!-- Top Rated Anime -->
       <section class="mb-8">
@@ -152,7 +256,7 @@
         <BaseText> The highest rated anime treasured by the deep. </BaseText>
 
         <SkeletonCard v-if="!topRatedAnime" />
-        <AnimeCard class="mt-5" :anime="topRatedAnime" />
+        <AnimeCard class="mt-3" :anime="topRatedAnime" />
       </section>
     </div>
   </div>
@@ -162,7 +266,13 @@
 import AnimeCard from "../Components/Anime/AnimeCard.vue";
 import SkeletonCard from "../Components/Skeleton/SkeletonCard.vue";
 
-import { PlayIcon, XMarkIcon } from "@heroicons/vue/20/solid";
+import {
+  PlayIcon,
+  XMarkIcon,
+  StarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/vue/20/solid";
 
 import { useForm } from "@inertiajs/vue3";
 
@@ -172,6 +282,9 @@ export default {
     SkeletonCard,
     PlayIcon,
     XMarkIcon,
+    StarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
   },
   props: {
     trendingAnime: Array,
@@ -179,11 +292,19 @@ export default {
     popularAnime: Array,
     topRatedAnime: Array,
     continueAnime: Array,
+    featuredAnime: Array,
+    watchHistoryIds: Array,
   },
   data() {
     return {
+      counter: 0,
+      animeBanners: [],
+      counterId: null,
       form: useForm(),
       removeForm: useForm(),
+      watchForm: useForm({
+        isWatched: false,
+      }),
       showConfirmationModal: false,
       removeAnime: {
         id: null,
@@ -193,9 +314,56 @@ export default {
       isRemoveBtnVisible: false,
       timeout: null,
       activeContinueAnimeId: null,
+      formattedFeaturedAnime: [],
+      seen: [],
     };
   },
+  mounted() {
+    this.getTrendingAnimeWithBanner();
+
+    console.log(this.watchHistoryIds);
+
+    clearInterval(this.counterId);
+
+    this.counterId = setInterval(() => {
+      this.showCarouselBanner();
+    }, 8000);
+  },
   methods: {
+    isInWatchHistories(watchId) {
+      return this.watchHistoryIds.includes(watchId);
+    },
+    watchNow(anilistId, episode, isWatched) {
+      console.log(anilistId);
+      this.watchForm.isWatched = isWatched;
+
+      this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`);
+    },
+    nextBanner() {
+      this.counter++;
+    },
+    prevBanner() {
+      this.counter--;
+    },
+    showSelectedBanner(index) {
+      this.counter = index;
+    },
+    formattedScore(score) {
+      return (score / 100) * 10;
+    },
+    showCarouselBanner() {
+      this.counter++;
+      if (this.counter === this.featuredAnime.length) {
+        this.counter = 0;
+      }
+    },
+    getTrendingAnimeWithBanner() {
+      this.trendingAnime.filter((anime) => {
+        if (anime.bannerImage) {
+          this.animeBanners.push(anime);
+        }
+      });
+    },
     showRemoveButton(id) {
       this.activeContinueAnimeId = id;
       clearTimeout(this.timeout);

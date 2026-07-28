@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\AnimeCache;
-use Illuminate\Support\Facades\Http;
 
 class SearchService
 {
@@ -21,9 +20,18 @@ class SearchService
         $sort = $filters['sort'] ?? 'popularity';
         $genres = $filters['genres'] ?? null;
 
+        $sortOrder = 'DESC';
+
+        if ($sort && $sort === 'oldest'){
+            $sort = 'season_year';
+            $sortOrder = 'ASC';
+        }
+
         $filteredAnime = AnimeCache::when($search, function ($query) use ($search) {
-            $query->where('title', 'LIKE', "%{$search}%")
-                ->orWhere('romaji_title', 'LIKE', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('romaji_title', 'LIKE', "%{$search}%");
+                });
         })->when($status, function ($query) use ($status) {
             $query->where('status', $status);
         })->when($format, function ($query) use ($format) {
@@ -39,7 +47,7 @@ class SearchService
                 $query->whereJsonContains('genres', $genre);
             }
         })
-        ->orderByDesc($sort)
+        ->orderBy($sort, $sortOrder)
         ->paginate(24);
 
         return $filteredAnime;
