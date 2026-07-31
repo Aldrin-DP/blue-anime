@@ -353,6 +353,185 @@ class AnilistService
         }
     }
 
+    public function getTopRatedAnimePage(int $page, int $perPage)
+    {
+        try {
+            return Http::post($this->ANILIST_API, [
+                'query' => '
+                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort], $type: MediaType) {
+                    Page(perPage: $perPage, page: $page) {
+                        media(sort: $sort, type: $type) {
+                        title {
+                            english
+                            romaji
+                        }
+                        averageScore
+                        bannerImage
+                        countryOfOrigin
+                        coverImage {
+                            extraLarge
+                        }
+                        description
+                        episodes
+                        format
+                        genres
+                        status
+                        id
+                        nextAiringEpisode {
+                            episode
+                            airingAt
+                        }
+                        seasonYear
+                        season
+                        popularity
+                        studios {
+                            nodes {
+                                name
+                                }
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            total
+                            perPage
+                            currentPage
+                            lastPage
+                        }
+                    }
+                }',
+                'variables' => [
+                    'page' => $page,
+                    'perPage' => $perPage,
+                    'sort' => 'SCORE_DESC',
+                    'type' => 'ANIME'
+                ]
+            ])->json();
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getTrendingAnime(int $page, int $perPage)
+    {
+        try {
+            return Http::post($this->ANILIST_API, [
+                'query' => '
+                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort], $type: MediaType) {
+                    Page(perPage: $perPage, page: $page) {
+                        media(sort: $sort, type: $type) {
+                        title {
+                            english
+                            romaji
+                        }
+                        averageScore
+                        bannerImage
+                        countryOfOrigin
+                        coverImage {
+                            extraLarge
+                        }
+                        description
+                        episodes
+                        format
+                        genres
+                        status
+                        id
+                        nextAiringEpisode {
+                            episode
+                            airingAt
+                        }
+                        seasonYear
+                        season
+                        popularity
+                        studios {
+                            nodes {
+                                name
+                                }
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            total
+                            perPage
+                            currentPage
+                            lastPage
+                        }
+                    }
+                }',
+                'variables' => [
+                    'page' => $page,
+                    'perPage' => $perPage,
+                    'sort' => 'TRENDING_DESC',
+                    'type' => 'ANIME'
+                ]
+            ])->json();
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAnimeForSeason(string $season, int $year, int $page, int $perPage)
+    {
+        try {
+            return Http::post($this->ANILIST_API, [
+                'query' => '
+                query ExampleQuery($perPage: Int, $page: Int, $type: MediaType, $season: MediaSeason, $year: Int) {
+                    Page(perPage: $perPage, page: $page) {
+                        media(type: $type, seasonYear: $year, season: $season) {
+                        title {
+                            english
+                            romaji
+                        }
+                        averageScore
+                        bannerImage
+                        countryOfOrigin
+                        coverImage {
+                            extraLarge
+                        }
+                        description
+                        episodes
+                        format
+                        genres
+                        status
+                        id
+                        nextAiringEpisode {
+                            episode
+                            airingAt
+                        }
+                        seasonYear
+                        season
+                        popularity
+                        studios {
+                            nodes {
+                                name
+                                }
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            total
+                            perPage
+                            currentPage
+                            lastPage
+                        }
+                    }
+                }',
+                'variables' => [
+                    'page' => $page,
+                    'perPage' => $perPage,
+                    'season' => $season,
+                    'seasonYear' => $year,
+                    'type' => 'ANIME'
+                ]
+            ])->json();
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
+    }
+
+
     public function getPopularChineAnimePage(int $page, int $perPage)
     {
         try {
@@ -403,6 +582,66 @@ class AnilistService
                     'page' => $page,
                     'perPage' => $perPage,
                     'sort' => 'POPULARITY_DESC',
+                    'countryOfOrigin' => 'CN',
+                    'type' => 'ANIME'
+                ]
+            ])->json();
+        } catch (Exception $e) {
+            Log::error('Anilist fetch failed:' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getTrendingChineseAnimePage(int $page, int $perPage)
+    {
+        try {
+            return Http::post($this->ANILIST_API, [
+                'query' => '
+                query ExampleQuery($perPage: Int, $page: Int, $sort: [MediaSort], $countryOfOrigin: CountryCode, $type: MediaType) {
+                    Page(perPage: $perPage, page: $page) {
+                        media(sort: $sort, countryOfOrigin: $countryOfOrigin, type: $type) {
+                        title {
+                            english
+                            romaji
+                        }
+                        averageScore
+                        bannerImage
+                        countryOfOrigin
+                        coverImage {
+                            extraLarge
+                        }
+                        description
+                        episodes
+                        format
+                        genres
+                        status
+                        id
+                        nextAiringEpisode {
+                            episode
+                            airingAt
+                        }
+                        seasonYear
+                        season
+                        popularity
+                        studios {
+                            nodes {
+                                name
+                                }
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            total
+                            perPage
+                            currentPage
+                            lastPage
+                        }
+                    }
+                }',
+                'variables' => [
+                    'page' => $page,
+                    'perPage' => $perPage,
+                    'sort' => 'TRENDING_DESC',
                     'countryOfOrigin' => 'CN',
                     'type' => 'ANIME'
                 ]

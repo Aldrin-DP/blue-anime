@@ -12,7 +12,7 @@
 
         <div class="mt-3 flex items-center gap-2 overflow-x-auto w-full pb-5">
           <div v-for="anime in continueAnime" class="w-72 shrink-0">
-            <div class="rounded-md">
+            <div class="rounded-md mr-3">
               <div
                 class="aspect-4/2 relative"
                 @mousemove="showRemoveButton(anime.id)"
@@ -191,7 +191,7 @@
               </div>
             </div>
             <div
-              class="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center gap-1 p-1 rounded lg:backdrop-blur-sm bg-transparent lg:bg-black/20"
+              class="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center justify-center gap-1 p-1 rounded lg:backdrop-blur-sm bg-transparent lg:bg-black/10"
             >
               <button :disabled="counter === 0" @click="prevBanner">
                 <ChevronLeftIcon
@@ -320,7 +320,7 @@ export default {
   },
   mounted() {
     this.getTrendingAnimeWithBanner();
-
+    console.log(this.newEpisodes);
     console.log(this.watchHistoryIds);
 
     clearInterval(this.counterId);

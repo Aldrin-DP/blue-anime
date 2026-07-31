@@ -272,11 +272,15 @@
                 >
                   View Details
                 </button>
-                <div class="flex gap-1">
+                <div class="flex items-center gap-1">
                   <button @click="toggleFavorite(watchlist.anilistId)">
                     <HeartIcon
-                      :class="watchlist.isFavorite ? 'text-pink-500' : ''"
-                      class="size-5 lg:size-6 cursor-pointer text-gray-700 dark:text-gray-400"
+                      :class="
+                        watchlist.isFavorite
+                          ? 'text-pink-500'
+                          : 'text-gray-700 dark:text-gray-400'
+                      "
+                      class="size-5 lg:size-6 cursor-pointer"
                     />
                   </button>
                   <div class="relative">
@@ -292,7 +296,7 @@
                       <div class="">
                         <ul class="w-full rounded-lg">
                           <label
-                            class="text-gray-600 dark:text-gray-500 block w-full py-0.5 pl-1 border-b border-gray-300 dark:border-gray-600"
+                            class="text-gray-600 mb-1 dark:text-gray-500 block w-full py-0.5 pl-1 border-b border-gray-300 dark:border-gray-600"
                             >Change status to:</label
                           >
                           <li
@@ -303,7 +307,7 @@
                                 : ''
                             "
                             :key="item"
-                            class="capitalize py-0.5 pl-3 my-0.5 rounded text-gray-700 dark:text-gray-400 font-medium tracking-wide hover:text-gray-800 hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-gray-200 hover:cursor-pointer transition-all duration-300"
+                            class="capitalize last:mb-1 py-0.5 pl-3 my-0.5 rounded text-gray-700 dark:text-gray-400 font-medium tracking-wide hover:text-gray-800 hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-gray-200 hover:cursor-pointer transition-all duration-300"
                             @click="updateStatus(watchlist.anilistId, item)"
                           >
                             {{ item }}
@@ -314,7 +318,7 @@
                         class="border-t border-gray-300 dark:border-gray-600"
                       >
                         <button
-                          class="mt-2 mb-1 text-red-400 cursor-pointer tracking-wide font-medium w-full hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-red-500 hover:text-red-500 text-start pl-3 py-0.5 rounded"
+                          class="mt-1 text-red-400 cursor-pointer tracking-wide font-medium w-full hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-red-500 hover:text-red-500 text-start pl-3 py-0.5 rounded"
                           @click="
                             requestRemoveWatchlist(
                               watchlist.title,

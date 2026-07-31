@@ -299,7 +299,7 @@
                   </div>
 
                   <div class="flex items-center gap-2 mt-4">
-                    <div class="flex items-center">
+                    <div class="flex items-center gap-1">
                       <StarIcon class="size-5 text-gray-800 dark:text-gray-300">
                       </StarIcon>
                       <span class="text-gray-800 dark:text-gray-300">{{
@@ -781,30 +781,39 @@ export default {
         : this.anime.episodes;
     },
     formattedPreviewTime() {
-      let minute = Math.floor(this.previewTime / 60);
+      let hour = Math.floor(this.previewTime / 3600);
+      let minute = Math.floor((this.previewTime / 60) % 60);
       let second = Math.floor(this.previewTime % 60);
 
+      if (minute < 10) {
+        minute = "0" + minute;
+      }
       if (second < 10) {
         second = "0" + second;
       }
 
-      return `${minute}:${second}`;
+      return `${hour}:${minute}:${second}`;
     },
     formattedDuration() {
-      const minute = Math.floor(this.duration / 60);
+      const hour = Math.floor(this.duration / 3600);
+      const minute = Math.floor((this.duration / 60) % 60);
       const second = Math.floor(this.duration % 60);
 
-      return `${minute}:${second}`;
+      return `${hour}:${minute}:${second}`;
     },
     formatCurrentTime() {
-      let minute = Math.floor(this.currentTime / 60);
+      let hour = Math.floor(this.currentTime / 3600);
+      let minute = Math.floor((this.currentTime / 60) % 60);
       let second = Math.floor(this.currentTime % 60);
 
+      if (minute < 10) {
+        minute = "0" + minute;
+      }
       if (second < 10) {
         second = "0" + second;
       }
 
-      return `${minute}:${second} - ${this.formattedDuration}`;
+      return `${hour}:${minute}:${second} - ${this.formattedDuration}`;
     },
     progressBar() {
       return (this.currentTime / this.duration) * 100;

@@ -6,7 +6,7 @@
       v-for="(anime, index) in anime"
       :key="anime.api_id"
       class="mb-1 cursor-pointer"
-      @click="handleClick(anime.api_id, anime.episodes)"
+      @click="handleClick(anime.api_id, anime.episode)"
     >
       <div
         class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative overflow-hidden"
@@ -14,10 +14,10 @@
         @mouseleave="handleMouseLeave(anime.api_id)"
       >
         <span
-          v-if="anime.episodes"
+          v-if="anime.episode"
           class="absolute py-0.5 inline rounded-md px-2 text-xs sm:text-sm shadow top-2 left-2 font-bold bg-blue-800 text-gray-300"
         >
-          EP {{ anime.episodes }}
+          EP {{ anime.episode }}
         </span>
         <span
           v-if="anime.format && !anime.episode"

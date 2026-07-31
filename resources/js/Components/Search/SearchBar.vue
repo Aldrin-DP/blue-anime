@@ -22,7 +22,7 @@
         Loading...
       </li>
       <li
-        v-else-if="results.length < 1 && search.length > 1"
+        v-else-if="results.length < 1 && search.length"
         class="px-2 py-1 flex gap-2 items-center cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-900 transition-all duration-300"
       >
         No results

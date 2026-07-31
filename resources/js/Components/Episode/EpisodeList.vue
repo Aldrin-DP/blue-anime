@@ -7,7 +7,6 @@
       :currentEpisode="currentEpisode"
       :currentPage="currentPage"
     />
-    asdasd
   </div>
 </template>
 

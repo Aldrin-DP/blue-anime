@@ -108,7 +108,7 @@ export default {
     setCompleted(ep) {
       if (!this.$page.props.auth.user) return;
 
-      return this.episodesProgress.find((p) => p.episode === ep) ?? "asd";
+      return this.episodesProgress.find((p) => p.episode === ep) ?? "";
     },
   },
   computed: {

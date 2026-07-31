@@ -76,7 +76,7 @@
                   class="font-semibold text-gray-300 rounded-lg dark:text-gray-300 bg-gradient-to-b from-sea-700 to-sea-800 w-48 px-2 py-2 flex justify-between items-center hover:cursor-pointer"
                   @click="toggleSelection"
                 >
-                  <span class="capitalize"> {{ status }}</span>
+                  <span class="capitalize"> {{ formattedStatus }}</span>
                   <ChevronRightIcon v-if="!isOpen" class="size-6" />
                   <ChevronDownIcon v-else class="size-6" />
                 </button>
@@ -233,6 +233,12 @@ export default {
     },
   },
   computed: {
+    formattedStatus() {
+      if (this.status === "plan_to_watch") {
+        return "Plan to Watch";
+      }
+      return this.status;
+    },
     genres() {
       const genres = this.anime.genres;
       return genres.slice(0, 5);
