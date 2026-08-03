@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Services\AnilistService;
 use App\Services\AnimeService;
 use App\Services\UserAnimeService;

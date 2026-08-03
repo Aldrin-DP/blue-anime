@@ -128,7 +128,7 @@
               :style="{
                 backgroundImage: `url(${anime.banner_image ? anime.banner_image : anime.cover_image})`,
               }"
-              class="w-full h-65 lg:h-[450px] md:aspect-21/9 sm:aspect-3/1 bg-cover bg-center object-cover object-center rounded-xl flex items-center justify-center lg:items-end"
+              class="w-full h-65 lg:h-[400px] md:aspect-21/9 sm:aspect-3/1 bg-cover bg-center object-cover object-center rounded-xl flex items-center justify-center lg:items-end"
             >
               <div
                 class="w-full h-full pb-9 text-center lg:text-start px-3 lg:p-5 flex flex-col items-center lg:items-start lg:justify-end"
@@ -319,9 +319,8 @@ export default {
     };
   },
   mounted() {
+    console.log(this.continueAnime);
     this.getTrendingAnimeWithBanner();
-    console.log(this.newEpisodes);
-    console.log(this.watchHistoryIds);
 
     clearInterval(this.counterId);
 
@@ -334,7 +333,6 @@ export default {
       return this.watchHistoryIds.includes(watchId);
     },
     watchNow(anilistId, episode, isWatched) {
-      console.log(anilistId);
       this.watchForm.isWatched = isWatched;
 
       this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`);
@@ -390,21 +388,13 @@ export default {
       this.removeAnime.id = id;
       this.removeAnime.title = title;
       this.removeAnime.episode = episode;
-      console.log(
-        this.removeAnime.id,
-        this.removeAnime.title,
-        this.removeAnime.episode,
-      );
+
       this.showConfirmationModal = true;
-    },
-    toggleKebab(id, episode) {
-      console.log(animeId, episode);
     },
     continueWatching(api_id, episode) {
       this.form.get(`/anime/${api_id}/episodes/${episode}`);
     },
     goToAnime(animeId) {
-      console.log(typeof animeId);
       this.form.get(`/anime/${animeId}`);
     },
   },

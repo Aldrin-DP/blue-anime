@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Services\AnilistService;
 use App\Services\AnimeService;
 use App\Services\UserAnimeService;
@@ -27,8 +28,8 @@ class HomeController extends Controller
         $watchHistoryIds = [];
 
         if ($user) {
-            $watchHistoryIds = $watchHistoryService->getWatchHistoryIds();    
-            $continueWatchingList = $userAnimeService->getContinueWatchingList($user->id);
+            $watchHistoryIds = $watchHistoryService->getWatchHistoryIds($user);    
+            $continueWatchingList = $userAnimeService->getContinueWatchingList($user);
         }
 
         return inertia('Home', [

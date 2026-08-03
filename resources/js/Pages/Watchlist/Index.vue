@@ -564,7 +564,6 @@ export default {
   },
   methods: {
     confirmRemoveWatchlist() {
-      console.log(this.idToBeRemoved);
       this.deleteForm.delete(`/watchlists/${this.idToBeRemoved}`, {
         preserveState: true,
         preserveScroll: true,
@@ -585,7 +584,6 @@ export default {
       this.showConfirmationModal = false;
     },
     updateStatus(anilistId, status) {
-      console.log(anilistId, status);
       if (status === "planning") {
         status = "plan_to_watch";
       }

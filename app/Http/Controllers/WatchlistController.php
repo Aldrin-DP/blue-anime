@@ -13,37 +13,11 @@ use Illuminate\Http\Request;
 
 class WatchlistController extends Controller
 {   
-    public function index() {
+    public function index(UserAnimeService $userAnimeService) {
 
-        $user = auth()->user();
+        $user = auth()->user(); 
 
-        $watchlists = Watchlist::with([
-            'anime', 
-            'anime.watch_histories' => function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->where('current_time', '>', 0);
-            }])
-        ->where('user_id', $user->id)
-        ->latest('updated_at')
-        ->get();
-
-        $userWatchlists = $watchlists->map(fn($watchlist) => [
-            'id' => $watchlist->id,
-            'anilistId' => $watchlist->anime->api_id,
-            'status' => $watchlist->status,
-            'progress' => $watchlist->progress,
-            'isFavorite' => $watchlist->is_favorite,
-            'title' => $watchlist->anime->title,
-            'format' => $watchlist->anime->format,
-            'coverImage' => $watchlist->anime->cover_image,
-            'score' => $watchlist->anime->score,
-            'genres' => $watchlist->anime->genres,
-            'episodes' => $watchlist->anime->episodes,
-            'lastWatchedEpisode' => $watchlist->anime->watch_histories->last()?->episode,
-            'lastWatched' => $watchlist->anime->watch_histories->last()?->duration ? 
-                    ($watchlist->anime->watch_histories->last()?->current_time / $watchlist->anime->watch_histories->last()?->duration * 100) : null,
-            'completed_at' => $watchlist->completed_at?->format('M d, Y')
-            ]);
+        $userWatchlists = $userAnimeService->getUserWatchlists($user->id);
 
         return inertia('Watchlist/Index', [
             'watchlists' => $userWatchlists

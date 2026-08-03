@@ -71,11 +71,11 @@ class UserAnimeService
 
     }
 
-    public function getContinueWatchingList(int $userId): array
+    public function getContinueWatchingList(User $user): array
     {   
         $continueWatchingList = [];
 
-        $watchHistory = WatchHistory::where('user_id', $userId)
+        $watchHistory = WatchHistory::where('user_id', $user->id)
             ->where('is_completed', false)
             ->where('hidden_from_continue_watching', false)
             ->with('anime')
@@ -101,6 +101,91 @@ class UserAnimeService
             }
 
         return $continueWatchingList;
+    }
+
+    public function getUserWatchlists(int $userId): array 
+    {
+        $userWatchlists = [];
+
+        $watchlists = Watchlist::with([
+            'anime', 
+            'anime.watch_histories' => function($query) use ($userId) {
+                $query->where('user_id', $userId)
+                    ->where('current_time', '>', 0);
+            }])
+        ->where('user_id', $userId)
+        ->latest('updated_at')
+        ->get();
+
+        $userWatchlists = $watchlists->map(fn($watchlist) => [
+            'id' => $watchlist->id,
+            'anilistId' => $watchlist->anime->api_id,
+            'status' => $watchlist->status,
+            'progress' => $watchlist->progress,
+            'isFavorite' => $watchlist->is_favorite,
+            'title' => $watchlist->anime->title,
+            'format' => $watchlist->anime->format,
+            'coverImage' => $watchlist->anime->cover_image,
+            'score' => $watchlist->anime->score,
+            'genres' => $watchlist->anime->genres,
+            'episodes' => $watchlist->anime->episodes,
+            'lastWatchedEpisode' => $watchlist->anime->watch_histories->last()?->episode,
+            'lastWatched' => $watchlist->anime->watch_histories->last()?->duration ? 
+                    ($watchlist->anime->watch_histories->last()?->current_time / $watchlist->anime->watch_histories->last()?->duration * 100) : null,
+            'completed_at' => $watchlist->completed_at?->format('M d, Y')
+        ])->toArray();
+
+        return $userWatchlists;
+    }
+
+    public function updateWatchlistProgress(User $user, int $animeId, float $watchedPercentage): void
+    {
+        if ($watchedPercentage < 60) {
+            return;
+        }
+        $watchlist = Watchlist::where('user_id', $user->id)
+            ->where('anime_id', $animeId)
+            ->first();
+
+        if (!$watchlist) {
+            Watchlist::create([
+                'user_id' => $user->id,
+                'anime_id' => $animeId,
+                'status' => 'watching',
+                'progress' => $watchedPercentage,
+            ]);
+        } elseif ($watchlist->status === 'plan_to_watch') {
+            $watchlist->status = 'watching';
+            $watchlist->progress = $watchedPercentage;
+            $watchlist->save();
+        } elseif ($watchlist->status === 'watching') {
+            $watchlist->progress = $watchedPercentage;
+            $watchlist->save();
+        } else {
+            // status completed or dropped
+        }
+        
+    }
+
+    public function markAnimeAsCompleted(
+        User $user,
+        int $animeId,
+        int $episode,
+        int $totalEpisode,
+        float $watchedPercentage
+    ): void 
+    {
+        if ($watchedPercentage >= 90 && $episode === $totalEpisode) {
+            $inWatchlists = Watchlist::where('user_id', $user->id)
+                ->where('anime_id', $animeId)
+                ->first();
+
+            if ($inWatchlists) {
+                $inWatchlists->status = 'completed';
+                $inWatchlists->completed_at = now();
+                $inWatchlists->save();
+            }
+        }
     }
 
 }

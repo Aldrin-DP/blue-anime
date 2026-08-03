@@ -51,9 +51,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/watchlists/{anilistId}/favorite', [WatchlistController::class, 'toggleFavorite']);
     Route::delete('/watchlists/{id}', [WatchlistController::class, 'destroy']);
     
-    // autosave progress - Episode/Show.vue
+    // autosave progress - Pages/Episode/Show.vue
     Route::post('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'save']);
-    // mark as watched/unwatched - EpisodeCard.vue
+    // mark as watched/unwatched - Component/Episode/EpisodeCard.vue
     Route::patch('/watch-histories/{animeId}/{episode}', [WatchHistoryController::class, 'update']);
     Route::patch('/watch-histories/{id}', [WatchHistoryController::class, 'hide']);
 

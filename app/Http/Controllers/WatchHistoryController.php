@@ -2,89 +2,76 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SaveWatchHistoryRequest;
 use App\Models\WatchHistory;
 use App\Models\Watchlist;
 use App\Services\AnimeService;
+use App\Services\UserAnimeService;
+use App\Services\WatchHistoryService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class WatchHistoryController extends Controller
-{
-    public function save(Request $request, int $anilistId, int $episode, AnimeService $animeService)
-    {
-        $cachedAnime = $animeService->getOrCacheAnime($anilistId);
+{   
+    public function __construct(
+        private AnimeService $animeService, 
+        private UserAnimeService $userAnimeService,
+        private WatchHistoryService $watchHistoryService
+    ){}
 
+    public function save(SaveWatchHistoryRequest $request, int $anilistId, int $episode) 
+    {
         $user = $request->user();
 
-        $currentTime = $request->input('currentTime');
-        $duration = $request->input('duration');
-        $isCompleted = $request->input('isCompleted');
+        $validated = $request->validated();
 
-        $watchedPercentage = ($currentTime / $duration) * 100;
+        $duration = $validated['duration'];
+        $currentTime = $validated['currentTime'];
+        $isCompleted = $validated['isCompleted'];
 
-        if ($watchedPercentage >= 60) {
+        $watchedPercentage = $duration > 0
+            ? ($currentTime / $duration) * 100
+            : 0;
 
-            $inWatchlists = Watchlist::where('user_id', $user->id)
-                ->where('anime_id', $cachedAnime->id)
-                ->first();
+        $cachedAnime = $this->animeService->getOrCacheAnime($anilistId);  
 
-            if (!$inWatchlists) {
-                Watchlist::create([
-                    'user_id' => $user->id,
-                    'anime_id' => $cachedAnime->id,
-                    'status' => 'watching',
-                    'progress' => $watchedPercentage,
-                ]);
-            } elseif ($inWatchlists->status === 'plan_to_watch') {
-                $inWatchlists->status = 'watching';
-                $inWatchlists->progress = $watchedPercentage;
-                $inWatchlists->save();
-            } elseif ($inWatchlists->status === 'watching') {
-                $inWatchlists->progress = $watchedPercentage;
-                $inWatchlists->save();
-            } else {
-                // status completed or dropped
-            }
-        }
+        $this->userAnimeService->updateWatchlistProgress($user, $cachedAnime->id, $watchedPercentage);
 
-        WatchHistory::updateOrCreate(
-            ['user_id' => $user->id, 'anime_id' => $cachedAnime->id, 'episode' => $episode],
-            ['current_time' => $currentTime, 'duration' => $duration, 'is_completed' => $isCompleted]
+        $this->watchHistoryService->saveWatchHistory(
+            $user,
+            $cachedAnime->id,
+            $episode,
+            $currentTime,
+            $duration,
+            $isCompleted
+        );   
+
+        $this->watchHistoryService->addNextEpisodeToContinueWatching(
+            $user,
+            $cachedAnime->id,
+            $episode,
+            $cachedAnime->episodes,
+            $watchedPercentage,
         );
 
-        if ($watchedPercentage >= 90 && $episode < $cachedAnime->episodes) {
-            $nextEpisode = $episode + 1;
+        $this->userAnimeService->markAnimeAsCompleted(
+            $user,
+            $cachedAnime->id,
+            $episode,
+            $cachedAnime->episodes,
+            $watchedPercentage
+        );
 
-            WatchHistory::firstOrCreate(
-                ['user_id' => $user->id, 'anime_id' => $cachedAnime->id, 'episode' => $nextEpisode],
-                ['current_time' => 0, 'duration' => 0, 'is_completed' => false]
-            );
-        }
-
-        Log::info('episode check', [
-            'episode' => $episode,
-            'episode_type' => gettype($episode),
-            'totalEpisode' => $cachedAnime->total_episode,
-            'totalEpisode_type' => gettype($cachedAnime->total_episode)
+        return response()->json([
+            'message' => 'Watch history updated'
         ]);
-
-        if ($watchedPercentage >= 90 && $episode === $cachedAnime->total_episode) {
-            $inWatchlists = Watchlist::where('user_id', $user->id)
-                ->where('anime_id', $cachedAnime->id)
-                ->first();
-
-            if ($inWatchlists) {
-                $inWatchlists->status = 'completed';
-                $inWatchlists->completed_at = now();
-                $inWatchlists->save();
-            }
-        }
-
-        return response()->json(['success' => true]);
     }
 
-    public function update(Request $request, int $anilistId, int $episode, AnimeService $animeService)
-    {
+    public function update(
+        SaveWatchHistoryRequest $request, 
+        int $anilistId, 
+        int $episode, 
+        AnimeService $animeService
+    ){
         $user = $request->user();
 
         $cachedAnime = $animeService->getOrCacheAnime($anilistId);
@@ -102,7 +89,7 @@ class WatchHistoryController extends Controller
             ]
         );
 
-        return response()->json(['success' => true]);
+        // return response()->json(['message' => 'Watch history updated']);
     }
 
     public function hide(int $id)

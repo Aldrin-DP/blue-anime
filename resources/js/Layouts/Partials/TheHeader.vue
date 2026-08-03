@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-gray-50/90 text-gray-800 dark:bg-gray-950/80 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 flex items-center sticky backdrop-blur-md top-0 z-10000"
+    class="bg-gray-50/90 text-gray-800 dark:bg-gray-950/80 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 flex items-center sticky backdrop-blur-md top-0 z-50"
   >
     <header class="max-w-325 w-full lg:flex lg:mx-10 xl:mx-15 lg:items-center">
       <div
@@ -184,7 +184,7 @@ export default {
     document.addEventListener("click", this.handleClickOutside);
   },
   beforeUnmount() {
-    document.addEventListener("click", this.handleClickOutside);
+    document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
     handleClickOutside(event) {

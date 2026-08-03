@@ -20,17 +20,9 @@ class WatchController extends Controller
 
         $anime = $anilistService->getAnime($anilistId);
 
-        
-
         $cachedAnime = $animeService->getOrCacheAnime($anilistId);
-        
-
-        
-
         $episodeData = $streamingService->getEpisode($anilistId, $episode);
-        
-        
-        
+              
         $episodeProgress = $userAnimeService->getEpisodeProgress($cachedAnime->id, $user); 
         
         $resumeTime = collect($episodeProgress)->firstWhere('episode', $episode);

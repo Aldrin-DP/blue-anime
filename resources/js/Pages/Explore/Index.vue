@@ -231,12 +231,20 @@
         </div>
       </div>
 
-      <div v-if="!data">No results found.</div>
+      <div v-if="data.data.length < 1" class="mt-5">
+        <p class="text-gray-800 dark:text-gray-400 text-lg">
+          We couldn't find any anime matching your search.
+        </p>
+      </div>
 
       <div v-else>
-        <div class="mt-5 w-full flex justify-between items-center">
-          <div>Results</div>
+        <div class="mt-5 w-full lg:flex lg:justify-between items-center">
           <div class="flex items-center gap-1">
+            <span class="text-gray-700 dark:text-gray-400">
+              {{ formattedTotalAnime }} available anime
+            </span>
+          </div>
+          <div class="flex items-center gap-1 mt-2 lg:mt-0">
             <button
               @click="prevPage"
               :disabled="currentPage === 1"
@@ -398,7 +406,7 @@ export default {
   },
   props: {
     data: Object,
-    selectedFilters: Array,
+    selectedFilters: Object,
   },
   data() {
     return {
@@ -467,8 +475,6 @@ export default {
   },
   mounted() {
     this.addYear();
-    console.log(this.data);
-    console.log(this.selectedFilters);
   },
   methods: {
     clearFilter() {
@@ -489,13 +495,6 @@ export default {
       this.currentActiveAnimeId = animeId;
       this.showDetails = false;
     },
-    // handleClick(anilistId, episode) {
-    //   if (episode) {
-    //     this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`);
-    //     return;
-    //   }
-    //   this.searchForm.get(`/anime/${anilistId}`);
-    // },
     formattedScore(score) {
       return (score / 100) * 10;
     },
@@ -516,11 +515,8 @@ export default {
       for (let i = currentYear; i >= 1970; i--) {
         this.years.push(i);
       }
-      console.log(this.years);
     },
     searchAnime() {
-      console.log(this.searchForm);
-      console.log("asd");
       this.searchForm.get("/explore", {
         preserveState: true,
         preserveScroll: true,
@@ -547,11 +543,13 @@ export default {
     goToAnime(anilistId) {
       this.form.get(`/anime/${anilistId}`, {
         preserveState: true,
-        preserveScroll: true,
       });
     },
   },
   computed: {
+    formattedTotalAnime() {
+      return this.data.total.toLocaleString();
+    },
     filteredAnime() {
       return this.data.data;
     },

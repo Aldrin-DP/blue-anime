@@ -61,6 +61,8 @@ class AnilistService
                                     mediaRecommendation {
                                         episodes
                                         format
+                                        averageScore
+                                        genres
                                         title {
                                             english
                                             romaji

@@ -24,8 +24,5 @@ export default {
     currentEpisode: Number,
     currentPage: Number,
   },
-  mounted() {
-    console.log(this.currentPage);
-  },
 };
 </script>

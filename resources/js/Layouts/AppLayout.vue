@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col h-full max-w-[1440px] mx-auto bg-gray-50 dark:bg-gray-950"
+    class="flex min-h-dvh flex-col max-w-[1440px] mx-auto bg-gray-50 dark:bg-gray-950"
   >
     <TheHeader />
 

@@ -109,7 +109,7 @@
                 <button
                   v-if="isIntroVisible"
                   @click="skipIntro"
-                  class="absolute bottom-20 right-5 px-3 py-1.5 border border-gray-600 backdrop-blur-md cursor-pointer rounded bg-gray-950/70 text-gray-300 font-semibold tracking-wide"
+                  class="absolute top-3 right-3 md:bottom-20 md:right-5 px-3 py-1.5 border border-gray-600 backdrop-blur-md cursor-pointer rounded bg-gray-950/70 text-gray-300 font-semibold tracking-wide"
                 >
                   Skip Intro
                 </button>
@@ -444,6 +444,12 @@ export default {
     handleTimeUpdate() {
       this.syncCurrentTime();
       this.updateIntroVisibility();
+
+      const video = this.getVideoEl();
+
+      if (video && video.currentTime >= video.duration * 0.9) {
+        this.saveProgress();
+      }
     },
     handleCanPlay() {
       this.setIsLoadingToFalse();
@@ -471,8 +477,6 @@ export default {
 
     async toggleFullscreen() {
       const videoWrapper = this.$refs.videoWrapper;
-
-      console.log(document.fullscreenElement);
 
       if (document.fullscreenElement !== null) {
         await document.exitFullscreen();
@@ -510,6 +514,7 @@ export default {
       if (!video) return;
 
       video.pause();
+      this.saveProgress();
     },
     seek(time) {
       const t = Number(time);
@@ -650,25 +655,33 @@ export default {
 
       this.intervalId = setInterval(() => {
         this.saveProgress();
-      }, 60000);
+      }, 15000);
     },
     syncCurrentTime() {
+      if (!this.getVideoEl()) return;
+
       this.currentTime = this.getVideoEl().currentTime;
     },
 
     async saveProgress() {
       if (!this.$page.props.auth.user) return;
+
       const video = this.getVideoEl();
       if (!video) return;
+
       const currentTime = video.currentTime;
+
       if (
         this.lastSavedTime !== null &&
         Math.abs(currentTime - this.lastSavedTime) < 5
       )
         return;
+
       if (currentTime < 20) return;
+
       this.lastSavedTime = currentTime;
       const isCompleted = currentTime >= video.duration * 0.9;
+
       const data = {
         currentTime: currentTime,
         duration: this.duration,
@@ -680,24 +693,20 @@ export default {
         coverImage: this.anime.coverImage.extraLarge,
         bannerImage: this.anime.bannerImage,
       };
-      console.log(data);
+
+      const url = `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`;
+
       try {
-        console.log("saveProgress called!", this.currentlyPlayingEpisode);
-        const response = await fetch(
-          `/watch-histories/${this.anime.id}/${this.currentlyPlayingEpisode}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
-                .content,
-              "X-Requested-With": "XMLHttpRequest",
-            },
-            body: JSON.stringify(data),
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+              .content,
+            "X-Requested-With": "XMLHttpRequest",
           },
-        );
-        console.log(response);
-        console.log("it runs");
+          body: JSON.stringify(data),
+        });
       } catch (error) {
         console.error("saveprogress fetch failed", error);
       }
@@ -792,12 +801,20 @@ export default {
         second = "0" + second;
       }
 
+      if (this.previewTime < 3600) {
+        return `${minute}:${second}`;
+      }
+
       return `${hour}:${minute}:${second}`;
     },
     formattedDuration() {
       const hour = Math.floor(this.duration / 3600);
       const minute = Math.floor((this.duration / 60) % 60);
       const second = Math.floor(this.duration % 60);
+
+      if (this.duration < 3600) {
+        return `${minute}:${second}`;
+      }
 
       return `${hour}:${minute}:${second}`;
     },
@@ -811,6 +828,10 @@ export default {
       }
       if (second < 10) {
         second = "0" + second;
+      }
+
+      if (this.duration < 3600) {
+        return `${minute}:${second} - ${this.formattedDuration}`;
       }
 
       return `${hour}:${minute}:${second} - ${this.formattedDuration}`;

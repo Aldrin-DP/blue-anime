@@ -83,9 +83,6 @@ export default {
       isCompleted: false,
     };
   },
-  mounted() {
-    console.log(this.currentPage);
-  },
   methods: {
     updateWatchStatus(anilistId, episode, isCompleted) {
       this.updateWatchStatusForm.isCompleted = isCompleted;
@@ -116,10 +113,6 @@ export default {
       const start = (this.currentPage - 1) * 20 + 1;
       const end = Math.min(this.currentPage * 20, this.episodes);
       const pages = [];
-
-      console.log("currentPage:", this.currentPage);
-      console.log("Start:", start);
-      console.log("End:", end);
 
       if (this.sorted === "desc") {
         const sortStart = this.episodes - (this.currentPage - 1) * 20;

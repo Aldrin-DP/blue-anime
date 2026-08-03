@@ -93,7 +93,7 @@ export default {
     animeStatus() {
       let status = this.anime.status.toLowerCase();
 
-      if (status === "releasing") return "Airing";
+      if (status === "releasing") return "Ongoing";
       if (status === "finished") return "Completed";
     },
   },
