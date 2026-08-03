@@ -21,26 +21,41 @@
           >
             Episode {{ ep }}
           </p>
-          <div v-if="this.$page.props.auth.user">
+          <div
+            v-if="this.$page.props.auth.user"
+            class="relative"
+            @mouseenter="handleMouseEnter(ep)"
+            @mouseleave="handleMouseLeave"
+          >
             <button
               v-if="setCompleted(ep)?.isCompleted"
               :class="{
-                'text-sea-700! border-sea-300! dark:text-sea-300! dark:border-sea-300!':
+                'text-sea-700! border-green-500! dark:text-green-500! dark:border-green-500!':
                   setCompleted(ep)?.isCompleted,
               }"
-              class="border cursor-pointer border-gray-300 dark:border-gray-700 text-[15px] rounded tracking-wide text-gray-800 dark:text-gray-400 w-[75px] hover:text-blue-400 hover:border-sea-300 transition-all duration-500"
+              class="cursor-pointer border-gray-300 dark:border-gray-700 text-[15px] rounded tracking-wide text-gray-800 dark:text-gray-400 hover:text-blue-400 hover:border-sea-300 transition-all duration-500"
               @click="updateWatchStatus(anime.id, ep, false)"
             >
-              Watched
+              <CheckCircleIcon class="size-6" />
             </button>
 
             <button
               v-else
-              class="border cursor-pointer border-gray-300 dark:border-gray-700 text-[15px] rounded tracking-wide text-gray-800 dark:text-gray-400 w-[75px] hover:text-blue-400 hover:border-sea-300 transition-all duration-500"
+              class="cursor-pointer border-gray-300 dark:border-gray-700 text-[15px] rounded tracking-wide text-gray-800 dark:text-gray-400 hover:text-green-400 hover:border-sea-300 transition-all duration-500"
               @click="updateWatchStatus(anime.id, ep, true)"
             >
-              Watch
+              <EyeIcon class="size-6" />
             </button>
+            <div
+              v-if="ep === currentlyHoveredEpisode"
+              class="text-center font-medium bg-gray-200/40 text-gray-800 rounded text-[13px] rounded-br-lg px-1.5 py-1 absolute -top-7 right-4 w-33 backdrop-blur-md"
+            >
+              {{
+                setCompleted(ep)?.isCompleted
+                  ? "Mark as Unwatched"
+                  : "Mark as Watched"
+              }}
+            </div>
           </div>
         </div>
 
@@ -62,7 +77,7 @@
 </template>
 
 <script>
-import { FaceSmileIcon } from "@heroicons/vue/24/outline";
+import { CheckCircleIcon, EyeIcon } from "@heroicons/vue/24/outline";
 import { useForm, router } from "@inertiajs/vue3";
 export default {
   props: {
@@ -71,6 +86,10 @@ export default {
     currentEpisode: Number,
     sorted: String,
     currentPage: Number,
+  },
+  components: {
+    CheckCircleIcon,
+    EyeIcon,
   },
   data() {
     return {
@@ -81,11 +100,35 @@ export default {
         isCompleted: false,
       }),
       isCompleted: false,
+      currentlyHoveredEpisode: null,
     };
   },
   methods: {
+    handleMouseEnter(ep) {
+      this.currentlyHoveredEpisode = ep;
+    },
+    handleMouseLeave() {
+      this.currentlyHoveredEpisode = null;
+    },
     updateWatchStatus(anilistId, episode, isCompleted) {
+      const currentEpisode = this.setWatchProgress(episode);
+      console.log(currentEpisode);
+
+      let episodeCurrentTime = currentEpisode?.currentTime;
+      let episodeDuration = currentEpisode?.duration;
+
+      if (episodeCurrentTime === undefined) {
+        episodeCurrentTime = 0;
+      }
+
+      if (episodeDuration === undefined) {
+        episodeDuration = 0;
+      }
+
+      this.updateWatchStatusForm.currentTime = episodeCurrentTime;
+      this.updateWatchStatusForm.duration = episodeDuration;
       this.updateWatchStatusForm.isCompleted = isCompleted;
+
       this.updateWatchStatusForm.patch(
         `/watch-histories/${anilistId}/${episode}`,
         {

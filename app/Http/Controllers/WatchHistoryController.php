@@ -66,30 +66,26 @@ class WatchHistoryController extends Controller
         ]);
     }
 
-    public function update(
-        SaveWatchHistoryRequest $request, 
-        int $anilistId, 
-        int $episode, 
-        AnimeService $animeService
-    ){
+    public function update(SaveWatchHistoryRequest $request, int $anilistId, int $episode)
+    {
         $user = $request->user();
+        
+        $validated = $request->validated();
 
-        $cachedAnime = $animeService->getOrCacheAnime($anilistId);
+        $duration = $validated['duration'];
+        $currentTime = $validated['currentTime'];
+        $isCompleted = $validated['isCompleted'];
 
-        WatchHistory::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'anime_id' => $cachedAnime->id,
-                'episode' => $episode
-            ],
-            [
-                'current_time' => $request->input('currentTime'),
-                'duration' => $request->input('duration'),
-                'is_completed' => $request->input('isCompleted')
-            ]
+        $cachedAnime = $this->animeService->getOrCacheAnime($anilistId);
+
+        $this->userAnimeService->toggleWatchedStatus(
+            $user,
+            $cachedAnime->id,
+            $episode,
+            $currentTime,
+            $duration,
+            $isCompleted
         );
-
-        // return response()->json(['message' => 'Watch history updated']);
     }
 
     public function hide(int $id)

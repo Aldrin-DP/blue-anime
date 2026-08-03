@@ -225,7 +225,7 @@
                   }"
                   class="rounded w-26 text-center text-gray-100 p-1 inline-block text-[10px] font-bold uppercase tracking-widest lg:mt-1"
                 >
-                  {{ status(watchlist.status) }}
+                  {{ formattedStatus(watchlist.status) }}
                 </div>
               </div>
 
@@ -300,17 +300,19 @@
                             >Change status to:</label
                           >
                           <li
-                            v-for="item in statuses"
+                            v-for="status in watchStatusOptions"
                             :class="
-                              watchlist.status === item
+                              watchlist.status === status.value
                                 ? 'bg-gray-300! dark:bg-gray-900!'
                                 : ''
                             "
-                            :key="item"
+                            :key="status.value"
                             class="capitalize last:mb-1 py-0.5 pl-3 my-0.5 rounded text-gray-700 dark:text-gray-400 font-medium tracking-wide hover:text-gray-800 hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-gray-200 hover:cursor-pointer transition-all duration-300"
-                            @click="updateStatus(watchlist.anilistId, item)"
+                            @click="
+                              updateStatus(watchlist.anilistId, status.value)
+                            "
                           >
-                            {{ item }}
+                            {{ status.label }}
                           </li>
                         </ul>
                       </div>
@@ -556,11 +558,19 @@ export default {
       isKebabOpen: false,
       id: 0,
       lastSavedId: 0,
-      statuses: ["watching", "planning", "completed", "dropped"],
+      watchStatusOptions: [
+        { label: "Watching", value: "watching" },
+        { label: "Plan to Watch", value: "plan_to_watch" },
+        { label: "Completed", value: "completed" },
+        { label: "Dropped", value: "dropped" },
+      ],
       showConfirmationModal: false,
       titleToBeRemoved: "",
       idToBeRemoved: null,
     };
+  },
+  mounted() {
+    console.log(this.watchlists);
   },
   methods: {
     confirmRemoveWatchlist() {
@@ -584,9 +594,15 @@ export default {
       this.showConfirmationModal = false;
     },
     updateStatus(anilistId, status) {
-      if (status === "planning") {
-        status = "plan_to_watch";
+      const anime = this.watchlists.find((watchlist) => {
+        return watchlist.anilistId === anilistId;
+      });
+
+      if (anime.status === status) {
+        this.isKebabOpen = false;
+        return;
       }
+
       this.updateForm.status = status;
       this.updateForm.patch(`/watchlists/${anilistId}`, {
         onSuccess: this.$inertia.reload({
@@ -649,7 +665,7 @@ export default {
     continueWatching(api_id, episode) {
       this.form.get(`/anime/${api_id}/episodes/${episode}`);
     },
-    status(status) {
+    formattedStatus(status) {
       if (status === "plan_to_watch") {
         status = "Plan to Watch";
       }

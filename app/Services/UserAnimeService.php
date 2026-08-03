@@ -61,6 +61,7 @@ class UserAnimeService
         
         return array_map(fn($episode) => [
                 'episode' => $episode['episode'],
+                'duration' => $episode['duration'],
                 'currentTime' => $episode['current_time'],
                 'progress' => $episode['duration']
                     ?($episode['current_time'] / $episode['duration']) * 100
@@ -186,6 +187,29 @@ class UserAnimeService
                 $inWatchlists->save();
             }
         }
+    }
+
+    public function toggleWatchedStatus(
+        User $user,
+        int $animeId,
+        int $episode,
+        float $currentTime,
+        int $duration,
+        bool $isCompleted
+    ): void 
+    {
+        WatchHistory::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'anime_id' => $animeId,
+                'episode' => $episode
+            ],
+            [
+                'current_time' => $currentTime,
+                'duration' => $duration,
+                'is_completed' => $isCompleted
+            ]
+        );
     }
 
 }
