@@ -79,6 +79,7 @@
 <script>
 import { CheckCircleIcon, EyeIcon } from "@heroicons/vue/24/outline";
 import { useForm, router } from "@inertiajs/vue3";
+import { useToast } from "vue-toastification";
 export default {
   props: {
     anime: Object,
@@ -102,6 +103,9 @@ export default {
       isCompleted: false,
       currentlyHoveredEpisode: null,
     };
+  },
+  created() {
+    this.toast = useToast();
   },
   methods: {
     handleMouseEnter(ep) {
@@ -134,11 +138,24 @@ export default {
         {
           preserveScroll: true,
           preserveState: true,
+          onSuccess: () => {
+            this.toast.success("Watch status updated");
+          },
         },
       );
     },
     watchEpisode(animeId, episode) {
-      this.watchForm.get(`/anime/${animeId}/episodes/${episode}`);
+      this.watchForm.get(`/anime/${animeId}/episodes/${episode}`, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+          const message = this.$page.props.flash.episodeError;
+
+          if (message) {
+            this.toast.warning(message);
+          }
+        },
+      });
     },
     setWatchProgress(ep) {
       if (!this.$page.props.auth.user) return;

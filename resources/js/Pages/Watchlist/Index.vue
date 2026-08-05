@@ -309,7 +309,11 @@
                             :key="status.value"
                             class="capitalize last:mb-1 py-0.5 pl-3 my-0.5 rounded text-gray-700 dark:text-gray-400 font-medium tracking-wide hover:text-gray-800 hover:bg-gray-300 hover:dark:bg-gray-900 hover:dark:text-gray-200 hover:cursor-pointer transition-all duration-300"
                             @click="
-                              updateStatus(watchlist.anilistId, status.value)
+                              updateStatus(
+                                watchlist.anilistId,
+                                status.value,
+                                status.label,
+                              )
                             "
                           >
                             {{ status.label }}
@@ -533,6 +537,7 @@ import {
   ArrowLongRightIcon,
 } from "@heroicons/vue/24/outline";
 import { useForm, router } from "@inertiajs/vue3";
+import { useToast } from "vue-toastification";
 
 export default {
   props: {
@@ -569,6 +574,9 @@ export default {
       idToBeRemoved: null,
     };
   },
+  created() {
+    this.toast = useToast();
+  },
   mounted() {
     console.log(this.watchlists);
   },
@@ -593,7 +601,7 @@ export default {
     cancelRemoveWatchlist() {
       this.showConfirmationModal = false;
     },
-    updateStatus(anilistId, status) {
+    updateStatus(anilistId, status, statusLabel) {
       const anime = this.watchlists.find((watchlist) => {
         return watchlist.anilistId === anilistId;
       });
@@ -605,9 +613,12 @@ export default {
 
       this.updateForm.status = status;
       this.updateForm.patch(`/watchlists/${anilistId}`, {
-        onSuccess: this.$inertia.reload({
-          only: ["watchlists"],
-        }),
+        onSuccess: () => {
+          this.toast.success(`Status changed to ${statusLabel}`);
+          this.$inertia.reload({
+            only: ["watchlists"],
+          });
+        },
         onFinish: () => {
           this.isKebabOpen = false;
         },
@@ -635,9 +646,16 @@ export default {
       this.favoriteForm.patch(`/watchlists/${anilistId}/favorite`, {
         preserveState: true,
         preserveScroll: true,
-        onSuccess: this.$inertia.reload({
-          only: ["watchlists"],
-        }),
+        onSuccess: () => {
+          this.$inertia.reload({
+            only: ["watchlists"],
+          });
+          if (this.isFavorited) {
+            this.toast.success("Added to favorites.");
+          } else {
+            this.toast.success("Removed from favorites.");
+          }
+        },
       });
     },
     countAnimeStatus(status) {

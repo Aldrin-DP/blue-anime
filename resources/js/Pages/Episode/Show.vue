@@ -25,6 +25,7 @@
             <!-- video container -->
             <div
               ref="videoWrapper"
+              :class="{'is-fullscreen': isFullscreen}"
               class="w-full relative overflow-hidden rounded-xl shadow-2xl"
               @mousemove="handleMouseMove"
               @keydown="handleKeyDown($event)"
@@ -32,7 +33,7 @@
               <video
                 ref="video"
                 crossorigin="anonymous"
-                class="w-full roundex-xl"
+                class="w-full h-full"
                 @click="togglePlayback"
                 @timeupdate="handleTimeUpdate"
                 @loadedmetadata="handleLoadedMetaData"
@@ -423,6 +424,8 @@ export default {
     this.initPlayer();
     this.displayCurrentEpisode();
     this.initProgressAutoSave();
+
+    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
   },
   beforeUnmount() {
     this.saveProgress();
@@ -430,6 +433,9 @@ export default {
     clearInterval(this.intervalId);
   },
   methods: {
+    handleFullscreenChange() {
+      this.isFullscreen = !!document.fullscreenElement;
+    },
     handleMouseMove() {
       this.resetControlsTimer();
     },
@@ -437,8 +443,15 @@ export default {
       this.updateBuffered();
     },
     handleLoadedMetaData() {
+      const video = this.getVideoEl();
+
       this.setVideoDuration();
       this.resumeCurrentTime();
+
+      if (video.textTracks[0]) {
+        video.textTracks[0].mode = "showing";
+      }
+
       this.setupSubtitlePosition();
     },
     handleTimeUpdate() {
@@ -746,8 +759,9 @@ export default {
     },
     setupSubtitlePosition() {
       const track = this.getVideoEl().textTracks[0];
-      if (track) {
-        for (let cue of track.cues) {
+      if (track && track.cues) {
+        for (let i = 0; i < track.cues.length; i++) {
+          const cue = track.cues[i];
           cue.line = -3;
           cue.snapToLines = true;
         }

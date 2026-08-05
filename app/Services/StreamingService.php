@@ -12,13 +12,17 @@ class StreamingService
             $response =  Http::get("https://anivexa-api-navy.vercel.app/watch/anikoto/$id/sub/anikoto-$episode");
 
             if ($response->failed()) {
-                throw new \Exception("Failed to fetch episode $episode");
+                return null;
             }
 
             $response = $response->json();
 
             $episodeLink = collect($response['ssub']['streams'])
                 ->first(fn($link) => $link['default'] === true);
+
+            if (!$episodeLink) {
+                return null;
+            }
 
             $subtitleLink = collect($response['ssub']['subtitles'])
                 ->first(fn($link) => $link['default'] === true);

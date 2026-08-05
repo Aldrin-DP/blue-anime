@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -7,11 +7,28 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Outfit Variable', 'ui-sans-serif';
-    --color-sea-950: #051723;
-    --color-sea-900: #092536;
-    --color-sea-800: #123d5a;
-    --color-sea-700: #1d5680;
-    --color-sea-300: #7babcb;
-    --color-sea-100: #c6d7e4;
+  --font-sans: "Outfit Variable", "ui-sans-serif";
+  --color-sea-950: #051723;
+  --color-sea-900: #092536;
+  --color-sea-800: #123d5a;
+  --color-sea-700: #1d5680;
+  --color-sea-300: #7babcb;
+  --color-sea-100: #c6d7e4;
+}
+video::cue {
+  background: transparent;
+  color: #ffffff;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  font-weight: 400;
+  font-size: clamp(16px, 2.2vw, 24px);
+  font-style: italic;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000,
+    0 0 3px #000;
+}
+.is-fullscreen video::cue {
+  font-size: clamp(20px, 2.8vw, 39px);
 }

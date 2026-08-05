@@ -86,17 +86,21 @@
                   class="absolute w-48 rounded-lg py-1 px-2 top-[45px] bg-gradient-to-b from-sea-700 to-sea-800"
                 >
                   <li
-                    v-for="item in statuses"
-                    :key="item"
+                    v-for="status in watchStatusOptions"
+                    :key="status.value"
                     class="capitalize py-1.5 px-2 text-center bg-gradient-to-b from-sea-700/40 to-sea-800/40 my-1.5 rounded text-gray-300 font-semibold tracking-wide hover:cursor-pointer hover:text-gray-100 hover:from-sea-700/80 hover:to-sea-800/80 transition-all duration-300"
-                    @click="updateStatus(anime.id, item)"
+                    @click="updateStatus(anime.id, status.value, status.label)"
                   >
-                    {{ item }}
+                    {{ status.label }}
                   </li>
                 </ul>
               </div>
 
-              <BaseButton variant="primary" @click="toggleFavorite(anime.id)">
+              <BaseButton
+                variant="primary"
+                :disabled="favoriteForm.processing"
+                @click="toggleFavorite(anime.id)"
+              >
                 <HeartIcon
                   :class="isFavorited ? 'text-pink-500' : ''"
                   class="size-6"
@@ -127,7 +131,7 @@
 
       <EpisodeSection :anime="anime" :episodesProgress="episodesProgress" />
 
-      <AnimeRecommendation :anime="anime" />
+      <AnimeRecommendation :recommendations="recommendations" />
     </div>
   </div>
 </template>
@@ -146,6 +150,7 @@ import BaseButton from "../../Components/Base/BaseButton.vue";
 import AnimeInfo from "../../Components/Anime/AnimeInfo.vue";
 import EpisodeSection from "../../Components/Episode/EpisodeSection.vue";
 import AnimeRecommendation from "../../Components/Anime/AnimeRecommendation.vue";
+import { useToast } from "vue-toastification";
 
 export default {
   components: {
@@ -182,36 +187,54 @@ export default {
       isDescriptionOver40: true,
 
       selectedLabel: "",
-      statuses: ["watching", "plan to watch", "completed", "dropped"],
+      watchStatusOptions: [
+        { label: "Watching", value: "watching" },
+        { label: "Plan to Watch", value: "plan_to_watch" },
+        { label: "Completed", value: "completed" },
+        { label: "Dropped", value: "dropped" },
+      ],
       isOpen: false,
     };
   },
   mounted() {
+    console.log(this.anime);
     setInterval(() => {
       this.now = Math.floor(Date.now() / 1000);
     }, 1000);
   },
+  created() {
+    this.toast = useToast();
+  },
   methods: {
+    testToast() {
+      this.toast.success("🎉 Toastification is working!");
+    },
     toggleFavorite(anilistId) {
       this.favoriteForm.patch(`/watchlists/${anilistId}/favorite`, {
         preserveState: true,
         preserveScroll: true,
+        onSuccess: () => {
+          if (this.isFavorited) {
+            this.toast.success("Added to favorites.");
+          } else {
+            this.toast.success("Removed from favorites.");
+          }
+        },
       });
     },
-    updateStatus(anilistId, status) {
+    updateStatus(anilistId, status, statusLabel) {
       this.isOpen = false;
       if (this.status === status) {
         return;
       }
-      if (this.status === "plan_to_watch") {
-        this.status.replace("_", " ");
-      }
-      if (status === "plan to watch") {
-        status = "plan_to_watch";
-      }
 
       this.updateForm.status = status;
-      this.updateForm.patch(`/watchlists/${anilistId}`);
+      this.updateForm.patch(`/watchlists/${anilistId}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+          this.toast.success(`Status changed to ${statusLabel}`);
+        },
+      });
     },
     toggleSelection() {
       this.isOpen = !this.isOpen;
@@ -229,6 +252,9 @@ export default {
       this.form.post("/watchlists", {
         preserveScroll: true,
         preserveState: true,
+        onSuccess: () => {
+          this.toast.success(`Added to Watchlists`);
+        },
       });
     },
   },
@@ -284,6 +310,11 @@ export default {
       return this.anime.nextAiringEpisode
         ? this.anime.nextAiringEpisode.episode - 1
         : this.anime.episodes;
+    },
+    recommendations() {
+      const nodes = this.anime.recommendations?.nodes ?? [];
+
+      return nodes.map((node) => node.mediaRecommendation).filter(Boolean);
     },
   },
 };

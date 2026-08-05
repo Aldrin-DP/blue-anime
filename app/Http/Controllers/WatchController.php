@@ -22,6 +22,12 @@ class WatchController extends Controller
 
         $cachedAnime = $animeService->getOrCacheAnime($anilistId);
         $episodeData = $streamingService->getEpisode($anilistId, $episode);
+
+        if (!$episodeData){
+            return back()->with([
+                'episodeError' => 'This episode is currently unavailable.'
+            ]);
+        }
               
         $episodeProgress = $userAnimeService->getEpisodeProgress($cachedAnime->id, $user); 
         
