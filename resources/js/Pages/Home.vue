@@ -118,10 +118,23 @@
           </div>
         </div>
       </section>
+      <div v-else>
+        <div
+          class="h-10 w-75 bg-gray-300 dark:bg-gray-800 animate-pulse mb-2"
+        ></div>
+        <div class="h-5 w-120 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
+        <div class="mt-2 flex items-center gap-2 overflow-x-auto w-full pb-5">
+          <div v-for="item in 5" class="w-72 shrink-0">
+            <div
+              class="aspect-4/2 bg-gray-300 dark:bg-gray-800 animate-pulse"
+            ></div>
+          </div>
+        </div>
+      </div>
 
       <!-- Anime Banner Carousel -->
       <section class="mb-8">
-        <div class="relative">
+        <div v-if="featuredAnime && featuredAnime.length > 0" class="relative">
           <div v-for="(anime, index) in featuredAnime" :key="anime.id">
             <div
               v-if="index === counter"
@@ -219,6 +232,11 @@
               </button>
             </div>
           </div>
+        </div>
+        <div v-else>
+          <div
+            class="w-full bg-gray-300 dark:bg-gray-800 animate-pulse h-65 lg:h-[400px] md:aspect-21/9 sm:aspect-3/1 bg-cover bg-center object-cover object-center rounded-xl flex items-center justify-center lg:items-end"
+          ></div>
         </div>
       </section>
 
