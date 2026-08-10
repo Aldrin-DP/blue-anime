@@ -113,7 +113,7 @@
     </section>
 
     <!-- Delete Account -->
-    <section
+    <!-- <section
       class="my-5 w-full bg-linear-to-tr from-white/30 to-white/40 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 shadow-lg dark:shadow p-5 rounded-lg"
     >
       <BaseHeading size="large"> Delete Account</BaseHeading>
@@ -122,7 +122,7 @@
       <div class="flex justify-end">
         <BaseButton variant="danger"> DELETE MY ACCOUNT </BaseButton>
       </div>
-    </section>
+    </section> -->
   </div>
 </template>
 

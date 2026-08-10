@@ -19,13 +19,13 @@
           Episode {{ currentEpisode }}
         </p>
       </div>
-      <div class="flex flex-col lg:flex-row gap-3 xl:gap-5">
+      <div class="flex flex-col lg:flex-row gap-3 xl:gap-5 items-start">
         <div class="w-full xl:w-8/12 rounded-xl">
           <div class="w-full">
             <!-- video container -->
             <div
               ref="videoWrapper"
-              :class="{'is-fullscreen': isFullscreen}"
+              :class="{ 'is-fullscreen': isFullscreen }"
               class="w-full relative overflow-hidden rounded-xl shadow-2xl"
               @mousemove="handleMouseMove"
               @keydown="handleKeyDown($event)"
@@ -56,7 +56,8 @@
                     @click="skipBackward10"
                     class="cursor-pointer rounded-full p-1.5 text-gray-200 backdrop-blur-md bg-gray-950/20"
                   >
-                    <span class="material-symbols-outlined text-lg lg:text-5xl!"
+                    <span
+                      class="material-symbols-outlined text-lg sm:text-2xl md:text-3xl! lg:text-5xl!"
                       >replay_10</span
                     >
                   </button>
@@ -75,7 +76,8 @@
                     @click="skipForward10"
                     class="cursor-pointer rounded-full p-1.5 text-gray-200 backdrop-blur-md bg-gray-950/20"
                   >
-                    <span class="material-symbols-outlined text-lg lg:text-5xl!"
+                    <span
+                      class="material-symbols-outlined text-lg sm:text-2xl md:text-3xl! lg:text-5xl!"
                       >forward_10</span
                     >
                   </button>
@@ -110,7 +112,7 @@
                 <button
                   v-if="isIntroVisible"
                   @click="skipIntro"
-                  class="absolute top-3 right-3 md:bottom-20 md:right-5 px-3 py-1.5 border border-gray-600 backdrop-blur-md cursor-pointer rounded bg-gray-950/70 text-gray-300 font-semibold tracking-wide"
+                  class="absolute h-10 top-3 right-3 md:top-auto md:bottom-20 md:right-5 px-3 py-1.5 border border-gray-600 backdrop-blur-md cursor-pointer rounded bg-gray-950/70 text-gray-300 font-semibold tracking-wide"
                 >
                   Skip Intro
                 </button>
@@ -269,12 +271,19 @@
             </div>
           </div>
           <div
-            class="mt-3 p-5 border border-gray-300 dark:border-gray-700 bg-linear-to-br from-white/20 to-white/30 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 rounded-xl"
+            v-if="anime.nextAiringEpisode"
+            class="flex mt-2 border text-sm border-gray-300 dark:border-gray-700 justify-center gap-2 px-5 py-3 bg-linear-to-tr from-white/20 to-white/30 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 rounded-xl text-gray-700 dark:text-gray-400"
+          >
+            <span class="font-semibold tracking-wider">Next episode:</span>
+            <span class="font-bold">{{ airingAt }}</span>
+          </div>
+          <div
+            class="mt-2 p-5 border border-gray-300 dark:border-gray-700 bg-linear-to-br from-white/20 to-white/30 dark:bg-linear-to-br dark:from-gray-950/20 dark:to-gray-950/40 rounded-xl"
           >
             <div>
               <div class="flex gap-2">
                 <div
-                  class="w-37.5 border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3"
+                  class="w-35.5 border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3"
                 >
                   <img
                     :src="anime.coverImage.extraLarge"
@@ -316,7 +325,7 @@
                   </div>
                 </div>
               </div>
-              <div class="line-clamp-4 text-gray-800 dark:text-gray-300 mt-2">
+              <div class="line-clamp-3 text-gray-800 dark:text-gray-300 mt-2">
                 {{ cleanedDescription }}
               </div>
             </div>
@@ -418,6 +427,7 @@ export default {
       isPreviewTimeVisible: false,
       previewTime: 0,
       widthPercent: 0,
+      now: Math.floor(Date.now() / 1000),
     };
   },
   mounted() {
@@ -425,7 +435,11 @@ export default {
     this.displayCurrentEpisode();
     this.initProgressAutoSave();
 
-    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
+    document.addEventListener("fullscreenchange", this.handleFullscreenChange);
+
+    setInterval(() => {
+      this.now = Math.floor(Date.now() / 1000);
+    }, 1000);
   },
   beforeUnmount() {
     this.saveProgress();
@@ -787,6 +801,17 @@ export default {
   },
 
   computed: {
+    airingAt() {
+      const airingAt = this.anime.nextAiringEpisode.airingAt;
+      const secondsUntilAiring = airingAt - this.now;
+
+      const days = Math.floor(secondsUntilAiring / 86400);
+      const hours = Math.floor((secondsUntilAiring % 86400) / 3600);
+      const mins = Math.floor((secondsUntilAiring % 3600) / 60);
+      const secs = Math.floor(secondsUntilAiring % 60);
+
+      return `${days}d ${hours}h ${mins}m ${secs}s`;
+    },
     animeTitle() {
       return this.anime.title.english
         ? this.anime.title.english

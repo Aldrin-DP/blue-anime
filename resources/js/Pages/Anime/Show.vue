@@ -1,6 +1,8 @@
 <template>
   <div>
-    <Head :title="`${anime.title.english} -  `" />
+    <Head
+      :title="`${anime.title.english ? anime.title.english : anime.title.romaji} -  `"
+    />
     <div class="p-0 m-0 lg:p-10 xl:px-15 xl:py-10 relative">
       <section class="relative bg-cover bg-center lg:flex">
         <img
@@ -57,7 +59,43 @@
               <span class="font-bold">{{ airingAt }}</span>
             </div>
 
-            <div class="mt-5 flex gap-3 items-center">
+            <div class="mt-5 flex gap-3 items-center flex-wrap sm:no-wrap">
+              <BaseButton
+                :isProcessing="watchForm.processing"
+                :variant="
+                  anime.status === 'NOT_YET_RELEASED' ? 'disabled' : 'primary'
+                "
+                class="flex justify-center w-full sm:w-auto"
+                :disabled="anime.status === 'NOT_YET_RELEASED'"
+                @click="handleWatchAction"
+              >
+                <div class="flex items-center justify-center gap-1">
+                  <PlayIcon
+                    v-if="anime.status !== 'NOT_YET_RELEASED'"
+                    class="size-6"
+                  />
+                  <ClockIcon
+                    v-if="anime.status === 'NOT_YET_RELEASED'"
+                    class="size-5"
+                  />
+                  <span
+                    v-if="anime.status === 'NOT_YET_RELEASED'"
+                    class="text-base"
+                  >
+                    Coming Soon
+                  </span>
+                  <span v-else-if="status === 'watching'" class="text-base">
+                    Continue Watching
+                  </span>
+                  <span v-else-if="status === 'completed'" class="text-base">
+                    Watch Again
+                  </span>
+                  <span v-else-if="status === 'dropped'" class="text-base">
+                    Resume Watching
+                  </span>
+                  <span v-else class="text-base">Watch Now</span>
+                </div>
+              </BaseButton>
               <BaseButton
                 v-if="!inWatchlist"
                 :isProcessing="form.processing"
@@ -88,7 +126,14 @@
                   <li
                     v-for="status in watchStatusOptions"
                     :key="status.value"
-                    class="capitalize py-1.5 px-2 text-center bg-gradient-to-b from-sea-700/40 to-sea-800/40 my-1.5 rounded text-gray-300 font-semibold tracking-wide hover:cursor-pointer hover:text-gray-100 hover:from-sea-700/80 hover:to-sea-800/80 transition-all duration-300"
+                    :class="
+                      anime.status === 'NOT_YET_RELEASED' &&
+                      (status.value === 'watching' ||
+                        status.value === 'dropped')
+                        ? 'bg-gray-500! hover:bg-gray-600!'
+                        : 'hover:from-sea-700/80 hover:to-sea-800/80'
+                    "
+                    class="capitalize py-1.5 px-2 text-center bg-gradient-to-b from-sea-700/40 to-sea-800/40 my-1.5 rounded text-gray-300 font-semibold tracking-wide hover:cursor-pointer hover:text-gray-100 transition-all duration-300"
                     @click="updateStatus(anime.id, status.value, status.label)"
                   >
                     {{ status.label }}
@@ -114,7 +159,7 @@
               <span class="tracking-wider text-xs lg:text-base font-semibold"
                 >SYNOPSIS</span
               >
-              <div class="mt-3 lg:text-[15px]">
+              <div class="mt-3 lg:text-[16px]">
                 {{ truncatedDescription }}
               </div>
               <span
@@ -129,9 +174,13 @@
         </div>
       </section>
 
-      <EpisodeSection :anime="anime" :episodesProgress="episodesProgress" />
+      <div v-if="anime.status !== 'NOT_YET_RELEASED'">
+        <EpisodeSection :anime="anime" :episodesProgress="episodesProgress" />
+      </div>
 
-      <AnimeRecommendation :recommendations="recommendations" />
+      <div v-if="recommendations.length > 0">
+        <AnimeRecommendation :recommendations="recommendations" />
+      </div>
     </div>
   </div>
 </template>
@@ -144,6 +193,8 @@ import {
   CheckIcon,
   ChevronRightIcon,
   ChevronDownIcon,
+  PlayIcon,
+  ClockIcon,
 } from "@heroicons/vue/20/solid";
 import { useForm, router } from "@inertiajs/vue3";
 import BaseButton from "../../Components/Base/BaseButton.vue";
@@ -164,6 +215,8 @@ export default {
     CheckIcon,
     ChevronRightIcon,
     ChevronDownIcon,
+    PlayIcon,
+    ClockIcon,
   },
   props: {
     anime: Object,
@@ -171,12 +224,14 @@ export default {
     episodesProgress: Array,
     status: String,
     isFavorited: Boolean,
+    continueLastWatchedEpisode: Number,
   },
   data() {
     return {
       form: useForm({
         anilistId: "",
       }),
+      watchForm: useForm(),
       updateForm: useForm({
         status: "",
       }),
@@ -188,8 +243,8 @@ export default {
 
       selectedLabel: "",
       watchStatusOptions: [
-        { label: "Watching", value: "watching" },
         { label: "Plan to Watch", value: "plan_to_watch" },
+        { label: "Watching", value: "watching" },
         { label: "Completed", value: "completed" },
         { label: "Dropped", value: "dropped" },
       ],
@@ -198,6 +253,7 @@ export default {
   },
   mounted() {
     console.log(this.anime);
+    console.log(this.continueLastWatchedEpisode);
     setInterval(() => {
       this.now = Math.floor(Date.now() / 1000);
     }, 1000);
@@ -206,10 +262,29 @@ export default {
     this.toast = useToast();
   },
   methods: {
-    testToast() {
-      this.toast.success("🎉 Toastification is working!");
+    handleWatchAction() {
+      let episode = this.continueLastWatchedEpisode;
+      if (this.status === "plan_to_watch" || !this.continueLastWatchedEpisode) {
+        episode = 1;
+      }
+      const animeId = this.anime.id;
+      this.watchForm.get(`/anime/${animeId}/episodes/${episode}`, {
+        onSuccess: () => {
+          const message = this.$page.props.flash.episodeError;
+
+          if (message) {
+            this.toast.warning(message);
+          }
+        },
+      });
     },
     toggleFavorite(anilistId) {
+      if (!this.$page.props.auth.user) {
+        router.visit(
+          `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
+        );
+        return;
+      }
       this.favoriteForm.patch(`/watchlists/${anilistId}/favorite`, {
         preserveState: true,
         preserveScroll: true,
@@ -225,6 +300,12 @@ export default {
     updateStatus(anilistId, status, statusLabel) {
       this.isOpen = false;
       if (this.status === status) {
+        return;
+      }
+      if (
+        this.anime.status === "NOT_YET_RELEASED" &&
+        (status === "watching" || status === "dropped")
+      ) {
         return;
       }
 

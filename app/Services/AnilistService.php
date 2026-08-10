@@ -129,6 +129,157 @@ class AnilistService
         }
     }
 
+
+    public function getNewChineseEpisodes()
+    {
+        try {
+            return Cache::remember('anime.new.chinese.episodes', now()->addHours(5), function () {
+                $trendingResponse = Http::post($this->ANILIST_API, [
+                    'query' => '
+                        query (
+                            $page: Int,
+                            $perPage: Int,
+                            $countryOfOrigin: CountryCode
+                        ) {
+                            Page(
+                                page: $page,
+                                perPage: $perPage
+                            ) {
+                                media(
+                                    type: ANIME
+                                    status: RELEASING
+                                    sort: TRENDING_DESC
+                                    countryOfOrigin: $countryOfOrigin
+                                ) {
+                                    id
+                                    title {
+                                        romaji
+                                        english
+                                    }
+                                }
+                            }
+                        }
+                    ',
+                    'variables' => [
+                        'page' => 1,
+                        'perPage' => 50,
+                        'countryOfOrigin' => 'CN',
+                    ],
+                ]);
+
+                if ($trendingResponse->failed()) {
+                    throw new Exception(
+                        'AniList trending request failed: ' . $trendingResponse->body()
+                    );
+                }
+
+                $trendingChineseAnime = $trendingResponse->json('data.Page.media', []);
+
+                if (empty($trendingChineseAnime)) {
+                    return [];
+                }
+
+                $trendingIds = array_map(fn($anime) => $anime['id'], $trendingChineseAnime);
+
+                $now = now()->timestamp;
+
+                $fourteenDaysAgo = now()
+                    ->subDays(14)
+                    ->timestamp;
+
+                $response = Http::post($this->ANILIST_API, [
+                    'query' => '
+                        query (
+                            $trendingIds: [Int],
+                            $page: Int,
+                            $perPage: Int,
+                            $since: Int,
+                            $until: Int
+                        ) {
+                            Page(
+                                page: $page,
+                                perPage: $perPage
+                            ) {
+                                airingSchedules(
+                                    mediaId_in: $trendingIds
+                                    airingAt_greater: $since
+                                    airingAt_lesser: $until
+                                    sort: TIME_DESC
+                                ) {
+                                    episode
+                                    airingAt
+
+                                    media {
+                                        id
+                                        popularity
+                                        genres
+                                        format
+                                        averageScore
+                                        trending
+
+                                        title {
+                                            romaji
+                                            english
+                                        }
+
+                                        coverImage {
+                                            extraLarge
+                                            large
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ',
+                    'variables' => [
+                        'trendingIds' => $trendingIds,
+                        'page' => 1,
+                        'perPage' => 18,
+                        'since' => $fourteenDaysAgo,
+                        'until' => $now,
+                    ],
+                ]);
+
+                if ($response->failed()) {
+                    throw new Exception('AniList airing schedule request failed: ' . $response->body());
+                }
+
+                $airingSchedules =
+                    $response->json(
+                        'data.Page.airingSchedules',
+                        []
+                    );
+
+                return array_map(
+                    fn($anime) => [
+                        'episode' => $anime['episode'],
+                        'airing_at' => $anime['airingAt'],
+                        'api_id' => $anime['media']['id'],
+                        'title' =>
+                        $anime['media']['title']['english']
+                            ?? $anime['media']['title']['romaji'],
+                        'format' => $anime['media']['format'],
+                        'score' => $anime['media']['averageScore'],
+                        'genres' => $anime['media']['genres'],
+                        'cover_image' =>
+                        $anime['media']['coverImage']['extraLarge']
+                            ?? $anime['media']['coverImage']['large'],
+                    ],
+                    $airingSchedules
+                );
+            });
+
+        } catch (Exception $e) {
+
+            Log::error(
+                'AniList fetch failed: ' .
+                    $e->getMessage()
+            );
+
+            return [];
+        }
+    }
+
     public function getNewEpisodes()
     {
         try {

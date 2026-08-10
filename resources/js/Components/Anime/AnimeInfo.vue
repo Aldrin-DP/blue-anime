@@ -7,8 +7,9 @@
         <span class="">{{ animeStatus }}</span>
       </div>
       <div class="xl:hidden flex items-center gap-1">
-        <StarIcon class="size-6" />
-        <span>{{ anime.averageScore }}%</span>
+        <StarIcon class="size-6" v-if="anime.averageScore" />
+        <span v-if="anime.averageScore">{{ anime.averageScore }}%</span>
+        <span v-else>TBA</span>
       </div>
       <div
         v-if="anime.nextAiringEpisode"
@@ -27,26 +28,29 @@
     </div>
     <div class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Score:</span>
-      <span class="">{{ formattedScore(anime.averageScore).toFixed(1) }}</span>
+
+      <span class="" v-if="anime.averageScore">{{
+        formattedScore(anime.averageScore).toFixed(1)
+      }}</span>
+      <span v-else>TBA</span>
     </div>
-    <div
-      v-if="anime.nextAiringEpisode"
-      class="hidden xl:flex items-center gap-1"
-    >
+    <div v-if="anime.episodes" class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Episodes:</span>
-      <span class="">{{ anime.nextAiringEpisode.episode - 1 }}</span>
+      <span class="">{{ anime.episodes ? anime.episodes : "TBA" }}</span>
     </div>
     <div v-else class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Episodes:</span>
-      <span class="">{{ anime.episodes ? anime.episodes : "" }}</span>
+      <span class="">{{ anime.nextAiringEpisode.episode - 1 }}</span>
     </div>
+
     <div class="hidden xl:flex items-center gap-1">
-      <span class="uppercase text-xs text-gray-600">Released Year:</span>
+      <span class="uppercase text-xs text-gray-600">Released Date:</span>
       <span class="">{{ releaseYear }} </span>
     </div>
     <div class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Duration:</span>
-      <span class="">{{ anime.duration }} mins</span>
+      <span class="" v-if="anime.duration"> {{ anime.duration }} mins</span>
+      <span v-else>TBA</span>
     </div>
     <div class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Format:</span>
@@ -61,7 +65,7 @@
     </div>
     <div class="hidden xl:flex items-center gap-1">
       <span class="uppercase text-xs text-gray-600">Season:</span>
-      <span class="">{{ anime.season }} </span>
+      <span class="">{{ anime.season || "TBA" }} </span>
     </div>
   </div>
 </template>
@@ -88,13 +92,25 @@ export default {
       return this.data;
     },
     releaseYear() {
-      return `${this.anime.startDate.month}-${this.anime.startDate.day}-${this.anime.startDate.year}`;
+      let year = this.anime.startDate.year;
+      let month = this.anime.startDate.month;
+      let day = this.anime.startDate.day;
+      if (year && month && day) {
+        return `${this.anime.startDate.month}-${this.anime.startDate.day}-${this.anime.startDate.year}`;
+      } else if (!year && !month && !day) {
+        return "TBA";
+      } else if (!day) {
+        day = "?";
+      } else {
+      }
+      return `${month}-${day}-${year}`;
     },
     animeStatus() {
       let status = this.anime.status.toLowerCase();
 
       if (status === "releasing") return "Ongoing";
       if (status === "finished") return "Completed";
+      if (status === "not_yet_released") return "Upcoming";
     },
   },
 };

@@ -44,13 +44,14 @@ class WatchHistoryController extends Controller
             $duration,
             $isCompleted
         );   
-
+        
         $this->watchHistoryService->addNextEpisodeToContinueWatching(
             $user,
             $cachedAnime->id,
             $episode,
             $cachedAnime->episodes,
             $watchedPercentage,
+            $cachedAnime->next_episode
         );
 
         $this->userAnimeService->markAnimeAsCompleted(

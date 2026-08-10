@@ -46,7 +46,9 @@ class SyncPopularChineseAnime extends Command
                         'popularity' => $anime['popularity'],
                         'studio' => $anime['studios']['nodes'][0]['name'] ?? null,
                         'genres' => $anime['genres'],
-                        'totalEpisode' => $anime['episodes'] ?? null
+                        'totalEpisode' => $anime['episodes'] ?? null,
+                        'next_episode' => $anime['nextAiringEpisode']['episode'] ?? null,
+                        'next_episode_airing_at' => $anime['nextAiringEpisode']['airingAt'] ?? null,
                     ]
                 );
             }

@@ -5,7 +5,7 @@
     <div class="p-4 lg:p-10 xl:px-15 xl:py-10">
       <!-- Continue Watching -->
       <section v-if="continueAnime.length > 0" class="mb-8">
-        <BaseHeading> Continue Watching </BaseHeading>
+        <BaseHeading> Resume Your Dive </BaseHeading>
         <BaseText>
           The deep remembers where you stopped, continue your journey.
         </BaseText>
@@ -230,6 +230,16 @@
         <SkeletonCard v-if="!newEpisodes" />
         <AnimeCard class="mt-3" :anime="newEpisodes" />
       </section>
+
+      <!-- New Chinese Anime Episodes -->
+      <section class="mb-8">
+        <BaseHeading> Fresh from Eastern Deep </BaseHeading>
+        <BaseText> New donghuas have surfaced, watch them now. </BaseText>
+
+        <SkeletonCard v-if="!chineseNewEpisodes" />
+        <AnimeCard class="mt-3" :anime="chineseNewEpisodes" />
+      </section>
+
       <!-- Trending Anime -->
       <section class="mb-8">
         <BaseHeading> Making Waves </BaseHeading>
@@ -291,6 +301,7 @@ export default {
     newEpisodes: Array,
     popularAnime: Array,
     topRatedAnime: Array,
+    chineseNewEpisodes: Array,
     continueAnime: Array,
     featuredAnime: Array,
     watchHistoryIds: Array,

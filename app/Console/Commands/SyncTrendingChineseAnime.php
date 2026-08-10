@@ -43,7 +43,9 @@ class SyncTrendingChineseAnime extends Command
                         'popularity' => $anime['popularity'],
                         'studio' => $anime['studios']['nodes'][0]['name'] ?? null,
                         'genres' => $anime['genres'],
-                        'total_episode' => $anime['episodes'] ?? null
+                        'total_episode' => $anime['episodes'] ?? null,
+                        'next_episode' => $anime['nextAiringEpisode']['episode'] ?? null,
+                        'next_episode_airing_at' => $anime['nextAiringEpisode']['airingAt'] ?? null,
                     ]
                 );
             }

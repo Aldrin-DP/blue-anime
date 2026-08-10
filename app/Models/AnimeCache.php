@@ -23,7 +23,9 @@ class AnimeCache extends Model
         'status',
         'popularity',
         'country_of_origin',
-        'total_episode'
+        'total_episode',
+        'next_episode',
+        'next_episode_airing_at'
     ];
 
     public function watchlists(): HasMany

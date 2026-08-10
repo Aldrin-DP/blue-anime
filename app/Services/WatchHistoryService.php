@@ -42,15 +42,24 @@ class WatchHistoryService
         int $animeId,
         int $episode,
         int $totalEpisode,
-        float $watchedPercentage
+        float $watchedPercentage,
+        ?int $existingNextEpisode
+
     ){  
         if ($watchedPercentage >= 90 && $episode < $totalEpisode) {
+            if ((($episode+1) === $existingNextEpisode) && $existingNextEpisode !== null){ 
+                return;
+            }
             $nextEpisode = $episode + 1;
 
-            WatchHistory::firstOrCreate(
+            $history = WatchHistory::firstOrCreate(
                 ['user_id' => $user->id, 'anime_id' => $animeId, 'episode' => $nextEpisode],
-                ['current_time' => 0, 'duration' => 0, 'is_completed' => false]
+                ['current_time' => 0, 'duration' => 0, 'is_completed' => false, 'hidden_from_continue_watching' => false]
             );
+
+            $history->update([
+                'hidden_from_continue_watching' => false
+            ]);
         }
     }
 }

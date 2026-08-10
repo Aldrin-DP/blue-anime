@@ -121,6 +121,7 @@ class UserAnimeService
         $userWatchlists = $watchlists->map(fn($watchlist) => [
             'id' => $watchlist->id,
             'anilistId' => $watchlist->anime->api_id,
+            'airingStatus' => $watchlist->anime->status,
             'status' => $watchlist->status,
             'progress' => $watchlist->progress,
             'isFavorite' => $watchlist->is_favorite,

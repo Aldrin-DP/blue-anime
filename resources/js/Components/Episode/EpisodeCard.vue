@@ -146,8 +146,6 @@ export default {
     },
     watchEpisode(animeId, episode) {
       this.watchForm.get(`/anime/${animeId}/episodes/${episode}`, {
-        preserveScroll: true,
-        preserveState: true,
         onSuccess: () => {
           const message = this.$page.props.flash.episodeError;
 

@@ -23,6 +23,7 @@ class HomeController extends Controller
         $trendingAnime = $animeService->getTrendingAnime();
         $topRatedAnime = $animeService->getTopRatedAnime();
         $featuredAnime = $animeService->getProcessedFeaturedAnime();
+        $chineseNewEpisodes = $anilistService->getNewChineseEpisodes();
     
         $continueWatchingList = [];
         $watchHistoryIds = [];
@@ -37,6 +38,7 @@ class HomeController extends Controller
             'trendingAnime' => $trendingAnime,
             'popularAnime' => $popularAnime,
             'topRatedAnime' => $topRatedAnime,
+            'chineseNewEpisodes' => $chineseNewEpisodes,
             'continueAnime' => $continueWatchingList,
             'featuredAnime' => $featuredAnime,
             'watchHistoryIds' => $watchHistoryIds

@@ -1,5 +1,5 @@
 <template>
-  <Head title="Register - " />
+  <Head title="Login - " />
   <div class="flex flex-col items-center">
     <div class="w-full max-w-115 flex flex-col my-10 items-center">
       <BaseHeading> Dive Back In </BaseHeading>

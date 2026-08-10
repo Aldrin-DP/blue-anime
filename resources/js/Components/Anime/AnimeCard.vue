@@ -41,7 +41,7 @@
               {{ anime.title ? anime.title : anime.romaji_title }}
             </h3>
             <span v-if="anime.episodes" class="text-gray-300 font-semibold">
-              Episode {{ anime.episodes }}
+              {{ anime.episodes }} Episodes
             </span>
 
             <div class="flex items-center gap-2 mt-1">
@@ -87,6 +87,7 @@
 <script>
 import { useForm } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/20/solid";
+import { useToast } from "vue-toastification";
 
 export default {
   props: {
@@ -103,6 +104,9 @@ export default {
       currentActiveAnimeId: null,
     };
   },
+  created() {
+    this.toast = useToast();
+  },
   methods: {
     handleMouseEnter(animeId) {
       this.currentActiveAnimeId = animeId;
@@ -114,7 +118,16 @@ export default {
     },
     handleClick(anilistId, episode) {
       if (episode) {
-        this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`);
+        this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`, {
+          preserveScroll: true,
+          preserveState: true,
+          onSuccess: () => {
+            const message = this.$page.props.flash.episodeError;
+            if (message) {
+              this.toast.warning(message);
+            }
+          },
+        });
         return;
       }
       this.form.get(`/anime/${anilistId}`);

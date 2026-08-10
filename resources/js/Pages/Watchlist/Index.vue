@@ -132,6 +132,7 @@
                   {{ watchlist.title }}
                 </h3>
                 <div
+                  v-if="watchlist.airingStatus !== 'NOT_YET_RELEASED'"
                   :class="
                     watchlist.status === 'watching' ? 'hidden md:flex' : 'flex'
                   "
@@ -210,6 +211,16 @@
                   </span>
                 </div>
                 <div
+                  v-if="watchlist.airingStatus === 'NOT_YET_RELEASED'"
+                  class="flex items-center gap-1 mb-1"
+                >
+                  <div class="w-3.5 h-3.5 bg-yellow-400 rounded-full"></div>
+                  <span
+                    class="uppercase font-semibold text-xs tracking-wider text-gray-700 dark:text-gray-400"
+                    >Coming Soon</span
+                  >
+                </div>
+                <div
                   v-if="watchlist.status === 'completed'"
                   class="hidden lg:block text-sm lg:text-base text-gray-800 dark:text-gray-300"
                 >
@@ -256,7 +267,10 @@
                   Start Watching
                 </button>
                 <button
-                  v-if="watchlist.status === 'plan_to_watch'"
+                  v-if="
+                    watchlist.status === 'plan_to_watch' &&
+                    watchlist.airingStatus !== 'NOT_YET_RELEASED'
+                  "
                   class="text-xs md:text-sm rounded-full cursor-pointer font-medium tracking-wide border px-2 py-1 lg:px-2 lg:py-1 text-gray-700 dark:text-gray-400 border-gray-400 dark:border-gray-700"
                   @click="watchEpisode(watchlist.anilistId, 1)"
                 >
@@ -265,7 +279,9 @@
                 <button
                   v-if="
                     watchlist.status === 'dropped' ||
-                    watchlist.status === 'completed'
+                    watchlist.status === 'completed' ||
+                    (watchlist.status === 'plan_to_watch' &&
+                      watchlist.airingStatus === 'NOT_YET_RELEASED')
                   "
                   class="text-xs md:text-sm rounded-full cursor-pointer font-medium tracking-wide border px-2 py-1 lg:px-2 lg:py-1 text-gray-700 dark:text-gray-400 border-gray-400 dark:border-gray-700"
                   @click="goToAnime(watchlist.anilistId)"
@@ -643,6 +659,8 @@ export default {
       });
     },
     toggleFavorite(anilistId) {
+      const anime = this.isFavorited(anilistId);
+      console.log(anime);
       this.favoriteForm.patch(`/watchlists/${anilistId}/favorite`, {
         preserveState: true,
         preserveScroll: true,
@@ -650,12 +668,17 @@ export default {
           this.$inertia.reload({
             only: ["watchlists"],
           });
-          if (this.isFavorited) {
-            this.toast.success("Added to favorites.");
-          } else {
+          if (anime.isFavorite) {
             this.toast.success("Removed from favorites.");
+          } else {
+            this.toast.success("Added to favorites.");
           }
         },
+      });
+    },
+    isFavorited(anilistId) {
+      return this.watchlists.find((anime) => {
+        return anime.anilistId === anilistId;
       });
     },
     countAnimeStatus(status) {

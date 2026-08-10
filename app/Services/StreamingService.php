@@ -25,13 +25,18 @@ class StreamingService
             }
 
             $subtitleLink = collect($response['ssub']['subtitles'])
-                ->first(fn($link) => $link['default'] === true);
+                ->first(fn($link) => ($link['default'] ?? false) === true);
 
+            if (!$subtitleLink) {
+                $subtitleLink = collect($response['ssub']['subtitles'])
+                    ->first();
+            }
 
-            $subtitle = 
-                'https://anidb-proxy.seaanime.workers.dev/?url='
-                . urlencode($subtitleLink['file'])   
-                . '&ref=' . urlencode('https://megaplay.buzz/');
+            $subtitle = $subtitleLink 
+                ? 'https://anidb-proxy.seaanime.workers.dev/?url='
+                 . urlencode($subtitleLink['file'])   
+                 . '&ref=' . urlencode('https://megaplay.buzz/') 
+                : null;
                 
             return [
                 'episodeUrl' => $episodeLink['url'], 

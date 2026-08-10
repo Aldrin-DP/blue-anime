@@ -42,7 +42,10 @@ class AnimeService
                         ? $media['nextAiringEpisode']['episode'] - 1
                         : null),
                 'season' => $media['season'] ?? null,
-                'genres' => $media['genres'],
+                'genres' => $media['genres'] ?? null,
+                'status' => $media['status'] ?? null,
+                'next_episode' => $media['nextAiringEpisode']['episode'] ?? null,
+                'next_episode_airing_at' => $media['nextAiringEpisode']['airingAt'] ?? null,
             ]
         );
     }
@@ -73,7 +76,7 @@ class AnimeService
     public function getPopularAnime() 
     {
         return Cache::remember('anime.popular', now()->addDays(2), function () {
-            return AnimeCache::orderBy('score', 'desc')
+            return AnimeCache::orderBy('popularity', 'desc')
                 ->limit(18)
                 ->get()
                 ->toArray();
@@ -122,16 +125,17 @@ class AnimeService
 
         $uniqueFeaturedAnime = [];
 
+        $animeIds = collect($featuredAnime)->pluck('id');
+
+        $histories = WatchHistory::where('user_id', $user->id)
+            ->whereIn('anime_id', $animeIds)
+            ->latest()
+            ->get()
+            ->unique('anime_id');
+
         foreach ($featuredAnime as $anime) {
-            $progress = WatchHistory::where('user_id', $user->id)
-                ->where('anime_id', $anime['id'])
-                ->latest()
-                ->first();
-
-            if (!$progress) {
-                $progress = null;
-            }
-
+            $progress = $histories->firstWhere('anime_id', $anime['id']);
+            
             $uniqueFeaturedAnime[] = [
                 'id' => $anime['id'],
                 'api_id' => $anime['api_id'],
