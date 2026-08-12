@@ -100,9 +100,11 @@ export default {
     },
     nextPage() {
       this.currentPage++;
+      this.goToPage(this.currentPage);
     },
     prevPage() {
       this.currentPage--;
+      this.goToPage(this.currentPage);
     },
     goToPage(page) {
       this.currentPage = page;

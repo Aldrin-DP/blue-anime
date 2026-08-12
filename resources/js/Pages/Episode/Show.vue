@@ -37,8 +37,10 @@
                 @click="togglePlayback"
                 @timeupdate="handleTimeUpdate"
                 @loadedmetadata="handleLoadedMetaData"
-                @canplay="handleCanPlay"
                 @progress="handleProgress"
+                @loadstart="isLoading = true"
+                @waiting="isLoading = true"
+                @playing="isLoading = false"
               >
                 <track
                   :src="episodeData.subtitleEn"
@@ -477,9 +479,6 @@ export default {
       if (video && video.currentTime >= video.duration * 0.9) {
         this.saveProgress();
       }
-    },
-    handleCanPlay() {
-      this.setIsLoadingToFalse();
     },
     handleKeyDown(event) {
       event.preventDefault();

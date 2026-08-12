@@ -65,7 +65,8 @@
                 :variant="
                   anime.status === 'NOT_YET_RELEASED' ? 'disabled' : 'primary'
                 "
-                class="flex justify-center w-full sm:w-auto"
+                loadingText="Loading..."
+                class="flex justify-center w-full md:w-52"
                 :disabled="anime.status === 'NOT_YET_RELEASED'"
                 @click="handleWatchAction"
               >

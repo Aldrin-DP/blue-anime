@@ -120,11 +120,14 @@ export default {
       if (episode) {
         this.watchForm.get(`/anime/${anilistId}/episodes/${episode}`, {
           preserveScroll: true,
-          preserveState: true,
           onSuccess: () => {
             const message = this.$page.props.flash.episodeError;
             if (message) {
               this.toast.warning(message);
+            } else {
+              this.$nextTick(() => {
+                window.scrollTo(0, 0);
+              });
             }
           },
         });

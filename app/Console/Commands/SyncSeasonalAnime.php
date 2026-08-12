@@ -30,6 +30,7 @@ class SyncSeasonalAnime extends Command
         $year = now()->year;
 
         while($hasNextPage) {
+            $this->info("Fetching page {$page}...");
             $response = $anilistService->getAnimeForSeason($season, $year, $page, $perPage);
 
             foreach ($response['data']['Page']['media'] as $anime) {
@@ -60,11 +61,13 @@ class SyncSeasonalAnime extends Command
                     ]
                 );
             }
-
+            $this->info("Page {$page} completed.");
             $page++;
             $hasNextPage = $response['data']['Page']['pageInfo']['hasNextPage'];
 
             sleep(2);
         }
+
+        $this->info("Sync completed.");
     }
 }

@@ -17,6 +17,8 @@ class StreamingService
 
             $response = $response->json();
 
+            // dd($response['ssub']['streams']);
+
             $episodeLink = collect($response['ssub']['streams'])
                 ->first(fn($link) => $link['default'] === true);
 

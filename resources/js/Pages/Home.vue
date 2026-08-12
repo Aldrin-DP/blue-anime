@@ -118,19 +118,6 @@
           </div>
         </div>
       </section>
-      <div v-else>
-        <div
-          class="h-10 w-75 bg-gray-300 dark:bg-gray-800 animate-pulse mb-2"
-        ></div>
-        <div class="h-5 w-120 bg-gray-300 dark:bg-gray-800 animate-pulse"></div>
-        <div class="mt-2 flex items-center gap-2 overflow-x-auto w-full pb-5">
-          <div v-for="item in 5" class="w-72 shrink-0">
-            <div
-              class="aspect-4/2 bg-gray-300 dark:bg-gray-800 animate-pulse"
-            ></div>
-          </div>
-        </div>
-      </div>
 
       <!-- Anime Banner Carousel -->
       <section class="mb-8">

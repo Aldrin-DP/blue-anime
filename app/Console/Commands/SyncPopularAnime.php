@@ -23,6 +23,7 @@ class SyncPopularAnime extends Command
         $hasNextPage = true;
 
         while($hasNextPage) {
+            $this->info("Fetching page {$page}...");
             $response = $anilistService->getPopularAnimePage($page, $perPage);
         
             foreach ($response['data']['Page']['media'] as $anime) {
@@ -53,11 +54,13 @@ class SyncPopularAnime extends Command
                     ]
                 );
             }
+            $this->info("Page {$page} completed.");
 
             $page++;
             $hasNextPage = $response['data']['Page']['pageInfo']['hasNextPage'];
 
-            sleep(2);
+            sleep(1);
         }
+        $this->info('Sync completed ');
     }
 }
