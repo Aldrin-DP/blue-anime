@@ -34,13 +34,14 @@
                 ref="video"
                 crossorigin="anonymous"
                 class="w-full h-full"
+                @loadstart="isLoading = true"
+                @waiting="isLoading = true"
+                @playing="isLoading = false"
                 @click="togglePlayback"
                 @timeupdate="handleTimeUpdate"
                 @loadedmetadata="handleLoadedMetaData"
                 @progress="handleProgress"
-                @loadstart="isLoading = true"
-                @waiting="isLoading = true"
-                @playing="isLoading = false"
+                @ended="handleVideoEnded"
               >
                 <track
                   :src="episodeData.subtitleEn"
@@ -82,6 +83,36 @@
                       class="material-symbols-outlined text-lg sm:text-2xl md:text-3xl! lg:text-5xl!"
                       >forward_10</span
                     >
+                  </button>
+                </div>
+              </div>
+              <div
+                v-if="isAutoNextEpisodeEnabled"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 backdrop-blur-lg bg-white/10 p-2 w-50 rounded"
+              >
+                <div class="text-gray-400 flex gap-2">
+                  <label for="">Next Episode:</label>
+                  <span class="text-gray-300 font-semibold">Episode 6</span>
+                </div>
+                <span class="text-gray-300">
+                  {{
+                    autoNextEpisodeCounter === 0
+                      ? `Loading...`
+                      : `Playing in  ${autoNextEpisodeCounter}...`
+                  }}
+                </span>
+                <div
+                  class="mt-3 flex justify-between items-center gap-3 text-gray-400"
+                >
+                  <button
+                    class="bg-gray-500 rounded px-1 py-0.5 text-gray-300 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    class="bg-blue-500 rounded px-1 py-0.5 text-gray-300 cursor-pointer"
+                  >
+                    Play Now
                   </button>
                 </div>
               </div>
@@ -172,7 +203,6 @@
                     </button>
                     <div class="">
                       {{ formatCurrentTime }}
-                      <!-- skip intro -->
                     </div>
                     <div class="hidden sm:flex items-center">
                       <button
@@ -192,6 +222,19 @@
                         >
                       </button>
                     </div>
+                    <div>
+                      <button
+                        :class="
+                          isAutoNextOn
+                            ? 'border-sea-700 text-sea-300 font-semibold'
+                            : ''
+                        "
+                        class="px-1 py-0.5 border border-gray-400 text-sm text-gray-300 rounded cursor-pointer"
+                        @click="toggleAutoNextEpisode"
+                      >
+                        Auto Next
+                      </button>
+                    </div>
                   </div>
                   <div class="flex gap-3">
                     <!-- subtitle -->
@@ -203,13 +246,13 @@
                       </button>
 
                       <input
-                        @input="updateVolume($event)"
+                        v-model="volume"
+                        class="hidden sm:w-16"
                         type="range"
                         min="0"
                         max="1"
                         step="0.01"
-                        class="w-16"
-                        v-model="volume"
+                        @input="updateVolume($event)"
                       />
                     </div>
 
@@ -300,6 +343,9 @@
                   >
                     {{ animeTitle }}
                   </p>
+                  <p class="text-gray-800 dark:text-gray-300">
+                    {{ animeStatus }}
+                  </p>
                   <div class="flex flex-wrap gap-1 mt-2 mb-2">
                     <span
                       v-for="(genre, index) in anime.genres"
@@ -310,7 +356,7 @@
                     </span>
                   </div>
 
-                  <div class="flex items-center gap-2 mt-4">
+                  <div class="flex items-center gap-2 mt-2">
                     <div class="flex items-center gap-1">
                       <StarIcon class="size-5 text-gray-800 dark:text-gray-300">
                       </StarIcon>
@@ -417,7 +463,7 @@ export default {
       bufferedPercent: 0,
       duration: 0,
       progress: 0,
-      volume: 0.5,
+      volume: 1,
       savedVolume: 0,
       isIntroVisible: false,
       controlsVisible: false,
@@ -430,12 +476,18 @@ export default {
       previewTime: 0,
       widthPercent: 0,
       now: Math.floor(Date.now() / 1000),
+      isAutoNextOn: localStorage.getItem("isAutoNextOn") === "true",
+      isAutoNextEpisodeEnabled: false,
+      autoNextEpisodeCounter: 5,
     };
   },
   mounted() {
     this.initPlayer();
     this.displayCurrentEpisode();
     this.initProgressAutoSave();
+
+    console.log(this.anime);
+    console.log(typeof localStorage.getItem("isAutoNextOn"));
 
     document.addEventListener("fullscreenchange", this.handleFullscreenChange);
 
@@ -449,6 +501,36 @@ export default {
     clearInterval(this.intervalId);
   },
   methods: {
+    handleVideoEnded() {
+      if (!this.isAutoNextOn) return;
+
+      this.isAutoNextEpisodeEnabled = true;
+
+      const autoNextInterval = setInterval(() => {
+        this.autoNextEpisodeCounter--;
+      }, 1000);
+
+      if (!this.anime.nextAiringEpisode?.episode) {
+        if (this.currentEpisode + 1 <= this.anime.episodes) {
+          setTimeout(() => {
+            clearInterval(autoNextInterval);
+            this.nextEpisode();
+          }, 5000);
+        } else {
+          this.isAutoNextEpisodeEnabled = false;
+          return;
+        }
+      } else {
+        if (this.currentEpisode + 1 < this.anime.nextAiringEpisode?.episode) {
+          setTimeout(() => {
+            clearInterval(autoNextInterval);
+            this.nextEpisode();
+          }, 5000);
+        } else {
+          this.isAutoNextEpisodeEnabled = false;
+        }
+      }
+    },
     handleFullscreenChange() {
       this.isFullscreen = !!document.fullscreenElement;
     },
@@ -500,7 +582,10 @@ export default {
         this.skipForward10();
       }
     },
-
+    toggleAutoNextEpisode() {
+      this.isAutoNextOn = !this.isAutoNextOn;
+      localStorage.setItem("isAutoNextOn", this.isAutoNextOn);
+    },
     async toggleFullscreen() {
       const videoWrapper = this.$refs.videoWrapper;
 
@@ -811,6 +896,12 @@ export default {
 
       return `${days}d ${hours}h ${mins}m ${secs}s`;
     },
+    animeStatus() {
+      let status = this.anime.status.toLowerCase();
+
+      if (status === "releasing") return "Ongoing";
+      if (status === "finished") return "Completed";
+    },
     animeTitle() {
       return this.anime.title.english
         ? this.anime.title.english
@@ -852,6 +943,10 @@ export default {
 
       if (this.duration < 3600) {
         return `${minute}:${second}`;
+      }
+
+      if (second < 10) {
+        second = "0" + second;
       }
 
       return `${hour}:${minute}:${second}`;
