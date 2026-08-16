@@ -30,7 +30,7 @@
             <button
               v-if="setCompleted(ep)?.isCompleted"
               :class="{
-                'text-sea-700! border-green-500! dark:text-green-500! dark:border-green-500!':
+                ' text-green-700! border-green-700! dark:text-green-700! dark:border-green-700!':
                   setCompleted(ep)?.isCompleted,
               }"
               class="cursor-pointer border-gray-300 dark:border-gray-700 text-[15px] rounded tracking-wide text-gray-800 dark:text-gray-400 hover:text-blue-400 hover:border-sea-300 transition-all duration-500"

@@ -1,8 +1,7 @@
 <template>
   <div>
     <h2
-      :class="size === 'large' ? 'text-2xl' : 'text-3xl'"
-      class="font-bold tracking-wider text-gray-700 dark:text-gray-300"
+      class="font-bold text-[22px] md:text-3xl tracking-wider text-gray-700 dark:text-gray-300"
     >
       <slot></slot>
     </h2>

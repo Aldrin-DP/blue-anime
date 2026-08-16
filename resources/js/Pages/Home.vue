@@ -267,8 +267,22 @@
       </section>
       <!-- Top Rated Anime -->
       <section class="mb-8">
-        <BaseHeading> Pearls of the Deep </BaseHeading>
-        <BaseText> The highest rated anime treasured by the deep. </BaseText>
+        <div
+          class="w-full flex flex-col items-start md:flex-row md:justify-between md:items-end"
+        >
+          <div>
+            <BaseHeading> Pearls of the Deep </BaseHeading>
+            <BaseText>
+              The highest rated anime treasured by the deep.
+            </BaseText>
+          </div>
+          <button
+            class="mt-1 text-sm md:text-base flex gap-1 items-center text-gray-600 dark:text-gray-400 font-semibold cursor-pointer hover:text-gray-800 hover:dark:text-gray-300"
+          >
+            Dive Deeper
+            <ArrowLongRightIcon class="size-5" />
+          </button>
+        </div>
 
         <SkeletonCard v-if="!topRatedAnime" />
         <AnimeCard class="mt-3" :anime="topRatedAnime" />
@@ -287,6 +301,7 @@ import {
   StarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ArrowLongRightIcon,
 } from "@heroicons/vue/20/solid";
 
 import { useForm } from "@inertiajs/vue3";
@@ -300,6 +315,7 @@ export default {
     StarIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
+    ArrowLongRightIcon,
   },
   props: {
     trendingAnime: Array,

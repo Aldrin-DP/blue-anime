@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-5"
+    class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 lg:gap-5"
   >
     <div
       v-for="(anime, index) in anime"
@@ -70,13 +70,13 @@
         </div>
       </div>
       <h3
-        class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-2 lg:line-clamp-1 mt-1"
+        class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-1 mt-1 text-sm md:text-base"
       >
         {{ anime.title ? anime.title : anime.romaji_title }}
       </h3>
       <p
         v-if="anime.episode"
-        class="text-gray-600 dark:text-gray-400 font-semibold text-[13px]"
+        class="text-gray-600 dark:text-gray-400 font-medium md:font-semibold text-[13px] md:text-sm"
       >
         Episode {{ anime.episode }}
       </p>

@@ -1,6 +1,6 @@
 <template>
   <Head title="Login - " />
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center px-3 md:px-0">
     <div class="w-full max-w-115 flex flex-col my-10 items-center">
       <BaseHeading> Dive Back In </BaseHeading>
       <BaseText> Dive back in and pick up where you left off. </BaseText>

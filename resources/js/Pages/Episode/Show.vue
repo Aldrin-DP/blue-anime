@@ -389,7 +389,7 @@
         <span v-if="currentEpisode">Episode {{ currentEpisode }}</span>
       </div>
 
-      <div ref="episodes">
+      <div ref="episodes" class="scroll-mt-20">
         <EpisodeSection
           :anime="anime"
           :episodesProgress="episodesProgress"
@@ -858,10 +858,13 @@ export default {
     setupSubtitlePosition() {
       const track = this.getVideoEl().textTracks[0];
       if (track && track.cues) {
+        const isMobile = window.innerWidth <= 768;
+
         for (let i = 0; i < track.cues.length; i++) {
           const cue = track.cues[i];
-          cue.line = -3;
+
           cue.snapToLines = true;
+          cue.line = isMobile ? 90 : 80;
         }
       }
     },

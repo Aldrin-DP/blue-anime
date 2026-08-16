@@ -1,6 +1,6 @@
 <template>
   <Head title="Register - " />
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center px-3 md:px-0">
     <div class="w-full max-w-115 flex my-10 flex-col items-center">
       <BaseHeading> Begin Your Dive </BaseHeading>
       <BaseText> Begin your dive and explore thousands of anime. </BaseText>

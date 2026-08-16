@@ -1,5 +1,5 @@
 <template>
-  <section class="backdrop-blur-md mt-3 p-3">
+  <section class="backdrop-blur-md mt-5">
     <BaseHeading> Episodes </BaseHeading>
     <BaseText> {{ episodes }} episodes available </BaseText>
 
