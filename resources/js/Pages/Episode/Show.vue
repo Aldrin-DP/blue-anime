@@ -247,7 +247,7 @@
 
                       <input
                         v-model="volume"
-                        class="hidden sm:w-16"
+                        class="hidden sm:w-16 sm:block"
                         type="range"
                         min="0"
                         max="1"
