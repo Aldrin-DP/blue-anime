@@ -175,7 +175,7 @@
         </div>
       </section>
 
-      <div v-if="anime.status !== 'NOT_YET_RELEASED'">
+      <div v-if="anime.status !== 'NOT_YET_RELEASED'" class="px-4 md:px-0">
         <EpisodeSection :anime="anime" :episodesProgress="episodesProgress" />
       </div>
 

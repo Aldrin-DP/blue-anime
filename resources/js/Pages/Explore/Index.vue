@@ -295,7 +295,6 @@
             v-for="(anime, index) in filteredAnime"
             :key="anime.id"
             class="mb-1 cursor-pointer"
-            @click="goToAnime(anime.api_id)"
           >
             <div
               class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative overflow-hidden"
@@ -362,7 +361,8 @@
               </div>
             </div>
             <h3
-              class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-2 lg:line-clamp-1 mt-1"
+              class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-1 mt-1 text-sm md:text-base cursor-pointer"
+              @click="goToAnime(anime.api_id)"
             >
               {{ anime.title ? anime.title : anime.title_romaji }}
             </h3>
@@ -533,12 +533,12 @@ export default {
     prevPage(page) {
       this.searchForm.page = page;
       this.currentPage--;
-      this.searchAnime();
+      this.goToPage(this.currentPage);
     },
     nextPage(page) {
       this.searchForm.page = page;
       this.currentPage++;
-      this.searchAnime();
+      this.goToPage(this.currentPage);
     },
     goToAnime(anilistId) {
       this.form.get(`/anime/${anilistId}`, {

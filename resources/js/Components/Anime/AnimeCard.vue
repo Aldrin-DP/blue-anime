@@ -6,7 +6,6 @@
       v-for="(anime, index) in anime"
       :key="anime.api_id"
       class="mb-1 cursor-pointer"
-      @click="handleClick(anime.api_id, anime.episode)"
     >
       <div
         class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative overflow-hidden"
@@ -71,6 +70,7 @@
       </div>
       <h3
         class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-1 mt-1 text-sm md:text-base"
+        @click="handleClick(anime.api_id, anime.episode)"
       >
         {{ anime.title ? anime.title : anime.romaji_title }}
       </h3>

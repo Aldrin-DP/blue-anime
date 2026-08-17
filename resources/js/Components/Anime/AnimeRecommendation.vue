@@ -1,20 +1,19 @@
 <template>
   <div>
-    <section class="backdrop-blur-md mt-3 p-3">
+    <section class="backdrop-blur-md my-3 px-4">
       <h2
-        class="font-bold text-lg tracking-wide text-gray-700 dark:text-gray-400 mb-3"
+        class="font-bold text-lg tracking-wide text-gray-700 dark:text-gray-300 mt-5 mb-3"
       >
         From the Same Depths
       </h2>
       <div
-        class="grid gap-3 lg:gap-5 grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+        class="grid gap-3 lg:gap-5 grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
       >
         <div class="cursor-pointer relative" v-for="anime in recommendations">
           <div
             class="border-2 border-gray-200 dark:border-gray-700 p-0.75 bg-gray-300 dark:bg-gray-400 rounded-lg aspect-2/3 relative"
             @mouseenter="handleMouseEnter(anime.id)"
             @mouseleave="handleMouseLeave(anime.id)"
-            @click="showAnime(anime.id)"
           >
             <span
               v-if="anime.format"
@@ -71,11 +70,12 @@
               </div>
             </div>
           </div>
-          <p
-            class="text-gray-700 dark:text-gray-300 font-semibold truncate mt-1"
+          <h3
+            class="text-gray-700 dark:text-gray-300 font-semibold line-clamp-1 mt-1 text-sm md:text-base"
+            @click="showAnime(anime.id)"
           >
             {{ anime.title.english ? anime.title.english : anime.title.romaji }}
-          </p>
+          </h3>
         </div>
       </div>
     </section>
