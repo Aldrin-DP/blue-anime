@@ -942,7 +942,7 @@ export default {
     formattedDuration() {
       const hour = Math.floor(this.duration / 3600);
       const minute = Math.floor((this.duration / 60) % 60);
-      const second = Math.floor(this.duration % 60);
+      let second = Math.floor(this.duration % 60);
 
       if (this.duration < 3600) {
         return `${minute}:${second}`;
